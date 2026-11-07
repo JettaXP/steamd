@@ -37,8 +37,18 @@ jobs:
             mkdir -p out && cp app/build/outputs/apk/debug/app-debug.apk out/steamd-debug.apk
             exit 0
           fi
-          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/steamd.p12"
-          STEAMD_KEYSTORE="$RUNNER_TEMP/steamd.p12" ./gradlew :app:assembleRelease --console=plain
+          KS="$RUNNER_TEMP/steamd.p12"
+          if ! printf '%s' "$KEYSTORE_BASE64" | tr -cd 'A-Za-z0-9+/=' | base64 -d > "$KS" 2>/dev/null; then
+            echo "::error::STEAMD_KEYSTORE_BASE64 is not valid base64: paste the whole content of STEAMD_KEYSTORE_BASE64.txt"
+            exit 1
+          fi
+          export STEAMD_KEYSTORE_PASSWORD="$(printf '%s' "$STEAMD_KEYSTORE_PASSWORD" | tr -d ' \r\n\t')"
+          if ! keytool -list -keystore "$KS" -storetype PKCS12 -storepass "$STEAMD_KEYSTORE_PASSWORD" -alias steamd > "$RUNNER_TEMP/ks.txt" 2>&1; then
+            echo "::error::Cannot open the keystore: check STEAMD_KEYSTORE_PASSWORD and STEAMD_KEYSTORE_BASE64"
+            exit 1
+          fi
+          grep -i "SHA-256" "$RUNNER_TEMP/ks.txt" || true
+          STEAMD_KEYSTORE="$KS" ./gradlew :app:assembleRelease --console=plain
           rm -f "$RUNNER_TEMP/steamd.p12"
           mkdir -p out && cp app/build/outputs/apk/release/app-release.apk "out/steamd-${{ github.run_number }}.apk"
       - name: Debug APK (pull requests)
