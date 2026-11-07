@@ -165,8 +165,7 @@
   border: 0 !important;
 }
 
-:root:is(.rn_mobile_app, .steamd-preview) :is(.see_more_link > a, .DiscountsAndEventsReady > div:last-child > a,
-  .home_page_content div:has(> a:only-child:not(:has(img))) > a:only-child:not(:has(img)):not([class*="capsule"])) {
+:root:is(.rn_mobile_app, .steamd-preview) :is(.see_more_link > a, .DiscountsAndEventsReady > div:last-child > a) {
   background: var(--sd-sec-c) !important;
   background-image: none !important;
   color: var(--sd-on-sec-c) !important;
@@ -455,4 +454,93 @@
 :root:is(.rn_mobile_app, .steamd-preview) :is(.nw-DtQ670Sc-, .TSCZ-XXe31E-, .discount_pct) {
   background: color-mix(in oklab, #a1cd44 55%, var(--sd-c-high)) !important;
   color: #10200a !important;
+}
+
+:root:is(.rn_mobile_app, .steamd-preview) :is(.page_content_ctn, .game_page_background, .game_area_description, #game_area_description,
+  .game_page_autocollapse_ctn, .rightcol, .leftcol, .block, .block_content, .game_meta_data) {
+  background: transparent !important;
+  background-image: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_purchase_game, .game_area_purchase_game_dropdown_subscription,
+  .game_area_purchase_game_wrapper .game_area_purchase_game, #dlc_purchase_action, .block.responsive_apppage_details_right,
+  .user_reviews, .glance_ctn_responsive_left, .franchise_capsule_ctn, .recommendation_area) {
+  background: var(--sd-c) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: var(--sd-r-l) !important;
+  box-shadow: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_purchase_game { padding: 16px 16px 20px !important; margin-bottom: 12px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_purchase_game h1, .game_area_purchase_game h2, .game_area_purchase_game .title) {
+  color: var(--sd-on) !important; font-weight: 500 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .game_purchase_action_bg {
+  background: var(--sd-c-highest) !important;
+  border-radius: 24px !important;
+  padding: 4px !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .game_purchase_action_bg > :is(.game_purchase_price, .discount_block) {
+  background: transparent !important;
+  padding: 0 12px !important;
+  color: var(--sd-on) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.btn_addtocart, .btn_addtocart > a, .btn_addtocart > span, .btn_green_steamui.btn_medium) {
+  border-radius: 20px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_purchase_platform, .platform_img) { filter: grayscale(1) brightness(1.4); opacity: .7; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.app_tag, .glance_tags .app_tag, .app_tag.add_button) {
+  background: var(--sd-sec-c) !important;
+  color: var(--sd-on-sec-c) !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  padding: 4px 12px !important;
+  box-shadow: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_details_specs_ctn, .game_area_details_specs) {
+  background: var(--sd-c) !important;
+  border-radius: var(--sd-seg, 6px) !important;
+  margin-bottom: 3px !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_details_specs_ctn:first-child { border-radius: var(--sd-r-l) var(--sd-r-l) 6px 6px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_details_specs_ctn:last-child { border-radius: 6px 6px var(--sd-r-l) var(--sd-r-l) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_details_specs_ctn .icon, .game_area_details_specs .icon) { background: transparent !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_details_specs_ctn .label, .game_area_details_specs .name) { color: var(--sd-on) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(h2, h3, .block_title, .game_area_details_specs_title, .franchise_capsule_title,
+  .recommendation_highlight_title, [class*="SectionTitle"], [class*="sectionTitle"]) {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.queue_ctn .btnv6_blue_hoverfade, .queue_actions_ctn .btnv6_blue_hoverfade, #add_to_wishlist_area a, .queue_btn_ignore_menu) {
+  background: var(--sd-sec-c) !important;
+  color: var(--sd-on-sec-c) !important;
+  border-radius: 20px !important;
+  border: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.highlight_selector, .slider_left, .slider_right, .slider_bg, .slider .handle) {
+  background: var(--sd-c-high) !important;
+  border-radius: 12px !important;
+  border: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.highlight_strip_item, .highlight_player_item img, .highlight_screenshot img, .game_header_image_full) {
+  border-radius: var(--sd-r-s) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .highlight_strip_item.focus { outline: 2px solid var(--sd-p); outline-offset: 1px; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_page_background, .page_content_ctn, .franchise_capsule_ctn, .recommendation_area) :is(div, h2, h3, h4, span, a) {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.btn_blue_steamui, .btnv6_blue_blue_innerfade, .btnv6_lightblue_blue, .btn_darkblue_white_innerfade) {
+  background: var(--sd-sec-c) !important;
+  background-image: none !important;
+  color: var(--sd-on-sec-c) !important;
+  border-radius: 20px !important;
+  border: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.btn_blue_steamui, .btnv6_blue_blue_innerfade, .btnv6_lightblue_blue, .btn_darkblue_white_innerfade) > span {
+  background: transparent !important;
+  color: inherit !important;
 }
