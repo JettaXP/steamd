@@ -237,3 +237,120 @@
 :root:is(.rn_mobile_app, .steamd-preview) body.events_hub :is(h1, h2, h3, h4, [class*="Title"], [class*="Header"]) {
   font-weight: 500 !important;
 }
+
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page {
+  --sd-glass: color-mix(in oklab, var(--sd-c) 80%, transparent);
+  --sd-glass-high: color-mix(in oklab, var(--sd-c-high) 86%, transparent);
+  --sd-seg: 6px;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.profile_count_link_preview_ctn, .profile_count_link,
+  .profile_header_badgeinfo, .profile_in_game, .profile_customization, .profile_comment_area) {
+  background: var(--sd-glass) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 0 !important;
+  box-shadow: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.profile_count_link_preview_ctn, .profile_count_link) {
+  border-radius: var(--sd-seg) !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_awards .profile_count_link_preview_ctn {
+  border-top-left-radius: var(--sd-r-l) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_badges .profile_count_link_preview_ctn {
+  border-top-right-radius: var(--sd-r-l) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_item_links .profile_count_link:nth-last-child(3) {
+  border-bottom-left-radius: var(--sd-r-l) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_item_links .profile_count_link:nth-last-child(2) {
+  border-bottom-right-radius: var(--sd-r-l) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.profile_header_badgeinfo, .profile_in_game,
+  .profile_customization, .profile_comment_area) {
+  border-radius: var(--sd-r-l) !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_header_badgeinfo { margin: 8px 4px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_in_game { margin: 0 4px 8px !important; padding: 12px 16px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.profile_customization, .profile_comment_area) { margin-bottom: 12px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.profile_customization_header, .commentthread_header,
+  .profile_recentgame_header, .count_link_label, .profile_in_game_header) {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-weight: 500 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.profile_customization_header, .profile_recentgame_header) {
+  background: transparent !important;
+  color: var(--sd-on) !important;
+  padding: 16px 16px 8px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.recent_game, .showcase_content_bg, .showcase_stats_row) {
+  background: var(--sd-glass-high) !important;
+  border-radius: var(--sd-r-m) !important;
+  overflow: hidden;
+  margin: 4px 8px 8px !important;
+  border: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.game_info_cap img, .game_capsule, .showcase_slot img) {
+  border-radius: var(--sd-r-s) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.achievement_progress_bar_ctn, .achievement_progress_bar_ctn > div) {
+  border-radius: 999px !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .achievement_progress_bar_ctn { background: var(--sd-outline) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .achievement_progress_bar_ctn > div { background: var(--sd-p) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .commentthread_comments { padding: 0 8px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .commentthread_comment {
+  background: var(--sd-glass-high) !important;
+  border-radius: var(--sd-seg) !important;
+  margin: 0 0 3px !important;
+  padding: 12px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .commentthread_comment:first-child {
+  border-top-left-radius: var(--sd-r-l) !important;
+  border-top-right-radius: var(--sd-r-l) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .commentthread_comment:last-child {
+  border-bottom-left-radius: var(--sd-r-l) !important;
+  border-bottom-right-radius: var(--sd-r-l) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.commentthread_comment_avatar img, .playerAvatar:not(.profile_header_size) img) {
+  border-radius: 50% !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .btn_profile_action {
+  background: var(--sd-sec-c) !important;
+  color: var(--sd-on-sec-c) !important;
+  border-radius: 20px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .btn_profile_action > span {
+  background: transparent !important;
+  color: inherit !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.commentthread_pagelink, .pagebtn) { border-radius: 12px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .responsive_status_info {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .responsive_status_info .profile_in_game {
+  margin: 0 4px 8px !important;
+  width: auto !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.game_info_achievements_summary_area, .game_info_stats,
+  .profile_badges_badge, .showcase_stat) {
+  background: transparent !important;
+  border: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .game_info_stats {
+  background: color-mix(in oklab, var(--sd-c-highest) 70%, transparent) !important;
+  border-radius: var(--sd-r-s) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_recentgame_header {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
