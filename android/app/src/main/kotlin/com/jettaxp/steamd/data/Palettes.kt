@@ -69,7 +69,7 @@ object Palettes {
         if (source == ColorSource.Default) return SteamThemePatch.Options(storeTheme = storeTheme)
         val s = scheme(context, source, dark = true)
         val roles = mapOf(
-            Role.Primary to s.primary, Role.Surface to s.surface,
+            Role.Primary to s.primary, Role.Secondary to s.secondary, Role.Surface to s.surface,
             Role.SurfaceContainerLow to s.surfaceContainerLow, Role.SurfaceContainer to s.surfaceContainer,
             Role.SurfaceContainerHigh to s.surfaceContainerHigh, Role.SecondaryContainer to s.secondaryContainer,
             Role.OnSurface to s.onSurface, Role.OnSurfaceVariant to s.onSurfaceVariant,

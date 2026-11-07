@@ -22,7 +22,7 @@ class PatcherTest {
         val expected = System.getenv("STEAMD_EXPECTED")?.let(::File)?.takeIf { it.exists() }
         assumeTrue("STEAMD_EXPECTED not set", expected != null)
         val r = SteamThemePatch.apply(bundleFile!!.readBytes(), SteamThemePatch.Options())
-        assertEquals(11, r.colorsReplaced)
+        assertEquals(12, r.colorsReplaced)
         assertTrue(r.storeTheme)
         assertArrayEquals(expected!!.readBytes(), r.bundle)
     }
@@ -34,7 +34,7 @@ class PatcherTest {
         val hb = HermesBundle(r.bundle)
         assertEquals(96, hb.version)
         assertEquals(emptyList<Int>(), hb.findExact("#1A9FFF"))
-        assertEquals(3, hb.findExact("#8AB4F8").size)
+        assertEquals(2, hb.findExact("#8AB4F8").size)
     }
 
     @Test
@@ -61,7 +61,7 @@ class PatcherTest {
         }
         val unsigned = File(dir, "unsigned.apk")
         val report = ApkPatcher.patch(base, unsigned, SteamThemePatch.Options())
-        assertEquals(11, report.colorsReplaced)
+        assertEquals(12, report.colorsReplaced)
         val key = SigningKey.loadOrCreate(File(dir, "key.p12"), "pw".toCharArray())
         val signed = File(dir, "signed.apk")
         ApkSigning.sign(unsigned, signed, key, minSdk = 26)
@@ -102,7 +102,7 @@ class PatcherTest {
             }
         }
         val unsigned = File(dir, "unsigned.apk")
-        assertEquals(11, ApkPatcher.patch(base, unsigned, SteamThemePatch.Options()).colorsReplaced)
+        assertEquals(12, ApkPatcher.patch(base, unsigned, SteamThemePatch.Options()).colorsReplaced)
         val signed = File(dir, "signed.apk")
         ApkSigning.sign(unsigned, signed, SigningKey.generate())
         val v = ApkVerifier.Builder(signed).build().verify()

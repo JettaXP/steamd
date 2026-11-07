@@ -35,12 +35,13 @@ PALETTE = {
     "#2A2C34": "#26272B",  # background.primary (main surface, menu rows)
     "#3C3F49": "#3E4759",  # background.neutral (chips, tonal buttons)
     "#1A9FFF": "#8AB4F8",  # background.brand (accent)
-    "#1A97FF": "#8AB4F8",  # background.info
+    "#1A97FF": "#BEC6DC",  # background.info (Guard account selector: calm tone, dark text)
     "#DFE3E6": "#E3E2E6",  # foreground.standard (text)
     "#8B929A": "#C4C6D0",  # foreground.secondary (secondary text)
     "#3D4450": "#44474F",  # foreground.neutral
     "#30333A": "#2B2C31",  # divider "standard" block
     "#60636A": "#8E9099",  # divider "bright"
+    "#2F343E": "#2B2C31",  # main menu: expanded sub-items
 }
 
 # Which Material 3 role each original colour takes when --seed is used.
@@ -50,12 +51,13 @@ SEED_ROLES = {
     "#2A2C34": "surfaceContainer",
     "#3C3F49": "secondaryContainer",
     "#1A9FFF": "primary",
-    "#1A97FF": "primary",
+    "#1A97FF": "secondary",
     "#DFE3E6": "onSurface",
     "#8B929A": "onSurfaceVariant",
     "#3D4450": "outlineVariant",
     "#30333A": "surfaceContainerHigh",
     "#60636A": "outline",
+    "#2F343E": "surfaceContainerHigh",
 }
 
 # The script the app injects into its store/news WebViews (Steam 3.10.x).

@@ -10,15 +10,16 @@ object SteamThemePatch {
         "#2A2C34" to "#26272B",
         "#3C3F49" to "#3E4759",
         "#1A9FFF" to "#8AB4F8",
-        "#1A97FF" to "#8AB4F8",
+        "#1A97FF" to "#BEC6DC",
         "#DFE3E6" to "#E3E2E6",
         "#8B929A" to "#C4C6D0",
         "#3D4450" to "#44474F",
         "#30333A" to "#2B2C31",
         "#60636A" to "#8E9099",
+        "#2F343E" to "#2B2C31",
     )
 
-    enum class Role { Primary, Surface, SurfaceContainerLow, SurfaceContainer, SurfaceContainerHigh,
+    enum class Role { Primary, Secondary, Surface, SurfaceContainerLow, SurfaceContainer, SurfaceContainerHigh,
         SecondaryContainer, OnSurface, OnSurfaceVariant, Outline, OutlineVariant }
 
     val ROLES: Map<String, Role> = linkedMapOf(
@@ -27,12 +28,13 @@ object SteamThemePatch {
         "#2A2C34" to Role.SurfaceContainer,
         "#3C3F49" to Role.SecondaryContainer,
         "#1A9FFF" to Role.Primary,
-        "#1A97FF" to Role.Primary,
+        "#1A97FF" to Role.Secondary,
         "#DFE3E6" to Role.OnSurface,
         "#8B929A" to Role.OnSurfaceVariant,
         "#3D4450" to Role.OutlineVariant,
         "#30333A" to Role.SurfaceContainerHigh,
         "#60636A" to Role.Outline,
+        "#2F343E" to Role.SurfaceContainerHigh,
     )
 
     fun paletteFrom(roles: Map<Role, Int>): Map<String, String> =

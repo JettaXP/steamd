@@ -448,3 +448,11 @@
   border-radius: 8px !important;
   overflow: hidden;
 }
+:root:is(.rn_mobile_app, .steamd-preview) .TSCZ-XXe31E- {
+  border-radius: 8px !important;
+  padding: 2px 8px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.nw-DtQ670Sc-, .TSCZ-XXe31E-, .discount_pct) {
+  background: color-mix(in oklab, #a1cd44 55%, var(--sd-c-high)) !important;
+  color: #10200a !important;
+}
