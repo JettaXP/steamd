@@ -10,10 +10,11 @@ import com.jettaxp.steamd.data.Palettes
 import com.jettaxp.steamd.data.Settings
 import com.jettaxp.steamd.data.SteamApp
 import com.jettaxp.steamd.data.SteamInfo
-import com.jettaxp.steamd.install.Installer
+import com.jettaxp.steamd.patch.AutoRepatchWorker
+import com.jettaxp.steamd.patch.PatchEngine
+import com.jettaxp.steamd.patch.SteamStatus
+import com.jettaxp.steamd.patch.Step
 import com.jettaxp.steamd.patcher.ApkPatcher
-import com.jettaxp.steamd.patcher.ApkSigning
-import com.jettaxp.steamd.patcher.SigningKey
 import com.jettaxp.steamd.patcher.SteamThemePatch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,17 +23,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-
-enum class SteamStatus { NotInstalled, Official, Patched, Other }
 
 sealed interface Compat {
     data object Checking : Compat
     data class Supported(val hermesVersion: Int) : Compat
     data class Unsupported(val reason: String) : Compat
 }
-
-enum class Step { Copy, Patch, Sign, Uninstall, Install }
 
 sealed interface PatchFlow {
     data object Idle : PatchFlow
@@ -55,48 +51,46 @@ data class UiState(
     val appDynamicColor: Boolean = true,
     val language: AppLanguage = AppLanguage.System,
     val originalsBytes: Long = 0,
+    val autoRepatch: Boolean = true,
 )
 
 class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     private val settings = Settings(app)
-    private val keyFile = File(app.filesDir, "signing/steamd.p12")
-    private val originals = File(app.filesDir, "original")
-    private val work = File(app.cacheDir, "patch")
+    private val engine = PatchEngine(app)
 
     private val _state = MutableStateFlow(UiState(
         colorSource = settings.colorSource, storeTheme = settings.storeTheme, cssUrl = settings.cssUrl,
         appTheme = settings.appTheme, appDynamicColor = settings.appDynamicColor, language = Settings.language,
+        autoRepatch = settings.autoRepatch,
     ))
     val state: StateFlow<UiState> = _state.asStateFlow()
 
-    private var key: SigningKey? = null
-
-    init { refresh() }
+    init {
+        refresh()
+        AutoRepatchWorker.schedule(app)
+    }
 
     fun refresh() = viewModelScope.launch {
         val ctx = getApplication<Application>()
-        val k = withContext(Dispatchers.IO) { key ?: SigningKey.loadOrCreate(keyFile, PASSWORD).also { key = it } }
-        val ourCert = SteamApp.sha256(k.certificate.encoded)
-        val steam = withContext(Dispatchers.IO) { SteamApp.find(ctx) }
-        val status = when {
-            steam == null -> SteamStatus.NotInstalled
-            steam.certSha256 == ourCert -> SteamStatus.Patched
-            steam.certSha256 == storedOfficialCert() || storedOfficialCert() == null -> SteamStatus.Official
-            else -> SteamStatus.Other
+        val (steam, status, cert, saved) = withContext(Dispatchers.IO) {
+            val steam = SteamApp.find(ctx)
+            Quad(steam, engine.status(steam), engine.ourCert(), engine.originalsBytes())
         }
-        val saved = withContext(Dispatchers.IO) { originals.walkTopDown().filter { it.isFile }.sumOf { it.length() } }
         _state.update {
-            it.copy(steam = steam, status = status, compat = Compat.Checking, keyFingerprint = ourCert.take(16),
+            it.copy(steam = steam, status = status, compat = Compat.Checking, keyFingerprint = cert.take(16),
                 originalsBytes = saved, language = Settings.language)
         }
         if (steam != null) {
             val compat = withContext(Dispatchers.IO) { probe(steam, status) }
             _state.update { it.copy(compat = compat) }
         }
+        if (status == SteamStatus.Patched) AutoRepatchWorker.checkNow(ctx)
     }
 
+    private data class Quad(val steam: SteamInfo?, val status: SteamStatus, val cert: String, val saved: Long)
+
     private fun probe(steam: SteamInfo, status: SteamStatus): Compat = runCatching {
-        val base = if (status == SteamStatus.Patched) originalsFor(steam)?.first()
+        val base = if (status == SteamStatus.Patched) engine.originalsFor(steam)?.first()
             ?: return Compat.Unsupported("original APKs of this version are not saved")
             else steam.baseApk
         val r = SteamThemePatch.apply(ApkPatcher.readBundle(base), SteamThemePatch.Options())
@@ -107,6 +101,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     fun setColorSource(source: ColorSource) {
         settings.colorSource = source
         _state.update { it.copy(colorSource = source) }
+        AutoRepatchWorker.schedule(getApplication())
     }
 
     fun setStoreTheme(on: Boolean) {
@@ -120,6 +115,12 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         settings.cssUrl = u
         _state.update { it.copy(cssUrl = u) }
         return true
+    }
+
+    fun setAutoRepatch(on: Boolean) {
+        settings.autoRepatch = on
+        _state.update { it.copy(autoRepatch = on) }
+        AutoRepatchWorker.schedule(getApplication())
     }
 
     fun setAppTheme(theme: AppTheme) {
@@ -138,7 +139,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun clearOriginals() = viewModelScope.launch {
-        withContext(Dispatchers.IO) { originals.deleteRecursively() }
+        withContext(Dispatchers.IO) { engine.clearOriginals() }
         refresh()
     }
 
@@ -146,68 +147,14 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     fun dismissFlow() = _state.update { it.copy(flow = PatchFlow.Idle) }.also { refresh() }
 
     fun runPatch() = viewModelScope.launch {
-        val ctx = getApplication<Application>()
         val s = _state.value
         val steam = s.steam ?: return@launch
         val needsUninstall = s.status != SteamStatus.Patched
-        fun step(st: Step) = _state.update { it.copy(flow = PatchFlow.Running(st, needsUninstall)) }
         try {
-            step(Step.Copy)
-            val sources = withContext(Dispatchers.IO) { saveOriginals(steam) }
-            step(Step.Patch)
-            val options = Palettes.patchOptions(ctx, s.colorSource, s.storeTheme).copy(cssUrl = s.cssUrl)
-            val out = withContext(Dispatchers.IO) {
-                work.deleteRecursively(); work.mkdirs()
-                val unsigned = File(work, "base-unsigned.apk")
-                ApkPatcher.patch(sources.first(), unsigned, options)
-                unsigned
-            }
-            step(Step.Sign)
-            val signed = withContext(Dispatchers.IO) {
-                val k = key ?: SigningKey.loadOrCreate(keyFile, PASSWORD).also { key = it }
-                val list = mutableListOf<File>()
-                File(work, "base.apk").also { ApkSigning.sign(out, it, k); list += it }
-                out.delete()
-                sources.drop(1).forEach { split -> File(work, split.name).also { ApkSigning.sign(split, it, k); list += it } }
-                list
-            }
-            if (needsUninstall) {
-                step(Step.Uninstall)
-                val r = Installer.uninstall(ctx, SteamApp.PACKAGE)
-                if (!r.success) throw IllegalStateException(r.message ?: "uninstall cancelled")
-            }
-            step(Step.Install)
-            val r = Installer.install(ctx, signed)
-            if (!r.success) throw IllegalStateException(r.message ?: "install cancelled")
-            withContext(Dispatchers.IO) { work.deleteRecursively() }
+            engine.run(steam, silent = false) { st -> _state.update { it.copy(flow = PatchFlow.Running(st, needsUninstall)) } }
             _state.update { it.copy(flow = PatchFlow.Done) }
         } catch (e: Exception) {
             _state.update { it.copy(flow = PatchFlow.Failed(e.message ?: e.javaClass.simpleName)) }
         }
-    }
-
-    private fun saveOriginals(steam: SteamInfo): List<File> {
-        originalsFor(steam)?.let { return it }
-        if (_state.value.status == SteamStatus.Patched) throw IllegalStateException("original APKs are not saved")
-        originals.deleteRecursively()
-        val dir = File(originals, steam.versionCode.toString()).apply { mkdirs() }
-        val copies = steam.allApks.mapIndexed { i, apk ->
-            File(dir, if (i == 0) "base.apk" else apk.name).also { apk.copyTo(it, overwrite = true) }
-        }
-        steam.certSha256?.let { File(originals, "official.cert").writeText(it) }
-        return copies
-    }
-
-    private fun originalsFor(steam: SteamInfo): List<File>? {
-        val dir = File(originals, steam.versionCode.toString())
-        val base = File(dir, "base.apk")
-        if (!base.exists()) return null
-        return listOf(base) + (dir.listFiles().orEmpty().filter { it.name != "base.apk" }.sortedBy { it.name })
-    }
-
-    private fun storedOfficialCert(): String? = File(originals, "official.cert").takeIf { it.exists() }?.readText()
-
-    companion object {
-        private val PASSWORD = "steamd".toCharArray()
     }
 }

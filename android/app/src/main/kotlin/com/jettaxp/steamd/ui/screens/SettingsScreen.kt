@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -58,6 +59,7 @@ import com.jettaxp.steamd.R
 import com.jettaxp.steamd.UiState
 import com.jettaxp.steamd.data.AppLanguage
 import com.jettaxp.steamd.data.AppTheme
+import com.jettaxp.steamd.data.ColorSource
 import com.jettaxp.steamd.data.Palettes
 import com.jettaxp.steamd.patcher.SteamThemePatch
 
@@ -67,6 +69,7 @@ class SettingsActions(
     val onDynamicColor: (Boolean) -> Unit,
     val onStoreTheme: (Boolean) -> Unit,
     val onCssUrl: (String) -> Boolean,
+    val onAutoRepatch: (Boolean) -> Unit,
     val onClearOriginals: () -> Unit,
 )
 
@@ -97,6 +100,17 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
             SwitchItem(Icons.Filled.Storefront, stringResource(R.string.store_theme), stringResource(R.string.store_theme_desc),
                 checked = state.storeTheme, onChange = actions.onStoreTheme)
             Item(Icons.Filled.Link, stringResource(R.string.css_url), state.cssUrl, enabled = state.storeTheme) { dialog = Dialog.CssUrl }
+            SwitchItem(
+                Icons.Filled.Wallpaper, stringResource(R.string.auto_repatch),
+                stringResource(when {
+                    !Palettes.dynamicAvailable() -> R.string.dynamic_unavailable
+                    state.colorSource != ColorSource.Wallpaper -> R.string.auto_repatch_needs_wallpaper
+                    else -> R.string.auto_repatch_desc
+                }),
+                checked = state.autoRepatch && Palettes.dynamicAvailable() && state.colorSource == ColorSource.Wallpaper,
+                enabled = Palettes.dynamicAvailable() && state.colorSource == ColorSource.Wallpaper,
+                onChange = actions.onAutoRepatch,
+            )
 
             Section(R.string.section_storage)
             Item(Icons.Filled.DeleteOutline, stringResource(R.string.originals),

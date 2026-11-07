@@ -28,7 +28,7 @@ class ScreenshotTest {
     @get:Rule val compose = createComposeRule()
 
     private val steam = SteamInfo("3.10.11", 10928360, File("base.apk"), emptyList(), "x")
-    private val state = UiState(steam = steam, status = SteamStatus.Official, compat = Compat.Supported(96), keyFingerprint = "3f2a9c01b7e4d555")
+    private val state = UiState(steam = steam, status = com.jettaxp.steamd.patch.SteamStatus.Official, compat = Compat.Supported(96), keyFingerprint = "3f2a9c01b7e4d555")
 
     private fun shot(name: String, content: @androidx.compose.runtime.Composable () -> Unit) {
         compose.setContent { SteamdTheme { Scaffold { p -> androidx.compose.foundation.layout.Box(Modifier.padding(p)) { content() } } } }
@@ -36,7 +36,7 @@ class ScreenshotTest {
     }
 
     @Test fun home() = shot("home") { HomeScreen(state, {}, {}) }
-    private val noop = SettingsActions({}, {}, {}, {}, { true }, {})
+    private val noop = SettingsActions({}, {}, {}, {}, { true }, {}, {})
 
     @Test fun colorSeed() = shot("color-seed") { ColorScreen(state.copy(colorSource = ColorSource.Seed(0xFFB5651D.toInt())), {}) }
     @Test fun colorDefault() = shot("color-default") { ColorScreen(state, {}) }

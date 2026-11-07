@@ -40,6 +40,14 @@ class Settings(context: Context) {
         get() = runCatching { AppTheme.valueOf(prefs.getString("app_theme", null) ?: "System") }.getOrDefault(AppTheme.System)
         set(value) = prefs.edit().putString("app_theme", value.name).apply()
 
+    var autoRepatch: Boolean
+        get() = prefs.getBoolean("auto_repatch", true)
+        set(value) = prefs.edit().putBoolean("auto_repatch", value).apply()
+
+    var appliedFingerprint: String?
+        get() = prefs.getString("applied", null)
+        set(value) = prefs.edit().putString("applied", value).apply()
+
     var appDynamicColor: Boolean
         get() = prefs.getBoolean("app_dynamic", true)
         set(value) = prefs.edit().putBoolean("app_dynamic", value).apply()

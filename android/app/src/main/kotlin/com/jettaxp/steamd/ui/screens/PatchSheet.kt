@@ -35,7 +35,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.jettaxp.steamd.PatchFlow
 import com.jettaxp.steamd.R
-import com.jettaxp.steamd.Step
+import com.jettaxp.steamd.patch.Step
 import com.jettaxp.steamd.data.SteamApp
 
 @OptIn(ExperimentalMaterial3Api::class)

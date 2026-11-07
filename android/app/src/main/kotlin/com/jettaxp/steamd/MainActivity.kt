@@ -5,6 +5,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -61,18 +67,27 @@ class MainActivity : AppCompatActivity() {
                         }
                     },
                 ) { padding ->
-                    val m = Modifier.padding(padding)
-                    when (tab) {
-                        0 -> HomeScreen(state, onPatch = vm::startPatch, onRefresh = vm::refresh, modifier = m)
-                        1 -> ColorScreen(state, onSource = vm::setColorSource, modifier = m)
-                        else -> SettingsScreen(
-                            state,
-                            SettingsActions(
-                                onLanguage = vm::setLanguage, onTheme = vm::setAppTheme, onDynamicColor = vm::setAppDynamicColor,
-                                onStoreTheme = vm::setStoreTheme, onCssUrl = vm::setCssUrl, onClearOriginals = { vm.clearOriginals() },
-                            ),
-                            modifier = m,
-                        )
+                    AnimatedContent(
+                        targetState = tab,
+                        transitionSpec = {
+                            (fadeIn(tween(210, delayMillis = 90)) + scaleIn(tween(210, delayMillis = 90), initialScale = 0.92f))
+                                .togetherWith(fadeOut(tween(90)))
+                        },
+                        modifier = Modifier.padding(padding),
+                        label = "tabs",
+                    ) { current ->
+                        when (current) {
+                            0 -> HomeScreen(state, onPatch = vm::startPatch, onRefresh = vm::refresh)
+                            1 -> ColorScreen(state, onSource = vm::setColorSource)
+                            else -> SettingsScreen(
+                                state,
+                                SettingsActions(
+                                    onLanguage = vm::setLanguage, onTheme = vm::setAppTheme, onDynamicColor = vm::setAppDynamicColor,
+                                    onStoreTheme = vm::setStoreTheme, onCssUrl = vm::setCssUrl,
+                                    onAutoRepatch = vm::setAutoRepatch, onClearOriginals = { vm.clearOriginals() },
+                                ),
+                            )
+                        }
                     }
                 }
                 PatchSheet(state.flow, onConfirm = vm::runPatch, onDismiss = vm::dismissFlow)

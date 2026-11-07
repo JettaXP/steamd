@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
+import com.jettaxp.steamd.data.SteamApp
 import java.io.File
 
 data class InstallerResult(val action: String, val success: Boolean, val message: String?)
@@ -25,10 +26,16 @@ object Installer {
         return results.first { it.action == ACTION_UNINSTALL }
     }
 
-    suspend fun install(context: Context, apks: List<File>): InstallerResult {
+    suspend fun install(context: Context, apks: List<File>, silent: Boolean = false): InstallerResult {
         val pi = context.packageManager.packageInstaller
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
-        if (Build.VERSION.SDK_INT >= 31) params.setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_REQUIRED)
+        if (Build.VERSION.SDK_INT >= 31) {
+            params.setRequireUserAction(
+                if (silent) PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED
+                else PackageInstaller.SessionParams.USER_ACTION_REQUIRED,
+            )
+        }
+        params.setAppPackageName(SteamApp.PACKAGE)
         val id = pi.createSession(params)
         pi.openSession(id).use { session ->
             for (apk in apks) {

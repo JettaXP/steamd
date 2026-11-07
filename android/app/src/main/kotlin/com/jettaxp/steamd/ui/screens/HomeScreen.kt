@@ -37,7 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.jettaxp.steamd.Compat
 import com.jettaxp.steamd.R
-import com.jettaxp.steamd.SteamStatus
+import com.jettaxp.steamd.patch.SteamStatus
 import com.jettaxp.steamd.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)

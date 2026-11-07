@@ -2,10 +2,10 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
-    <path android:strokeColor="#3E4759" android:strokeWidth="5"
+    <path android:strokeColor="@color/ic_launcher_track" android:strokeWidth="5"
         android:pathData="M54,35a19,19 0,1 1,0 38a19,19 0,1 1,0 -38z" />
-    <path android:strokeColor="#AAC7FF" android:strokeWidth="5" android:strokeLineCap="round"
+    <path android:strokeColor="@color/ic_launcher_arc" android:strokeWidth="5" android:strokeLineCap="round"
         android:pathData="M54,35a19,19 0,1 1,-17.5 11.6" />
-    <path android:strokeColor="#D6E3FF" android:strokeWidth="3.6" android:strokeLineCap="round"
+    <path android:strokeColor="@color/ic_launcher_letter" android:strokeWidth="3.6" android:strokeLineCap="round"
         android:pathData="M48,61.5c1.4,1.6 3.5,2.5 6,2.5c3.4,0 5.6,-1.7 5.6,-4.3c0,-5.6 -11,-3.6 -11,-9.4c0,-2.6 2.3,-4.3 5.4,-4.3c2.2,0 4,0.8 5.2,2.2" />
 </vector>

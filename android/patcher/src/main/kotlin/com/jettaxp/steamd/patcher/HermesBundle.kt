@@ -15,6 +15,8 @@ class HermesBundle(original: ByteArray) {
     private val smallTableOffset: Int
     private val overflowTableOffset: Int
     private val storageOffset: Int
+    val objectValuesOffset: Int
+    val objectValuesSize: Int
 
     private val offsets: IntArray
     private val lengths: IntArray
@@ -50,6 +52,11 @@ class HermesBundle(original: ByteArray) {
         overflowTableOffset = align(smallTableOffset + stringCount * 4)
         storageOffset = align(overflowTableOffset + overflowCount * 8)
         if (storageOffset + storageSize > data.size) throw PatchException("Corrupt string table")
+        val arrays = align(storageOffset + storageSize)
+        val keys = align(arrays + buf.getInt(80))
+        objectValuesOffset = align(keys + buf.getInt(84))
+        objectValuesSize = buf.getInt(88)
+        if (objectValuesOffset + objectValuesSize > data.size) throw PatchException("Corrupt literal buffers")
 
         offsets = IntArray(stringCount)
         lengths = IntArray(stringCount)
@@ -134,6 +141,20 @@ class HermesBundle(original: ByteArray) {
     }
 
     fun storageOffsetOf(i: Int) = offsets[i]
+
+    fun findInObjectValues(signature: ByteArray): List<Int> {
+        val res = mutableListOf<Int>()
+        val end = objectValuesOffset + objectValuesSize - signature.size
+        var p = objectValuesOffset
+        outer@ while (p <= end) {
+            for (k in signature.indices) if (pristine[p + k] != signature[k]) { p++; continue@outer }
+            res += p
+            p++
+        }
+        return res
+    }
+
+    fun putInt(position: Int, value: Int) = buf.putInt(position, value)
 
     fun writeStorage(offset: Int, bytes: ByteArray) {
         System.arraycopy(bytes, 0, data, storageOffset + offset, bytes.size)

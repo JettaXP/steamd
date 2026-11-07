@@ -64,6 +64,14 @@ object SteamThemePatch {
         "<svg width=24 height=24 viewBox=\"0 0 24 24\"fill=none xmlns=http://www.w3.org/2000/svg><path class=copier",
     )
 
+    private val RADIUS_SIGNATURE = hexBytes(
+        "73000000001c0200008403000072040000000a0000007428000000200000001800000012000000"
+    )
+    private const val RADIUS_OFFSET = 13
+    val DEFAULT_RADIUS = 12 to 24
+
+    private fun hexBytes(h: String) = ByteArray(h.length / 2) { h.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
+
     private val HEX = Regex("#[0-9A-Fa-f]{6}")
     private val CSS_URL = Regex("https://[\\w.\\-/~%]+\\.css")
 
@@ -73,16 +81,29 @@ object SteamThemePatch {
         val cssUrl: String = DEFAULT_CSS_URL,
         val colors: Boolean = true,
         val storeTheme: Boolean = true,
+        val radius: Pair<Int, Int>? = DEFAULT_RADIUS,
     )
 
-    class Result(val bundle: ByteArray, val hermesVersion: Int, val colorsReplaced: Int, val storeTheme: Boolean, val log: List<String>)
+    class Result(val bundle: ByteArray, val hermesVersion: Int, val colorsReplaced: Int, val storeTheme: Boolean,
+                 val radius: Boolean, val log: List<String>)
 
     fun apply(bundle: ByteArray, options: Options): Result {
         val hb = HermesBundle(bundle)
         val log = mutableListOf<String>()
         val colors = if (options.colors) patchColors(hb, options.palette, log) else 0
         val store = if (options.storeTheme) patchWebView(hb, options.primary, options.cssUrl, log) else false
-        return Result(hb.finish(), hb.version, colors, store, log)
+        val radius = options.radius?.let { patchRadius(hb, it, log) } ?: false
+        return Result(hb.finish(), hb.version, colors, store, radius, log)
+    }
+
+    private fun patchRadius(hb: HermesBundle, radius: Pair<Int, Int>, log: MutableList<String>): Boolean {
+        val hits = hb.findInObjectValues(RADIUS_SIGNATURE)
+        if (hits.size != 1) { log += "skip corner radius: base theme not found in this version"; return false }
+        val p = hits[0] + RADIUS_OFFSET
+        hb.putInt(p + 1, radius.first)
+        hb.putInt(p + 5, radius.second)
+        log += "corner radius: ${radius.first}, ${radius.second}"
+        return true
     }
 
     private fun patchColors(hb: HermesBundle, palette: Map<String, String>, log: MutableList<String>): Int {

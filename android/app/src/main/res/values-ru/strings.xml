@@ -82,4 +82,7 @@
     <string name="delete">Удалить</string>
     <string name="save">Сохранить</string>
     <string name="reset">Сбросить</string>
+    <string name="auto_repatch">Следовать за обоями</string>
+    <string name="auto_repatch_desc">Когда меняются цвета обоев, steamd обновляет пропатченный Steam в фоне (Steam перезапустится)</string>
+    <string name="auto_repatch_needs_wallpaper">Выберите источник цвета «Обои»</string>
 </resources>

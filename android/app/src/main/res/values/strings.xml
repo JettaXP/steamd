@@ -83,4 +83,7 @@
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="reset">Reset</string>
+    <string name="auto_repatch">Follow wallpaper changes</string>
+    <string name="auto_repatch_desc">When the wallpaper colours change, steamd updates the patched Steam in the background (Steam restarts)</string>
+    <string name="auto_repatch_needs_wallpaper">Choose “Wallpaper” as the colour source</string>
 </resources>

@@ -78,6 +78,13 @@ WEBVIEW_JS = (
     '})();'
 )
 
+# Base theme literals around border.radius {standard: 4, large: 10} in the object value buffer:
+# breakpoint {0, 540, 900}, radius {4, 10}, heading levels {40, 32, 24, 18}. Unique in Steam 3.10.x.
+RADIUS_SIGNATURE = bytes.fromhex(
+    "73 00000000 1c020000 84030000 72 04000000 0a000000 74 28000000 20000000 18000000 12000000".replace(" ", ""))
+RADIUS_OFFSET = 13  # start of the radius literal inside the signature
+DEFAULT_RADIUS = (12, 24)
+
 # Developer-only strings whose storage is reused for the new values
 # (Hermes packs strings with overlap, so values cannot be changed in place).
 COLOR_DONORS = (
@@ -247,8 +254,25 @@ def patch_webview(pt, seed_primary, css_url):
     return True
 
 
+def patch_radius(pt, radius):
+    """Rounder corners for the native UI: rewrites the base theme's border.radius integers in place."""
+    h = pt.rd.r.header
+    align = lambda x: (x + 3) & ~3
+    values = align(align(align(pt.rd.storage_start + h.stringStorageSize) + h.arrayBufferSize) + h.objKeyBufferSize)
+    buf = bytes(pt.out[values:values + h.objValueBufferSize])
+    if buf.count(RADIUS_SIGNATURE) != 1:
+        print("  [skip] corner radius: base theme not found in this version")
+        return False
+    p = values + buf.find(RADIUS_SIGNATURE) + RADIUS_OFFSET
+    standard, large = radius
+    pt.out[p + 1:p + 5] = int(standard).to_bytes(4, "little", signed=True)
+    pt.out[p + 5:p + 9] = int(large).to_bytes(4, "little", signed=True)
+    print(f"  corner radius: standard 4 -> {standard}, large 10 -> {large}")
+    return True
+
+
 def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_url=DEFAULT_CSS,
-                 colors=True, store=True):
+                 colors=True, store=True, radius=DEFAULT_RADIUS):
     if data[:8] != bytes.fromhex("c61fbc03c103191f"):
         sys.exit("Not a Hermes bundle")
     ver = int.from_bytes(data[8:12], "little")
@@ -257,7 +281,8 @@ def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_u
     pt = _Patch(data)
     n = patch_colors(pt, palette) if colors else 0
     s = patch_webview(pt, seed_primary, css_url) if store else False
-    print(f"Hermes v{ver}: colours replaced: {n}; store theme: {'yes' if s else 'no'}")
+    rr = patch_radius(pt, radius) if radius else False
+    print(f"Hermes v{ver}: colours replaced: {n}; store theme: {'yes' if s else 'no'}; radius: {'yes' if rr else 'no'}")
     return pt.finish()
 
 
@@ -298,6 +323,8 @@ def main():
     ap.add_argument("--seed", help='seed colour for a Material You palette, e.g. "#6750A4"')
     ap.add_argument("--fonts", help="folder with replacement static .ttf files")
     ap.add_argument("--css-url", default=DEFAULT_CSS, help="stylesheet for the store and news")
+    ap.add_argument("--radius", default="%d,%d" % DEFAULT_RADIUS,
+                    help='corner radius "standard,large" in dp (Steam: 4,10), or "off"')
     ap.add_argument("--no-colors", action="store_true", help="keep the native theme colours")
     ap.add_argument("--no-store-theme", action="store_true", help="do not load CSS in the store and news")
     ap.add_argument("--check", action="store_true", help="patch a bare bundle (dry run unless dst is given)")
@@ -309,8 +336,16 @@ def main():
             ap.error("--seed must look like #RRGGBB")
         palette, primary = palette_from_seed(a.seed)
         print(f"Seed {a.seed}: primary {primary}")
+    if a.radius == "off":
+        radius = None
+    else:
+        try:
+            radius = tuple(int(x) for x in a.radius.split(","))
+            assert len(radius) == 2 and all(0 <= x <= 100 for x in radius)
+        except (ValueError, AssertionError):
+            ap.error('--radius must look like "12,24" or "off"')
     kw = dict(palette=palette, seed_primary=primary, css_url=a.css_url,
-              colors=not a.no_colors, store=not a.no_store_theme)
+              colors=not a.no_colors, store=not a.no_store_theme, radius=radius)
 
     if a.check:
         out = patch_bundle(open(a.src, "rb").read(), **kw)
