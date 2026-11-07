@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity() {
                                     onLanguage = vm::setLanguage, onTheme = vm::setAppTheme, onDynamicColor = vm::setAppDynamicColor,
                                     onStoreTheme = vm::setStoreTheme, onCssUrl = vm::setCssUrl,
                                     onAutoRepatch = vm::setAutoRepatch, onClearOriginals = { vm.clearOriginals() },
+                                    onExportKey = { vm.exportKey(it) }, onImportKey = { vm.importKey(it) },
                                 ),
                             )
                         }

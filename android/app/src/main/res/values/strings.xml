@@ -86,4 +86,12 @@
     <string name="auto_repatch">Follow wallpaper changes</string>
     <string name="auto_repatch_desc">When the wallpaper colours change, steamd updates the patched Steam in the background (Steam restarts)</string>
     <string name="auto_repatch_needs_wallpaper">Choose “Wallpaper” as the colour source</string>
+    <string name="key_export">Back up the signing key</string>
+    <string name="key_export_desc">Save it somewhere safe: with it, a reinstalled steamd can update the patched Steam without uninstalling it</string>
+    <string name="key_import">Restore the signing key</string>
+    <string name="key_import_desc">From a backup made earlier</string>
+    <string name="key_import_warning">The current key will be replaced. Restore only the key the installed patched Steam was signed with, otherwise steamd will have to uninstall Steam on the next patch.</string>
+    <string name="key_exported">Key saved</string>
+    <string name="key_imported">Key restored</string>
+    <string name="key_error">Could not read or write the key file</string>
 </resources>

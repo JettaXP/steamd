@@ -85,4 +85,12 @@
     <string name="auto_repatch">Следовать за обоями</string>
     <string name="auto_repatch_desc">Когда меняются цвета обоев, steamd обновляет пропатченный Steam в фоне (Steam перезапустится)</string>
     <string name="auto_repatch_needs_wallpaper">Выберите источник цвета «Обои»</string>
+    <string name="key_export">Сохранить копию ключа</string>
+    <string name="key_export_desc">Храните её в надёжном месте: с ней переустановленный steamd сможет обновлять пропатченный Steam без удаления</string>
+    <string name="key_import">Восстановить ключ</string>
+    <string name="key_import_desc">Из сохранённой ранее копии</string>
+    <string name="key_import_warning">Текущий ключ будет заменён. Восстанавливайте только тот ключ, которым подписан установленный пропатченный Steam, иначе при следующем патче steamd придётся удалить Steam.</string>
+    <string name="key_exported">Ключ сохранён</string>
+    <string name="key_imported">Ключ восстановлен</string>
+    <string name="key_error">Не удалось прочитать или записать файл ключа</string>
 </resources>

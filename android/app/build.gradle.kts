@@ -13,12 +13,26 @@ android {
         applicationId = "com.jettaxp.steamd"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = (System.getenv("STEAMD_VERSION_CODE") ?: "1").toInt()
+        versionName = "0.2.0"
+    }
+
+    val keystore = System.getenv("STEAMD_KEYSTORE")?.let(::file)?.takeIf { it.exists() }
+    signingConfigs {
+        if (keystore != null) {
+            create("release") {
+                storeFile = keystore
+                storeType = "PKCS12"
+                storePassword = System.getenv("STEAMD_KEYSTORE_PASSWORD")
+                keyAlias = "steamd"
+                keyPassword = System.getenv("STEAMD_KEYSTORE_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
+            if (keystore != null) signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }

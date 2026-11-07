@@ -3,6 +3,8 @@ package com.jettaxp.steamd.ui.screens
 import android.content.Intent
 import android.net.Uri
 import android.text.format.Formatter
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +31,8 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,15 +75,23 @@ class SettingsActions(
     val onCssUrl: (String) -> Boolean,
     val onAutoRepatch: (Boolean) -> Unit,
     val onClearOriginals: () -> Unit,
+    val onExportKey: (android.net.Uri) -> Unit = {},
+    val onImportKey: (android.net.Uri) -> Unit = {},
 )
 
-private enum class Dialog { None, Language, Theme, CssUrl, ClearOriginals }
+private enum class Dialog { None, Language, Theme, CssUrl, ClearOriginals, ImportKey }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     var dialog by remember { mutableStateOf(Dialog.None) }
+    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/x-pkcs12")) { uri ->
+        if (uri != null) actions.onExportKey(uri)
+    }
+    val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) actions.onImportKey(uri)
+    }
     fun open(url: String) = context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
 
     Column(modifier.fillMaxSize()) {
@@ -118,6 +130,12 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
                 else stringResource(R.string.originals_empty),
                 enabled = state.originalsBytes > 0) { dialog = Dialog.ClearOriginals }
             Item(Icons.Filled.Key, stringResource(R.string.signing_key), state.keyFingerprint.ifEmpty { "…" }, onClick = null)
+            Item(Icons.Filled.Upload, stringResource(R.string.key_export), stringResource(R.string.key_export_desc)) {
+                exportLauncher.launch("steamd-key.p12")
+            }
+            Item(Icons.Filled.Download, stringResource(R.string.key_import), stringResource(R.string.key_import_desc)) {
+                dialog = Dialog.ImportKey
+            }
 
             Section(R.string.tab_about)
             Text(stringResource(R.string.about_text), style = MaterialTheme.typography.bodyMedium,
@@ -156,6 +174,16 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
             title = { Text(stringResource(R.string.originals_clear_title)) },
             text = { Text(stringResource(R.string.originals_clear_text)) },
             confirmButton = { TextButton(onClick = { dialog = Dialog.None; actions.onClearOriginals() }) { Text(stringResource(R.string.delete)) } },
+            dismissButton = { TextButton(onClick = { dialog = Dialog.None }) { Text(stringResource(R.string.cancel)) } },
+        )
+        Dialog.ImportKey -> AlertDialog(
+            onDismissRequest = { dialog = Dialog.None },
+            icon = { Icon(Icons.Filled.Download, null) },
+            title = { Text(stringResource(R.string.key_import)) },
+            text = { Text(stringResource(R.string.key_import_warning)) },
+            confirmButton = {
+                TextButton(onClick = { dialog = Dialog.None; importLauncher.launch(arrayOf("*/*")) }) { Text(stringResource(R.string.continue_)) }
+            },
             dismissButton = { TextButton(onClick = { dialog = Dialog.None }) { Text(stringResource(R.string.cancel)) } },
         )
         Dialog.None -> Unit

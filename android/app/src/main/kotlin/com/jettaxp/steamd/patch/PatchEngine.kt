@@ -33,6 +33,27 @@ class PatchEngine(private val context: Context) {
 
     fun ourCert(): String = SteamApp.sha256(key().certificate.encoded)
 
+    fun exportKey(out: java.io.OutputStream) {
+        key()
+        keyFile.inputStream().use { it.copyTo(out) }
+    }
+
+    fun importKey(bytes: ByteArray): String {
+        val tmp = File(app.cacheDir, "import.p12")
+        try {
+            tmp.writeBytes(bytes)
+            val imported = SigningKey.load(tmp, PASSWORD)
+            synchronized(KEY_LOCK) {
+                keyFile.parentFile?.mkdirs()
+                tmp.copyTo(keyFile, overwrite = true)
+                cachedKey = imported
+            }
+            return SteamApp.sha256(imported.certificate.encoded)
+        } finally {
+            tmp.delete()
+        }
+    }
+
     fun status(steam: SteamInfo?): SteamStatus {
         val official = storedOfficialCert()
         return when {

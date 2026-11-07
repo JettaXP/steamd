@@ -138,6 +138,30 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         Settings.language = language
     }
 
+    fun exportKey(uri: android.net.Uri) = viewModelScope.launch {
+        val ctx = getApplication<Application>()
+        val ok = withContext(Dispatchers.IO) {
+            runCatching { ctx.contentResolver.openOutputStream(uri)!!.use { engine.exportKey(it) } }.isSuccess
+        }
+        toast(if (ok) R.string.key_exported else R.string.key_error)
+    }
+
+    fun importKey(uri: android.net.Uri) = viewModelScope.launch {
+        val ctx = getApplication<Application>()
+        val ok = withContext(Dispatchers.IO) {
+            runCatching {
+                val bytes = ctx.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
+                require(bytes.size < 64 * 1024)
+                engine.importKey(bytes)
+            }.isSuccess
+        }
+        toast(if (ok) R.string.key_imported else R.string.key_error)
+        refresh()
+    }
+
+    private fun toast(res: Int) =
+        android.widget.Toast.makeText(getApplication(), res, android.widget.Toast.LENGTH_LONG).show()
+
     fun clearOriginals() = viewModelScope.launch {
         withContext(Dispatchers.IO) { engine.clearOriginals() }
         refresh()
