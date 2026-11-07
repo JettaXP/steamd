@@ -101,8 +101,8 @@
 }
 
 :root {
-  --md-ref-typeface-brand: 'Roboto Flex', system-ui, sans-serif;
-  --md-ref-typeface-plain: 'Roboto Flex', system-ui, sans-serif;
+  --md-ref-typeface-brand: 'Google Sans', system-ui, sans-serif;
+  --md-ref-typeface-plain: 'Google Sans', system-ui, sans-serif;
   --md-icon-font: 'Material Symbols Rounded';
 }
 

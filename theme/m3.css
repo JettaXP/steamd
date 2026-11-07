@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap");
 
 :root:is(.rn_mobile_app, .steamd-preview) {
   --sd-p: #aac7ff;
@@ -20,7 +20,7 @@
   --sd-r-s: 12px;
   --sd-r-m: 16px;
   --sd-r-l: 24px;
-  --sd-font: "Roboto Flex", "Motiva Sans", system-ui, sans-serif;
+  --sd-font: "Google Sans", "Motiva Sans", system-ui, sans-serif;
 
   color-scheme: dark;
   background: var(--sd-surface) !important;

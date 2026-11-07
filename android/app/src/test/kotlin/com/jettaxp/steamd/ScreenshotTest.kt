@@ -45,6 +45,12 @@ class ScreenshotTest {
     @Test @Config(qualifiers = "ru-w411dp-h891dp-night-xxhdpi")
     fun settingsRu() = shot("settings-ru") { SettingsScreen(state.copy(originalsBytes = 152_000_000), noop) }
 
+    @Test @Config(qualifiers = "ru-w411dp-h891dp-night-xxhdpi")
+    fun homeRu() = shot("home-ru") { HomeScreen(state, {}, {}) }
+
+    @Test @Config(qualifiers = "ru-w411dp-h891dp-night-xxhdpi")
+    fun colorSeedRu() = shot("color-seed-ru") { ColorScreen(state.copy(colorSource = ColorSource.Seed(0xFFB5651D.toInt())), {}) }
+
     @Test @Config(qualifiers = "ru-w411dp-h891dp-notnight-xxhdpi")
     fun homeRuLight() = shot("home-ru-light") { HomeScreen(state, {}, {}) }
 }
