@@ -2,6 +2,8 @@
 
 Тема в стиле Material 3 для Android-приложения Steam.
 
+Сайт проекта: **https://steamd.jettax.xyz**
+
 > Неофициальный проект, не связан с Valve. Скрипт меняет только вашу собственную копию приложения.
 > В репозитории нет файлов Steam. Не распространяйте пропатченные APK.
 
@@ -63,6 +65,7 @@ python patch/patch_steam.py --check index.android.bundle
 ## Благодарности
 - [kuska1/Material-Theme](https://github.com/kuska1/Material-Theme) (MIT), тема для Millennium, на которой основана тема магазина.
 - [hermes-dec](https://github.com/P1sec/hermes-dec), разбор байткода Hermes.
+- [Material Web](https://github.com/material-components/material-web) (Apache-2.0), компоненты сайта. Сборка лежит в `assets/material-web.js`, лицензии сохранены в конце файла.
 
 ## Лицензия
 MIT

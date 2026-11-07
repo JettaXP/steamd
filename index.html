@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ru" data-theme="system">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>steamd — Material 3 для Steam на Android</title>
+  <meta name="description" content="Неофициальный патч темы Material 3 для Android-приложения Steam: палитра, шрифты и тема магазина.">
+  <meta name="theme-color" content="#111318" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f9f9ff" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&family=Roboto+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block">
+  <link rel="stylesheet" href="assets/site.css">
+
+  <script>
+    // Restore theme and language before first paint
+    try {
+      var t = localStorage.getItem('steamd-theme'); if (t) document.documentElement.dataset.theme = t;
+      var l = localStorage.getItem('steamd-lang') || ((navigator.language || 'ru').slice(0, 2) === 'ru' ? 'ru' : 'en');
+      document.documentElement.lang = l;
+    } catch (e) {}
+  </script>
+  <script type="module" src="assets/site.js"></script>
+</head>
+<body>
+  <header class="top-bar">
+    <a class="brand" href="#top" aria-label="steamd">
+      <img src="assets/icon.svg" alt="" width="32" height="32">
+      <span>steamd</span>
+    </a>
+    <nav class="top-links" aria-label="Sections">
+      <md-text-button href="#features" data-i18n="nav.features">Возможности</md-text-button>
+      <md-text-button href="#install" data-i18n="nav.install">Установка</md-text-button>
+      <md-text-button href="#links" data-i18n="nav.links">Ссылки</md-text-button>
+    </nav>
+    <div class="top-actions">
+      <span class="anchor-wrap">
+        <md-icon-button id="lang-btn" data-i18n-label="a11y.lang" aria-label="Язык">
+          <md-icon>translate</md-icon>
+        </md-icon-button>
+        <md-menu id="lang-menu" anchor="lang-btn" positioning="popover">
+          <md-menu-item data-lang="ru"><div slot="headline">Русский</div></md-menu-item>
+          <md-menu-item data-lang="en"><div slot="headline">English</div></md-menu-item>
+        </md-menu>
+      </span>
+      <span class="anchor-wrap">
+        <md-icon-button id="theme-btn" data-i18n-label="a11y.theme" aria-label="Тема">
+          <md-icon id="theme-icon">brightness_auto</md-icon>
+        </md-icon-button>
+        <md-menu id="theme-menu" anchor="theme-btn" positioning="popover">
+          <md-menu-item data-theme-value="light"><md-icon slot="start">light_mode</md-icon><div slot="headline" data-i18n="theme.light">Светлая</div></md-menu-item>
+          <md-menu-item data-theme-value="dark"><md-icon slot="start">dark_mode</md-icon><div slot="headline" data-i18n="theme.dark">Тёмная</div></md-menu-item>
+          <md-menu-item data-theme-value="system"><md-icon slot="start">brightness_auto</md-icon><div slot="headline" data-i18n="theme.system">Как в системе</div></md-menu-item>
+        </md-menu>
+      </span>
+      <md-filled-tonal-icon-button href="https://github.com/JettaXP/steamd" target="_blank" aria-label="GitHub">
+        <svg class="gh" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      </md-filled-tonal-icon-button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-text">
+        <div class="chips">
+          <md-assist-chip data-i18n="chip.unofficial" label="Неофициальный проект"><md-icon slot="icon">info</md-icon></md-assist-chip>
+          <md-assist-chip label="MIT"><md-icon slot="icon">balance</md-icon></md-assist-chip>
+        </div>
+        <h1 class="md-typescale-display-medium" data-i18n="hero.title">Material 3 для Steam на Android</h1>
+        <p class="md-typescale-body-large lead" data-i18n="hero.lead">
+          steamd — патч, который перекрашивает официальное приложение Steam в спокойную палитру Material 3, меняет шрифт и подключает свою тему для магазина и новостей.
+        </p>
+        <div class="actions">
+          <md-filled-button href="#install">
+            <md-icon slot="icon">download</md-icon><span data-i18n="hero.install">Как установить</span>
+          </md-filled-button>
+          <md-outlined-button href="https://github.com/JettaXP/steamd" target="_blank">
+            <md-icon slot="icon">code</md-icon><span data-i18n="hero.source">Исходный код</span>
+          </md-outlined-button>
+        </div>
+      </div>
+
+      <!-- Illustration: a phone drawn with M3 surfaces (no third-party assets) -->
+      <div class="hero-art" aria-hidden="true">
+        <div class="phone">
+          <div class="phone-status"><span>09:50</span><span class="dots"></span></div>
+          <div class="phone-title">Guard</div>
+          <div class="phone-account">
+            <span class="avatar">J</span>
+            <span class="acc-text"><b>JettaX</b><small data-i18n="art.account">Этот аккаунт</small></span>
+            <md-icon>expand_more</md-icon>
+          </div>
+          <div class="ring">
+            <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="progress" cx="60" cy="60" r="52"/></svg>
+            <div class="code"><span id="demo-code">7KQ9T</span><small data-i18n="art.copy">Нажмите, чтобы скопировать</small></div>
+          </div>
+          <div class="phone-action"><md-icon>qr_code_scanner</md-icon><span data-i18n="art.scan">Сканировать QR-код</span></div>
+          <div class="phone-nav">
+            <span><md-icon>newspaper</md-icon><small data-i18n="art.news">Новости</small></span>
+            <span class="active"><i><md-icon>shield</md-icon></i><small>Guard</small></span>
+            <span><md-icon>sell</md-icon><small data-i18n="art.shop">Магазин</small></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="section">
+      <h2 class="md-typescale-headline-medium" data-i18n="features.title">Что меняет патч</h2>
+      <div class="grid">
+        <md-elevated-card class="feature">
+          <md-icon class="feature-icon">palette</md-icon>
+          <h3 class="md-typescale-title-large" data-i18n="f1.title">Палитра M3</h3>
+          <p class="md-typescale-body-medium" data-i18n="f1.text">Встроенная тема приложения получает тёмные поверхности и мягкий голубой акцент. Меняются меню, Steam Guard, навигация и шапки.</p>
+        </md-elevated-card>
+        <md-elevated-card class="feature">
+          <md-icon class="feature-icon">text_fields</md-icon>
+          <h3 class="md-typescale-title-large" data-i18n="f2.title">Свой шрифт</h3>
+          <p class="md-typescale-body-medium" data-i18n="f2.text">Motiva Sans заменяется любым шрифтом с нужными начертаниями, например Roboto. Насыщенность и курсив подбираются автоматически.</p>
+        </md-elevated-card>
+        <md-elevated-card class="feature">
+          <md-icon class="feature-icon">storefront</md-icon>
+          <h3 class="md-typescale-title-large"><span data-i18n="f3.title">Тема магазина</span> <md-assist-chip class="soon" data-i18n="f3.soon" label="скоро"></md-assist-chip></h3>
+          <p class="md-typescale-body-medium" data-i18n="f3.text">Магазин и новости открываются в WebView. В них подгружается CSS с этого сайта, поэтому тему можно обновлять без пересборки приложения.</p>
+        </md-elevated-card>
+      </div>
+
+      <h3 class="md-typescale-title-large sub" data-i18n="palette.title">Палитра</h3>
+      <p class="md-typescale-body-medium muted" data-i18n="palette.text">Слева исходный цвет темы приложения, справа цвет после патча.</p>
+      <div class="palette" id="palette"></div>
+    </section>
+
+    <!-- Warning -->
+    <section class="section">
+      <md-outlined-card class="warning">
+        <md-icon>warning</md-icon>
+        <div>
+          <h3 class="md-typescale-title-medium" data-i18n="warn.title">Перед установкой запишите код восстановления Steam Guard</h3>
+          <p class="md-typescale-body-medium" data-i18n="warn.text">Пропатченное приложение подписано другим ключом, поэтому официальное нужно удалить. Вместе с ним удаляются данные Steam Guard. Код восстановления (R-xxxxx) находится в Steam → Steam Guard.</p>
+        </div>
+      </md-outlined-card>
+    </section>
+
+    <!-- Install -->
+    <section id="install" class="section">
+      <h2 class="md-typescale-headline-medium" data-i18n="install.title">Установка</h2>
+      <p class="md-typescale-body-medium muted">
+        <span data-i18n="install.req">Понадобятся:</span>
+        Python 3.10+, Java 11+, adb, <a href="https://github.com/patrickfav/uber-apk-signer/releases" target="_blank">uber-apk-signer</a>
+        <span data-i18n="install.fonts">и статические TTF-шрифты (например,</span>
+        <a href="https://fonts.google.com/specimen/Roboto" target="_blank">Roboto</a>).
+      </p>
+      <md-list class="steps">
+        <md-list-item>
+          <span slot="start" class="step-num">1</span>
+          <div slot="headline" data-i18n="s1">Установить зависимости</div>
+          <pre slot="supporting-text"><code>pip install hermes-dec fonttools</code></pre>
+        </md-list-item>
+        <md-list-item>
+          <span slot="start" class="step-num">2</span>
+          <div slot="headline" data-i18n="s2">Скачать все APK приложения (base и split)</div>
+          <pre slot="supporting-text"><code>adb shell pm path com.valvesoftware.android.steam.community
+adb pull &lt;path&gt; apk/</code></pre>
+        </md-list-item>
+        <md-list-item>
+          <span slot="start" class="step-num">3</span>
+          <div slot="headline" data-i18n="s3">Пропатчить base.apk</div>
+          <pre slot="supporting-text"><code>python patch/patch_steam.py apk/base.apk out/base.apk --fonts fonts/</code></pre>
+        </md-list-item>
+        <md-list-item>
+          <span slot="start" class="step-num">4</span>
+          <div slot="headline" data-i18n="s4">Подписать все APK одним ключом</div>
+          <pre slot="supporting-text"><code>cp apk/split_*.apk out/
+java -jar uber-apk-signer.jar --apks out --allowResign -o signed</code></pre>
+        </md-list-item>
+        <md-list-item>
+          <span slot="start" class="step-num">5</span>
+          <div slot="headline" data-i18n="s5">Заменить официальное приложение</div>
+          <pre slot="supporting-text"><code>adb uninstall com.valvesoftware.android.steam.community
+adb install-multiple signed/*.apk</code></pre>
+        </md-list-item>
+      </md-list>
+      <p class="md-typescale-body-medium muted" data-i18n="install.after">После установки войдите в аккаунт и заново привяжите Steam Guard. Откатиться можно в любой момент: удалите пропатченное приложение и установите Steam из Google Play.</p>
+    </section>
+
+    <!-- Limits -->
+    <section class="section">
+      <h2 class="md-typescale-headline-medium" data-i18n="limits.title">Ограничения</h2>
+      <md-list class="plain">
+        <md-list-item><md-icon slot="start">check_circle</md-icon><div slot="headline" data-i18n="l1">Проверено на Steam 3.10.11 (Hermes v96)</div></md-list-item>
+        <md-list-item><md-icon slot="start">dashboard</md-icon><div slot="headline" data-i18n="l2">Меняются цвета и шрифты, расположение элементов остаётся прежним</div></md-list-item>
+        <md-list-item><md-icon slot="start">update</md-icon><div slot="headline" data-i18n="l3">После обновления Steam патч нужно применить заново</div></md-list-item>
+      </md-list>
+    </section>
+
+    <!-- Links -->
+    <section id="links" class="section">
+      <h2 class="md-typescale-headline-medium" data-i18n="links.title">Ссылки</h2>
+      <md-list class="links">
+        <md-list-item type="link" href="https://github.com/JettaXP/steamd" target="_blank">
+          <md-icon slot="start">code</md-icon>
+          <div slot="headline" data-i18n="ln1.t">Репозиторий</div>
+          <div slot="supporting-text">github.com/JettaXP/steamd</div>
+          <md-icon slot="end">open_in_new</md-icon>
+        </md-list-item>
+        <md-list-item type="link" href="https://github.com/JettaXP/steamd/issues" target="_blank">
+          <md-icon slot="start">bug_report</md-icon>
+          <div slot="headline" data-i18n="ln2.t">Сообщить о проблеме</div>
+          <div slot="supporting-text" data-i18n="ln2.s">Приложите лог: adb logcat -d</div>
+          <md-icon slot="end">open_in_new</md-icon>
+        </md-list-item>
+        <md-list-item type="link" href="https://github.com/kuska1/Material-Theme" target="_blank">
+          <md-icon slot="start">favorite</md-icon>
+          <div slot="headline">Material-Theme</div>
+          <div slot="supporting-text" data-i18n="ln3.s">Тема для Millennium, основа темы магазина (MIT)</div>
+          <md-icon slot="end">open_in_new</md-icon>
+        </md-list-item>
+        <md-list-item type="link" href="https://github.com/P1sec/hermes-dec" target="_blank">
+          <md-icon slot="start">memory</md-icon>
+          <div slot="headline">hermes-dec</div>
+          <div slot="supporting-text" data-i18n="ln4.s">Разбор байткода Hermes</div>
+          <md-icon slot="end">open_in_new</md-icon>
+        </md-list-item>
+        <md-list-item type="link" href="https://m3.material.io" target="_blank">
+          <md-icon slot="start">design_services</md-icon>
+          <div slot="headline">Material Design 3</div>
+          <div slot="supporting-text">m3.material.io</div>
+          <md-icon slot="end">open_in_new</md-icon>
+        </md-list-item>
+      </md-list>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <md-divider></md-divider>
+    <p class="md-typescale-body-small" data-i18n="footer">
+      steamd — неофициальный проект, не связан с Valve Corporation. Steam является товарным знаком Valve Corporation.
+      Скрипт меняет только вашу собственную копию приложения. Не распространяйте пропатченные APK.
+    </p>
+    <p class="md-typescale-body-small">MIT © 2026 JettaX</p>
+  </footer>
+</body>
+</html>
