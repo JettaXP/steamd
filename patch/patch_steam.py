@@ -227,6 +227,7 @@ def patch_colors(pt, palette, verbose=True):
     for k, n in enumerate(news):
         pt.write_storage(doff + 7 * k, n.encode())
         pos[n] = doff + 7 * k
+    pt.color_offsets = pos
     for i, old, new in jobs:
         pt.repoint(i, pos[new], 7)
         if verbose:
@@ -271,6 +272,32 @@ def patch_radius(pt, radius):
     return True
 
 
+def patch_tab_marker(pt, palette):
+    """Tab bar marker gradient (#66C0F4 -> #2D73FF) in the theme accent: repoint its array to one string."""
+    accent = palette.get("#1A9FFF", "").upper()
+    offs = getattr(pt, "color_offsets", {})
+    S = pt.rd.strings
+    a = [i for i, s in enumerate(S) if s == "#66C0F4"]
+    b = [i for i, s in enumerate(S) if s == "#2D73FF"]
+    holder = [i for i, s in enumerate(S) if s == "Custom tabs are NYI"]
+    if accent not in offs or len(a) != 1 or len(b) != 1 or len(holder) != 1 or max(a[0], b[0], holder[0]) > 0xFFFF:
+        print("  [skip] tab marker: not found in this version")
+        return False
+    h = pt.rd.r.header
+    align = lambda x: (x + 3) & ~3
+    arrays = align(pt.rd.storage_start + h.stringStorageSize)
+    sig = bytes([0x52]) + a[0].to_bytes(2, "little") + b[0].to_bytes(2, "little")
+    buf = bytes(pt.out[arrays:arrays + h.arrayBufferSize])
+    if buf.count(sig) != 1:
+        print("  [skip] tab marker: colour array not found")
+        return False
+    p = arrays + buf.find(sig)
+    pt.out[p + 1:p + 5] = holder[0].to_bytes(2, "little") * 2
+    pt.repoint(holder[0], offs[accent], 7)
+    print(f"  tab marker: {accent}")
+    return True
+
+
 def patch_uppercase(pt):
     """Sentence case everywhere: the shared Text component reads props.uppercase; make it read props.__esModule."""
     S = pt.rd.strings
@@ -305,6 +332,8 @@ def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_u
     n = patch_colors(pt, palette) if colors else 0
     s = patch_webview(pt, seed_primary, css_url) if store else False
     rr = patch_radius(pt, radius) if radius else False
+    if colors:
+        patch_tab_marker(pt, palette)
     if not uppercase:
         patch_uppercase(pt)
     print(f"Hermes v{ver}: colours replaced: {n}; store theme: {'yes' if s else 'no'}; radius: {'yes' if rr else 'no'}")

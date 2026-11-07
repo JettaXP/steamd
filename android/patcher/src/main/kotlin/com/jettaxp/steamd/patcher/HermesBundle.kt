@@ -16,6 +16,8 @@ class HermesBundle(original: ByteArray) {
     private val overflowTableOffset: Int
     private val storageOffset: Int
     val objectValuesOffset: Int
+    val arraysOffset: Int
+    val arraysSize: Int
     val objectValuesSize: Int
 
     private val offsets: IntArray
@@ -53,6 +55,8 @@ class HermesBundle(original: ByteArray) {
         storageOffset = align(overflowTableOffset + overflowCount * 8)
         if (storageOffset + storageSize > data.size) throw PatchException("Corrupt string table")
         val arrays = align(storageOffset + storageSize)
+        arraysOffset = arrays
+        arraysSize = buf.getInt(80)
         val keys = align(arrays + buf.getInt(80))
         objectValuesOffset = align(keys + buf.getInt(84))
         objectValuesSize = buf.getInt(88)
@@ -157,6 +161,9 @@ class HermesBundle(original: ByteArray) {
     fun putInt(position: Int, value: Int) = buf.putInt(position, value)
 
     fun putShort(position: Int, value: Int) = buf.putShort(position, value.toShort())
+
+    fun findInArrays(signature: ByteArray): List<Int> =
+        findInFile(signature).filter { it >= arraysOffset && it + signature.size <= arraysOffset + arraysSize }
 
     fun findInFile(signature: ByteArray): List<Int> {
         val res = mutableListOf<Int>()

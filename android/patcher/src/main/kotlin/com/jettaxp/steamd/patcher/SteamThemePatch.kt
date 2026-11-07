@@ -91,11 +91,33 @@ object SteamThemePatch {
     fun apply(bundle: ByteArray, options: Options): Result {
         val hb = HermesBundle(bundle)
         val log = mutableListOf<String>()
-        val colors = if (options.colors) patchColors(hb, options.palette, log) else 0
+        val colorOffsets = HashMap<String, Int>()
+        val colors = if (options.colors) patchColors(hb, options.palette, log, colorOffsets) else 0
         val store = if (options.storeTheme) patchWebView(hb, options.primary, options.cssUrl, log) else false
         val radius = options.radius?.let { patchRadius(hb, it, log) } ?: false
+        if (options.colors) patchTabMarker(hb, options.palette, colorOffsets, log)
         if (!options.uppercase) patchUppercase(hb, log)
         return Result(hb.finish(), hb.version, colors, store, radius, log)
+    }
+
+    private fun patchTabMarker(hb: HermesBundle, palette: Map<String, String>, offsets: Map<String, Int>,
+                               log: MutableList<String>): Boolean {
+        val accent = palette["#1A9FFF"]?.uppercase()
+        val a = hb.findExact("#66C0F4")
+        val b = hb.findExact("#2D73FF")
+        val holder = hb.findExact("Custom tabs are NYI")
+        if (accent == null || accent !in offsets || a.size != 1 || b.size != 1 || holder.size != 1 ||
+            maxOf(a[0], b[0], holder[0]) > 0xFFFF) {
+            log += "skip tab marker: not found in this version"; return false
+        }
+        val sig = byteArrayOf(0x52, (a[0] and 0xFF).toByte(), (a[0] shr 8).toByte(), (b[0] and 0xFF).toByte(), (b[0] shr 8).toByte())
+        val hits = hb.findInArrays(sig)
+        if (hits.size != 1) { log += "skip tab marker: colour array not found"; return false }
+        hb.putShort(hits[0] + 1, holder[0])
+        hb.putShort(hits[0] + 3, holder[0])
+        hb.repoint(holder[0], offsets.getValue(accent), 7)
+        log += "tab marker: $accent"
+        return true
     }
 
     private fun patchUppercase(hb: HermesBundle, log: MutableList<String>): Boolean {
@@ -122,7 +144,8 @@ object SteamThemePatch {
         return true
     }
 
-    private fun patchColors(hb: HermesBundle, palette: Map<String, String>, log: MutableList<String>): Int {
+    private fun patchColors(hb: HermesBundle, palette: Map<String, String>, log: MutableList<String>,
+                            offsets: MutableMap<String, Int>): Int {
         data class Job(val index: Int, val old: String, val new: String)
         val jobs = mutableListOf<Job>()
         for ((old, new) in palette) {
@@ -144,6 +167,7 @@ object SteamThemePatch {
             hb.writeStorage(base + 7 * k, v.toByteArray(Charsets.US_ASCII))
             pos[v] = base + 7 * k
         }
+        offsets.putAll(pos)
         for (j in jobs) {
             hb.repoint(j.index, pos.getValue(j.new), 7)
             log += "${j.old} -> ${j.new}"

@@ -34,7 +34,7 @@ class PatcherTest {
         val hb = HermesBundle(r.bundle)
         assertEquals(96, hb.version)
         assertEquals(emptyList<Int>(), hb.findExact("#1A9FFF"))
-        assertEquals(2, hb.findExact("#8AB4F8").size)
+        assertEquals(3, hb.findExact("#8AB4F8").size)
     }
 
     @Test
