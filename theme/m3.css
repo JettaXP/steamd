@@ -544,3 +544,41 @@
   background: transparent !important;
   color: inherit !important;
 }
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_purchase_game_dropdown_selection {
+  background: var(--sd-c-highest) !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  color: var(--sd-on) !important;
+  padding-left: 16px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_purchase_game_dropdown_menu, .game_area_purchase_game_dropdown_menu_items_container) {
+  background: var(--sd-c-high) !important;
+  border: 0 !important;
+  border-radius: var(--sd-r-m) !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_purchase_game_dropdown_menu_item:hover { background: var(--sd-sec-c) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_purchase_game_wrapper.game_purchase_sub_dropdown {
+  background: var(--sd-c) !important;
+  background-image: none !important;
+  border-radius: var(--sd-r-l) !important;
+  overflow: hidden;
+  padding-bottom: 12px !important;
+  margin-bottom: 12px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .game_purchase_sub_dropdown :is(.game_area_purchase_game, .game_area_purchase_not_refundable) {
+  background: transparent !important;
+  background-image: none !important;
+  margin-bottom: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_purchase_not_refundable { padding: 0 16px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .game_purchase_sub_dropdown :is(.game_purchase_action, .game_area_purchase_game_dropdown_right_panel) {
+  position: static !important;
+  float: none !important;
+  display: flex !important;
+  justify-content: flex-end;
+  margin-top: 12px !important;
+  bottom: auto !important;
+  right: auto !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .game_purchase_sub_dropdown .game_area_purchase_not_refundable { margin-top: 8px !important; }
