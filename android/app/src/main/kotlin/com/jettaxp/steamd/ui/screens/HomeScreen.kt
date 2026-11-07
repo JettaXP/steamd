@@ -55,7 +55,8 @@ fun HomeScreen(state: UiState, onPatch: () -> Unit, onRefresh: () -> Unit, modif
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             SteamCard(state)
-            if (state.status == SteamStatus.Official) GuardCard()
+            if (state.compat == Compat.ForeignPatch) ForeignPatchCard()
+            else if (state.status == SteamStatus.Official) GuardCard()
             Spacer(Modifier.height(4.dp))
             val canPatch = state.steam != null && state.compat is Compat.Supported
             Button(onClick = onPatch, enabled = canPatch, modifier = Modifier.fillMaxWidth().height(56.dp)) {
@@ -103,6 +104,11 @@ private fun SteamCard(state: UiState) {
                         Spacer(Modifier.size(8.dp))
                         Text(stringResource(R.string.unsupported, c.reason), style = MaterialTheme.typography.bodyMedium)
                     }
+                    Compat.ForeignPatch -> {
+                        Icon(Icons.Filled.ErrorOutline, null, tint = MaterialTheme.colorScheme.error)
+                        Spacer(Modifier.size(8.dp))
+                        Text(stringResource(R.string.foreign_patch), style = MaterialTheme.typography.bodyMedium)
+                    }
                 }
             }
         }
@@ -125,6 +131,33 @@ private fun GuardCard() {
                 Text(stringResource(R.string.guard_title), style = MaterialTheme.typography.titleMedium)
                 Text(stringResource(R.string.guard_text), style = MaterialTheme.typography.bodyMedium)
             }
+        }
+    }
+}
+
+@Composable
+private fun ForeignPatchCard() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Card(
+        Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(stringResource(R.string.foreign_patch_title), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.foreign_patch_steps), style = MaterialTheme.typography.bodyMedium)
+            androidx.compose.material3.FilledTonalButton(onClick = {
+                val pkg = com.jettaxp.steamd.data.SteamApp.PACKAGE
+                val market = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("market://details?id=$pkg"))
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                runCatching { context.startActivity(market) }.onFailure {
+                    context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,
+                        android.net.Uri.parse("https://play.google.com/store/apps/details?id=$pkg")))
+                }
+            }) { Text(stringResource(R.string.open_play)) }
         }
     }
 }

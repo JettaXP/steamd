@@ -94,4 +94,8 @@
     <string name="key_exported">Key saved</string>
     <string name="key_imported">Key restored</string>
     <string name="key_error">Could not read or write the key file</string>
+    <string name="foreign_patch">Already patched by another copy of steamd</string>
+    <string name="foreign_patch_title">This Steam was patched by another steamd</string>
+    <string name="foreign_patch_steps">Its key is lost, so it cannot be patched again. 1. Save your Steam Guard recovery code. 2. Uninstall Steam. 3. Install the official Steam from Google Play. 4. Come back and tap refresh.</string>
+    <string name="open_play">Open Google Play</string>
 </resources>

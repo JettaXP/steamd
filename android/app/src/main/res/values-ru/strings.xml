@@ -93,4 +93,8 @@
     <string name="key_exported">Ключ сохранён</string>
     <string name="key_imported">Ключ восстановлен</string>
     <string name="key_error">Не удалось прочитать или записать файл ключа</string>
+    <string name="foreign_patch">Уже пропатчен другой копией steamd</string>
+    <string name="foreign_patch_title">Этот Steam пропатчен другим steamd</string>
+    <string name="foreign_patch_steps">Его ключ утерян, поэтому пропатчить заново не получится. 1. Запишите код восстановления Steam Guard. 2. Удалите Steam. 3. Установите официальный Steam из Google Play. 4. Вернитесь сюда и нажмите «Обновить».</string>
+    <string name="open_play">Открыть Google Play</string>
 </resources>

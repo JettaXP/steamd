@@ -28,6 +28,7 @@ sealed interface Compat {
     data object Checking : Compat
     data class Supported(val hermesVersion: Int) : Compat
     data class Unsupported(val reason: String) : Compat
+    data object ForeignPatch : Compat
 }
 
 sealed interface PatchFlow {
@@ -93,10 +94,21 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         val base = if (status == SteamStatus.Patched) engine.originalsFor(steam)?.first()
             ?: return Compat.Unsupported("original APKs of this version are not saved")
             else steam.baseApk
-        val r = SteamThemePatch.apply(ApkPatcher.readBundle(base), SteamThemePatch.Options())
+        val bundle = ApkPatcher.readBundle(base)
+        if (status != SteamStatus.Patched && containsAscii(bundle, "--sd-p")) return Compat.ForeignPatch
+        val r = SteamThemePatch.apply(bundle, SteamThemePatch.Options())
         if (r.colorsReplaced == 0 && !r.storeTheme) Compat.Unsupported("theme not found in this version")
         else Compat.Supported(r.hermesVersion)
     }.getOrElse { Compat.Unsupported(it.message ?: it.javaClass.simpleName) }
+
+    private fun containsAscii(data: ByteArray, text: String): Boolean {
+        val n = text.toByteArray(Charsets.US_ASCII)
+        outer@ for (i in 0..data.size - n.size) {
+            for (k in n.indices) if (data[i + k] != n[k]) continue@outer
+            return true
+        }
+        return false
+    }
 
     fun setColorSource(source: ColorSource) {
         settings.colorSource = source
