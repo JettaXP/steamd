@@ -505,8 +505,8 @@
   margin-bottom: 3px !important;
   overflow: hidden;
 }
-:root:is(.rn_mobile_app, .steamd-preview) .game_area_details_specs_ctn:first-child { border-radius: var(--sd-r-l) var(--sd-r-l) 6px 6px !important; }
-:root:is(.rn_mobile_app, .steamd-preview) .game_area_details_specs_ctn:last-child { border-radius: 6px 6px var(--sd-r-l) var(--sd-r-l) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_details_specs_ctn:first-of-type { border-radius: var(--sd-r-l) var(--sd-r-l) 6px 6px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_details_specs_ctn:last-of-type { border-radius: 6px 6px var(--sd-r-l) var(--sd-r-l) !important; }
 :root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_details_specs_ctn .icon, .game_area_details_specs .icon) { background: transparent !important; }
 :root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_details_specs_ctn .label, .game_area_details_specs .name) { color: var(--sd-on) !important; }
 :root:is(.rn_mobile_app, .steamd-preview) :is(h2, h3, .block_title, .game_area_details_specs_title, .franchise_capsule_title,
@@ -582,3 +582,77 @@
   right: auto !important;
 }
 :root:is(.rn_mobile_app, .steamd-preview) .game_purchase_sub_dropdown .game_area_purchase_not_refundable { margin-top: 8px !important; }
+
+/* Game page: media strip slider, action buttons, bundles, features, controllers */
+:root:is(.rn_mobile_app, .steamd-preview) :is(._1WAcs3o8Lg4-, .JIdk89M-jjc-) {
+  background: var(--sd-c-highest) !important;
+  border-radius: 12px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) ._1WAcs3o8Lg4- svg { color: var(--sd-on-var) !important; fill: currentColor; }
+:root:is(.rn_mobile_app, .steamd-preview) .xfzmpLIv9nQ- { background: var(--sd-c) !important; border-radius: 12px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(#reportBtn, #shareBtn, .queue_actions_ctn) img { filter: grayscale(1) brightness(1.9); }
+:root:is(.rn_mobile_app, .steamd-preview) .queue_btn_ignore > .btnv6_blue_hoverfade { border-radius: 20px 6px 6px 20px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .queue_btn_menu > .queue_menu_arrow {
+  background-color: var(--sd-sec-c) !important;
+  border-radius: 6px 20px 20px 6px !important;
+  margin-left: 2px;
+  filter: grayscale(1) brightness(1.6);
+}
+:root:is(.rn_mobile_app, .steamd-preview) .queue_menu_flyout_content {
+  background: var(--sd-c-high) !important;
+  border-radius: var(--sd-r-m) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .35) !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .queue_menu_option { background: transparent !important; color: var(--sd-on) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .queue_menu_option:hover { background: var(--sd-sec-c) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .queue_menu_option_label > .option_subtitle { color: var(--sd-on-var) !important; }
+
+:root:is(.rn_mobile_app, .steamd-preview) .bundle_contents_preview {
+  background: var(--sd-c-high) !important;
+  border-radius: var(--sd-r-m) !important;
+  padding: 8px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .bundle_contents_preview img { border-radius: 8px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .bundle_base_discount {
+  background: var(--sd-sec-c) !important;
+  color: var(--sd-on-sec-c) !important;
+  border-radius: var(--sd-r-s) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .discount_pct .bundle_base_discount {
+  background: transparent !important;
+  color: inherit !important;
+  opacity: .7;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_purchase_game :is(.bundle_label, .btn_packageinfo) { color: var(--sd-p) !important; }
+
+:root:is(.rn_mobile_app, .steamd-preview) #game_area_purchase > a:last-child,
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_purchase > a:last-child { display: inline-block; margin: 4px 0 24px 4px; }
+:root:is(.rn_mobile_app, .steamd-preview) .responsive_block_header {
+  background: transparent !important;
+  color: var(--sd-on) !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  padding: 16px 4px 8px !important;
+  text-transform: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_area_details_specs_ctn .label, .game_area_details_specs_ctn .icon,
+  .game_area_details_specs .name, .game_area_details_specs .icon) { background: transparent !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .game_area_details_specs_ctn { color: var(--sd-on) !important; }
+
+/* Controller support rows (React) */
+:root:is(.rn_mobile_app, .steamd-preview) .GMZfIVrEZB0- {
+  background: var(--sd-c) !important;
+  border-radius: var(--sd-seg, 6px) !important;
+  margin-bottom: 3px !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .GMZfIVrEZB0-:first-of-type { border-top-left-radius: var(--sd-r-l) !important; border-top-right-radius: var(--sd-r-l) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .GMZfIVrEZB0-:last-of-type { border-bottom-left-radius: var(--sd-r-l) !important; border-bottom-right-radius: var(--sd-r-l) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .gOWLvh1zsGE- { background: transparent !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .TM-gf0Qc-hM- { background: transparent !important; color: var(--sd-on) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) ._1jp-rCKW9iQ- { color: var(--sd-on-var) !important; padding: 12px 4px 6px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) a.game_area_details_specs_ctn { display: flex !important; align-items: center; min-height: 44px; }
+:root:is(.rn_mobile_app, .steamd-preview) a.game_area_details_specs_ctn .icon { padding: 0 8px 0 14px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) a.game_area_details_specs_ctn .label { padding: 10px 12px 10px 4px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .GMZfIVrEZB0- { min-height: 44px; display: flex !important; align-items: center; }
