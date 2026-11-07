@@ -1,0 +1,17 @@
+# Файлы Steam и сборки: не публикуются
+*.apk
+*.apks
+*.bundle
+*.hbc
+*.ttf
+*.otf
+apk/
+out/
+signed/
+fonts/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
