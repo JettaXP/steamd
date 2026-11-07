@@ -38,7 +38,9 @@ jobs:
             exit 0
           fi
           KS="$RUNNER_TEMP/steamd.p12"
-          if ! printf '%s' "$KEYSTORE_BASE64" | tr -cd 'A-Za-z0-9+/=' | base64 -d > "$KS" 2>/dev/null; then
+          B64="$(printf '%s' "$KEYSTORE_BASE64" | tr -cd 'A-Za-z0-9+/')"
+          while [ $(( ${#B64} % 4 )) -ne 0 ]; do B64="$B64="; done
+          if ! printf '%s' "$B64" | base64 -d > "$KS" 2>/dev/null; then
             echo "::error::STEAMD_KEYSTORE_BASE64 is not valid base64: paste the whole content of STEAMD_KEYSTORE_BASE64.txt"
             exit 1
           fi
