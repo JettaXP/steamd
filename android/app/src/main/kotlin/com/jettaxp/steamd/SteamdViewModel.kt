@@ -54,6 +54,7 @@ data class UiState(
     val originalsBytes: Long = 0,
     val autoRepatch: Boolean = true,
     val autoStatus: String? = null,
+    val googleSans: Boolean = true,
 )
 
 class SteamdViewModel(app: Application) : AndroidViewModel(app) {
@@ -63,7 +64,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     private val _state = MutableStateFlow(UiState(
         colorSource = settings.colorSource, storeTheme = settings.storeTheme, cssUrl = settings.cssUrl,
         appTheme = settings.appTheme, appDynamicColor = settings.appDynamicColor, language = Settings.language,
-        autoRepatch = settings.autoRepatch,
+        autoRepatch = settings.autoRepatch, googleSans = settings.googleSans,
     ))
     val state: StateFlow<UiState> = _state.asStateFlow()
 
@@ -128,6 +129,11 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         settings.cssUrl = u
         _state.update { it.copy(cssUrl = u) }
         return true
+    }
+
+    fun setGoogleSans(on: Boolean) {
+        settings.googleSans = on
+        _state.update { it.copy(googleSans = on) }
     }
 
     fun setAutoRepatch(on: Boolean) {

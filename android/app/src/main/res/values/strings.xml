@@ -52,7 +52,7 @@
     <string name="link_source">Source code</string>
     <string name="link_issues">Report a problem</string>
     <string name="version">Version %1$s</string>
-    <string name="licenses">MIT licence. Uses apksig and Material Components (Apache-2.0), Bouncy Castle (MIT).</string>
+    <string name="licenses">MIT licence. Uses apksig and Material Components (Apache-2.0), Bouncy Castle (MIT), Google Sans (SIL OFL 1.1).</string>
 
     <string name="preview_menu">Menu</string>
     <string name="preview_notifications">Notifications</string>
@@ -109,4 +109,6 @@
     <string name="auto_same">no changes</string>
     <string name="auto_error">error (%1$s)</string>
     <string name="auto_no_notif">Allow notifications so steamd can ask you to confirm updates</string>
+    <string name="google_sans">Google Sans font</string>
+    <string name="google_sans_desc">Replaces Motiva Sans in the whole Steam app. Apply the patch again after changing</string>
 </resources>

@@ -111,4 +111,20 @@ class PatcherTest {
         System.getenv("STEAMD_KEEP")?.let { signed.copyTo(File(it), overwrite = true) }
         dir.deleteRecursively()
     }
+
+    @Test
+    fun readsGoogleSansStyles() {
+        val dir = File("../app/src/main/assets/fonts")
+        assumeTrue(dir.exists())
+        val styles = dir.listFiles { f -> f.name.endsWith(".ttf") }!!.associate { f ->
+            val i = FontInfo.read(f.readBytes())
+            f.name to (i.weight to i.italic)
+        }
+        assertEquals(400 to false, styles["GoogleSans-Regular.ttf"])
+        assertEquals(500 to false, styles["GoogleSans-Medium.ttf"])
+        assertEquals(700 to false, styles["GoogleSans-Bold.ttf"])
+        assertEquals(400 to true, styles["GoogleSans-RegularItalic.ttf"])
+        assertEquals(700 to true, styles["GoogleSans-BoldItalic.ttf"])
+        assertTrue(FontInfo.read(File(dir, "GoogleSans-Regular.ttf").readBytes()).family == "Google Sans")
+    }
 }

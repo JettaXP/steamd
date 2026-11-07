@@ -83,6 +83,7 @@ python patch/patch_steam.py --check index.android.bundle
 ## Благодарности
 - [kuska1/Material-Theme](https://github.com/kuska1/Material-Theme) (MIT), тема для Millennium, вдохновившая тему магазина.
 - [hermes-dec](https://github.com/P1sec/hermes-dec), разбор байткода Hermes.
+- [Google Sans](https://github.com/googlefonts/googlesans) (SIL OFL 1.1), шрифт для приложения Steam; статические начертания лежат в `android/app/src/main/assets/fonts`.
 - [Material Web](https://github.com/material-components/material-web) (Apache-2.0), компоненты сайта. Сборка лежит в `assets/material-web.js`, лицензии сохранены в конце файла.
 - [Material Color Utilities](https://github.com/material-foundation/material-color-utilities) (Apache-2.0), генерация палитры на сайте (`assets/color-utils.js`).
 

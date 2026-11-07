@@ -51,7 +51,7 @@
     <string name="link_source">Исходный код</string>
     <string name="link_issues">Сообщить о проблеме</string>
     <string name="version">Версия %1$s</string>
-    <string name="licenses">Лицензия MIT. Используются apksig и Material Components (Apache-2.0), Bouncy Castle (MIT).</string>
+    <string name="licenses">Лицензия MIT. Используются apksig и Material Components (Apache-2.0), Bouncy Castle (MIT), Google Sans (SIL OFL 1.1).</string>
 
     <string name="preview_menu">Меню</string>
     <string name="preview_notifications">Уведомления</string>
@@ -108,4 +108,6 @@
     <string name="auto_same">без изменений</string>
     <string name="auto_error">ошибка (%1$s)</string>
     <string name="auto_no_notif">Разрешите уведомления, чтобы steamd мог попросить подтвердить обновление</string>
+    <string name="google_sans">Шрифт Google Sans</string>
+    <string name="google_sans_desc">Заменяет Motiva Sans во всём приложении Steam. После изменения примените патч заново</string>
 </resources>

@@ -79,8 +79,18 @@ class PatchEngine(private val context: Context) {
         Palettes.patchOptions(app, settings.colorSource, settings.storeTheme).copy(cssUrl = settings.cssUrl)
 
     fun fingerprint(options: SteamThemePatch.Options): String =
-        listOf(options.palette.values.joinToString(","), options.primary, options.cssUrl, options.storeTheme, options.radius)
-            .joinToString("|")
+        listOf(options.palette.values.joinToString(","), options.primary, options.cssUrl, options.storeTheme, options.radius,
+            settings.googleSans).joinToString("|")
+
+    private fun fonts(): List<ApkPatcher.FontReplacement> {
+        if (!settings.googleSans) return emptyList()
+        val names = app.assets.list("fonts").orEmpty().filter { it.endsWith(".ttf") }
+        return names.map { n ->
+            val bytes = app.assets.open("fonts/$n").use { it.readBytes() }
+            val info = com.jettaxp.steamd.patcher.FontInfo.read(bytes)
+            ApkPatcher.FontReplacement(info.weight, info.italic, bytes)
+        }
+    }
 
     suspend fun run(steam: SteamInfo, silent: Boolean, onStep: (Step) -> Unit = {}): Boolean = MUTEX.withLock {
         val status = status(steam)
@@ -92,7 +102,7 @@ class PatchEngine(private val context: Context) {
         val options = currentOptions()
         val unsigned = withContext(Dispatchers.IO) {
             work.deleteRecursively(); work.mkdirs()
-            File(work, "base-unsigned.apk").also { ApkPatcher.patch(sources.first(), it, options) }
+            File(work, "base-unsigned.apk").also { ApkPatcher.patch(sources.first(), it, options, fonts()) }
         }
         onStep(Step.Sign)
         val signed = withContext(Dispatchers.IO) {

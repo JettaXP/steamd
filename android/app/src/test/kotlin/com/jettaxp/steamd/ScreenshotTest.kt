@@ -36,7 +36,7 @@ class ScreenshotTest {
     }
 
     @Test fun home() = shot("home") { HomeScreen(state, {}, {}) }
-    private val noop = SettingsActions({}, {}, {}, {}, { true }, {}, {})
+    private val noop = SettingsActions(onLanguage = {}, onTheme = {}, onDynamicColor = {}, onStoreTheme = {}, onCssUrl = { true }, onAutoRepatch = {}, onClearOriginals = {})
 
     @Test fun colorSeed() = shot("color-seed") { ColorScreen(state.copy(colorSource = ColorSource.Seed(0xFFB5651D.toInt())), {}) }
     @Test fun colorDefault() = shot("color-default") { ColorScreen(state, {}) }

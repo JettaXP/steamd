@@ -40,6 +40,10 @@ class Settings(context: Context) {
         get() = runCatching { AppTheme.valueOf(prefs.getString("app_theme", null) ?: "System") }.getOrDefault(AppTheme.System)
         set(value) = prefs.edit().putString("app_theme", value.name).apply()
 
+    var googleSans: Boolean
+        get() = prefs.getBoolean("google_sans", true)
+        set(value) = prefs.edit().putBoolean("google_sans", value).apply()
+
     var autoRepatch: Boolean
         get() = prefs.getBoolean("auto_repatch", true)
         set(value) = prefs.edit().putBoolean("auto_repatch", value).apply()

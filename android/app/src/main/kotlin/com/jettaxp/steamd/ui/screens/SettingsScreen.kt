@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Wallpaper
@@ -74,6 +75,7 @@ class SettingsActions(
     val onStoreTheme: (Boolean) -> Unit,
     val onCssUrl: (String) -> Boolean,
     val onAutoRepatch: (Boolean) -> Unit,
+    val onGoogleSans: (Boolean) -> Unit = {},
     val onClearOriginals: () -> Unit,
     val onExportKey: (android.net.Uri) -> Unit = {},
     val onImportKey: (android.net.Uri) -> Unit = {},
@@ -111,6 +113,8 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
             Section(R.string.section_patch)
             SwitchItem(Icons.Filled.Storefront, stringResource(R.string.store_theme), stringResource(R.string.store_theme_desc),
                 checked = state.storeTheme, onChange = actions.onStoreTheme)
+            SwitchItem(Icons.Filled.TextFields, stringResource(R.string.google_sans), stringResource(R.string.google_sans_desc),
+                checked = state.googleSans, onChange = actions.onGoogleSans)
             Item(Icons.Filled.Link, stringResource(R.string.css_url), state.cssUrl, enabled = state.storeTheme) { dialog = Dialog.CssUrl }
             SwitchItem(
                 Icons.Filled.Wallpaper, stringResource(R.string.auto_repatch),
