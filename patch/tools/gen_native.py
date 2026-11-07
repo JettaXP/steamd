@@ -29,25 +29,25 @@ def tab_bar_item(rd, data):
                         insert={0x118: padding, 0x1B0: add})
 
 
-def card(rd, reg, tmp, tmp2):
-    """marginX 'small', marginBottom 'xxsmall', style {backgroundColor: '#2F343E'} (surfaceContainerHigh after the palette)."""
-    return (ins("LoadConstString", tmp, u16(sid(rd, "small")))
-            + ins("PutNewOwnById", reg, tmp, u16(sid(rd, "marginX")))
-            + ins("LoadConstString", tmp, u16(sid(rd, "xxsmall")))
-            + ins("PutNewOwnById", reg, tmp, u16(sid(rd, "marginBottom")))
-            + ins("NewObject", tmp)
+def row_style(rd, reg, tmp, tmp2):
+    """style {backgroundColor: '#2F343E' (surfaceContainerHigh after the palette), borderRadius: 4}."""
+    return (ins("NewObject", tmp)
             + ins("LoadConstStringLongIndex", tmp2, u32(sid(rd, "#2F343E")))
             + ins("PutNewOwnById", tmp, tmp2, u16(sid(rd, "backgroundColor")))
+            + ins("LoadConstUInt8", tmp2, 4)
+            + ins("PutNewOwnById", tmp, tmp2, u16(sid(rd, "borderRadius")))
             + ins("PutNewOwnByIdShort", reg, tmp, sid(rd, "style")))
 
 
 def link_section(rd, data):
-    """LinkSection (Store, Community): the section becomes a rounded card.
+    """LinkSection (Store, Community): the section becomes a segment of the menu group.
     Room: useState's result is indexed directly instead of going through _slicedToArray,
     and the Box component already held in r1 is reused instead of reloaded."""
     f = Fn(rd.r, fid_by_name(rd, "LinkSection"), data)
-    head = (bytes.fromhex("0200") + literal(rd, data, "PendingRequestDetails", "03000200", 83041)  # {borderRadius, overflow}
-            + card(rd, 0, 4, 6))
+    head = (ins("NewObject", 0)
+            + ins("LoadConstString", 4, u16(sid(rd, "hidden")))
+            + ins("PutNewOwnById", 0, 4, u16(sid(rd, "overflow")))
+            + row_style(rd, 0, 4, 6))
     box = lambda reg: ins("Mov", reg, 1)
     return f, f.rewrite(
         delete=[(0x57, 0x69), (0x6B, 0x6F), (0x76, 0x7A),
@@ -57,30 +57,57 @@ def link_section(rd, data):
 
 
 def header_link(rd, data):
-    """HeaderLink (News, Steam Guard, ...): each row becomes a rounded card.
+    """HeaderLink (News, Steam Guard, ...): each row becomes a segment of the menu group.
     Room: an unused useTheme().color.background.primary lookup and Box reloads."""
     f = Fn(rd.r, fid_by_name(rd, "HeaderLink"), data)
-    add = ins("LoadConstString", 4, u16(sid(rd, "standard"))) + ins("PutNewOwnById", 0, 4, u16(sid(rd, "borderRadius"))) \
-        + card(rd, 0, 4, 5)
     box = lambda reg: ins("Mov", reg, 1)
     return f, f.rewrite(delete=[(0x06, 0x10), (0x12, 0x26), (0x8A, 0x93), (0x160, 0x169), (0x17D, 0x186)],
-                        insert={0x4F: add, 0x93: box(11), 0x169: box(13), 0x186: box(16)})
+                        insert={0x4F: row_style(rd, 0, 4, 5), 0x93: box(11), 0x169: box(13), 0x186: box(16)})
 
 
 def main_menu(rd, data):
-    """MainMenuScreen: Divider -> empty Box, so the cards are separated by their margins only."""
+    """MainMenuScreen: the rows from Store to Chat form one group (a Box with a 24dp radius that clips
+    its children, 12dp side margins); dividers become 4dp transparent spacers; the small links below
+    move out of the group so it ends at Chat.
+    Room: jsx is taken from r9 (jsxs, the same function in production React) and Box from r8."""
     f = Fn(rd.r, fid_by_name(rd, "MainMenuScreen"), data)
-    div, box = sid(rd, "Divider"), sid(rd, "Box")
-    body = bytearray(f.original)
-    n = 0
-    for a, b, name, _ in f.ins:
-        raw = f.original[a:b]
-        if name == "GetById" and int.from_bytes(raw[4:6], "little") == div:
-            body[a + 3] = 0
-            body[a + 4:a + 6] = box.to_bytes(2, "little")
-            n += 1
-    assert n == 8, n
-    return f, bytes(body)
+    o, ins_ = f.original, f.ins
+    div = sid(rd, "Divider")
+    delete, insert = [], {}
+    # group container: r7 = NewObject at the start of the menu Box props
+    box_id = sid(rd, "Box")
+    a7 = next(ins_[k + 1][0] for k, (a, b, n, _) in enumerate(ins_)
+              if n == "GetByIdShort" and o[a + 1] == 8 and o[a + 4] == box_id and ins_[k + 1][2] == "NewObject" and o[ins_[k + 1][0] + 1] == 7)
+    after7 = next(a for a, b, n, _ in ins_ if a > a7)
+    insert[after7] = (ins("LoadConstString", 10, u16(sid(rd, "large"))) + ins("PutNewOwnById", 7, 10, u16(sid(rd, "borderRadius")))
+                      + ins("LoadConstString", 10, u16(sid(rd, "hidden"))) + ins("PutNewOwnById", 7, 10, u16(sid(rd, "overflow")))
+                      + ins("LoadConstString", 10, u16(sid(rd, "small"))) + ins("PutNewOwnById", 7, 10, u16(sid(rd, "marginX"))))
+    sites = [k for k, (a, b, n, _) in enumerate(ins_) if n == "GetById" and int.from_bytes(o[a + 4:a + 6], "little") == div]
+    assert len(sites) == 8
+    for k in sites[:-1]:
+        lj, gj, le, gd, no, call, put = ins_[k - 3:k + 4]
+        assert (lj[2], gj[2], le[2], no[2], call[2], put[2]) == ("LoadFromEnvironment", "GetByIdShort", "LoadFromEnvironment",
+                                                                 "NewObject", "Call3", "PutOwnByIndex"), k
+        rj = o[gj[0] + 1]
+        delete.append((lj[0], call[0]))
+        insert[call[0]] = (ins("Mov", rj, 9) + ins("NewObject", 11) + ins("LoadConstString", 12, u16(sid(rd, "xxsmall")))
+                           + ins("PutNewOwnById", 11, 12, u16(sid(rd, "paddingTop"))) + ins("Mov", 12, 8))
+    # the divider after Chat goes away (its jsx load stays: the register is used again below)
+    k = sites[-1]
+    delete.append((ins_[k - 1][0], ins_[k + 3][1]))
+    # small links: out of the group, into the screen's outer array
+    puts = [x for x in ins_ if x[2] == "PutOwnByIndex" and o[x[0] + 1] == 10 and o[x[0] + 3] == 17]
+    assert len(puts) == 1 and o[puts[0][0] + 2] == 11
+    delete.append((puts[0][0], puts[0][1]))
+    arr = next(x for x in ins_ if x[2] == "NewArray" and o[x[0] + 1] == 7 and o[x[0] + 2] == 2)
+    delete.append((arr[0], arr[1]))
+    insert[arr[1]] = bytes(o[arr[0]:arr[0] + 2]) + (3).to_bytes(2, "little")
+    first = next(x for x in ins_ if x[0] > arr[0] and x[2] == "PutOwnByIndex" and o[x[0] + 1] == 7 and o[x[0] + 3] == 0)
+    insert[first[1]] = bytes(o[first[0]:first[0] + 2]) + bytes([11, 1])
+    second = next(x for x in ins_ if x[0] > first[0] and x[2] == "PutOwnByIndex" and o[x[0] + 1] == 7 and o[x[0] + 3] == 1)
+    delete.append((second[0], second[1]))
+    insert[second[1]] = bytes(o[second[0]:second[0] + 3]) + bytes([2])
+    return f, f.rewrite(delete=delete, insert=insert)
 
 
 def literal(rd, data, fn, counts, values):
