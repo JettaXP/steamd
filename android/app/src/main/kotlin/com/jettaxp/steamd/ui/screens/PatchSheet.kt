@@ -47,7 +47,7 @@ fun PatchSheet(flow: PatchFlow, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     ModalBottomSheet(onDismissRequest = { if (!running) onDismiss() }, sheetState = sheet) {
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             when (flow) {
-                PatchFlow.Confirm -> ConfirmContent(onConfirm, onDismiss)
+                is PatchFlow.Confirm -> if (flow.update) UpdateContent(onConfirm, onDismiss) else ConfirmContent(onConfirm, onDismiss)
                 is PatchFlow.Running -> Steps(flow)
                 PatchFlow.Done -> {
                     Text(stringResource(R.string.patch_done), style = MaterialTheme.typography.titleMedium)
@@ -68,6 +68,17 @@ fun PatchSheet(flow: PatchFlow, onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 PatchFlow.Idle -> Unit
             }
         }
+    }
+}
+
+@Composable
+private fun UpdateContent(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    Text(stringResource(R.string.update_title), style = MaterialTheme.typography.titleLarge)
+    Text(stringResource(R.string.update_text), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+        Spacer(Modifier.size(8.dp))
+        Button(onClick = onConfirm) { Text(stringResource(R.string.continue_)) }
     }
 }
 

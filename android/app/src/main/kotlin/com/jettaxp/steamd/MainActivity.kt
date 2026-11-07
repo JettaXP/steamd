@@ -46,6 +46,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val state by vm.state.collectAsStateWithLifecycle()
+            val notifLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+                androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+            ) { vm.refresh() }
+            androidx.compose.runtime.LaunchedEffect(state.autoRepatch, state.colorSource) {
+                if (android.os.Build.VERSION.SDK_INT >= 33 && state.autoRepatch &&
+                    state.colorSource == com.jettaxp.steamd.data.ColorSource.Wallpaper &&
+                    !com.jettaxp.steamd.install.Notifier.canNotify(this@MainActivity)
+                ) notifLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
             SteamdTheme(theme = state.appTheme, dynamicColor = state.appDynamicColor) {
                 var tab by rememberSaveable { mutableIntStateOf(0) }
                 Scaffold(

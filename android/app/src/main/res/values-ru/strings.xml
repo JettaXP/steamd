@@ -97,4 +97,15 @@
     <string name="foreign_patch_title">Этот Steam пропатчен другим steamd</string>
     <string name="foreign_patch_steps">Его ключ утерян, поэтому пропатчить заново не получится. 1. Запишите код восстановления Steam Guard. 2. Удалите Steam. 3. Установите официальный Steam из Google Play. 4. Вернитесь сюда и нажмите «Обновить».</string>
     <string name="open_play">Открыть Google Play</string>
+    <string name="update_title">Применить тему заново</string>
+    <string name="update_text">Steam обновится поверх: вход в аккаунт и Steam Guard сохранятся. Android попросит подтвердить обновление.</string>
+    <string name="notif_channel">Цвета обоев</string>
+    <string name="notif_title">Цвета обоев изменились</string>
+    <string name="notif_text">Нажмите, чтобы обновить тему Steam</string>
+    <string name="auto_last">Последняя проверка %1$s: %2$s</string>
+    <string name="auto_applied">применено</string>
+    <string name="auto_pending">ждёт вас, нажмите на уведомление</string>
+    <string name="auto_same">без изменений</string>
+    <string name="auto_error">ошибка (%1$s)</string>
+    <string name="auto_no_notif">Разрешите уведомления, чтобы steamd мог попросить подтвердить обновление</string>
 </resources>

@@ -44,6 +44,14 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("auto_repatch", true)
         set(value) = prefs.edit().putBoolean("auto_repatch", value).apply()
 
+    var pendingFingerprint: String?
+        get() = prefs.getString("pending", null)
+        set(value) = prefs.edit().putString("pending", value).apply()
+
+    var lastAuto: String?
+        get() = prefs.getString("last_auto", null)
+        set(value) = prefs.edit().putString("last_auto", value).apply()
+
     var appliedFingerprint: String?
         get() = prefs.getString("applied", null)
         set(value) = prefs.edit().putString("applied", value).apply()

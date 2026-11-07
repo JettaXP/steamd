@@ -82,7 +82,7 @@ class PatchEngine(private val context: Context) {
         listOf(options.palette.values.joinToString(","), options.primary, options.cssUrl, options.storeTheme, options.radius)
             .joinToString("|")
 
-    suspend fun run(steam: SteamInfo, silent: Boolean, onStep: (Step) -> Unit = {}) = MUTEX.withLock {
+    suspend fun run(steam: SteamInfo, silent: Boolean, onStep: (Step) -> Unit = {}): Boolean = MUTEX.withLock {
         val status = status(steam)
         val needsUninstall = status != SteamStatus.Patched
         if (silent && needsUninstall) throw IllegalStateException("silent update needs the patched app installed")
@@ -110,8 +110,14 @@ class PatchEngine(private val context: Context) {
             }
             onStep(Step.Install)
             val r = Installer.install(app, signed, silent)
+            if (r.pending) {
+                settings.pendingFingerprint = fingerprint(options)
+                return@withLock false
+            }
             if (!r.success) throw IllegalStateException(r.message ?: "install cancelled")
             settings.appliedFingerprint = fingerprint(options)
+            settings.pendingFingerprint = null
+            true
         } finally {
             withContext(Dispatchers.IO) { work.deleteRecursively() }
         }

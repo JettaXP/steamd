@@ -114,11 +114,13 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
             Item(Icons.Filled.Link, stringResource(R.string.css_url), state.cssUrl, enabled = state.storeTheme) { dialog = Dialog.CssUrl }
             SwitchItem(
                 Icons.Filled.Wallpaper, stringResource(R.string.auto_repatch),
-                stringResource(when {
-                    !Palettes.dynamicAvailable() -> R.string.dynamic_unavailable
-                    state.colorSource != ColorSource.Wallpaper -> R.string.auto_repatch_needs_wallpaper
-                    else -> R.string.auto_repatch_desc
-                }),
+                when {
+                    !Palettes.dynamicAvailable() -> stringResource(R.string.dynamic_unavailable)
+                    state.colorSource != ColorSource.Wallpaper -> stringResource(R.string.auto_repatch_needs_wallpaper)
+                    !state.autoRepatch -> stringResource(R.string.auto_repatch_desc)
+                    !com.jettaxp.steamd.install.Notifier.canNotify(LocalContext.current) -> stringResource(R.string.auto_no_notif)
+                    else -> autoStatusText(state.autoStatus) ?: stringResource(R.string.auto_repatch_desc)
+                },
                 checked = state.autoRepatch && Palettes.dynamicAvailable() && state.colorSource == ColorSource.Wallpaper,
                 enabled = Palettes.dynamicAvailable() && state.colorSource == ColorSource.Wallpaper,
                 onChange = actions.onAutoRepatch,
@@ -296,4 +298,22 @@ private fun CssUrlDialog(current: String, onSave: (String) -> Boolean, onDismiss
             TextButton(onClick = { onSave(SteamThemePatch.DEFAULT_CSS_URL); onDismiss() }) { Text(stringResource(R.string.reset)) }
         },
     )
+}
+
+@Composable
+private fun autoStatusText(raw: String?): String? {
+    if (raw == null) return null
+    val code = raw.substringBefore('|')
+    val time = raw.substringAfter('|').toLongOrNull() ?: return null
+    val whenText = android.text.format.DateUtils.getRelativeTimeSpanString(
+        time, System.currentTimeMillis(), android.text.format.DateUtils.MINUTE_IN_MILLIS,
+    ).toString()
+    val what = when {
+        code == "applied" -> stringResource(R.string.auto_applied)
+        code == "pending" -> stringResource(R.string.auto_pending)
+        code == "same" -> stringResource(R.string.auto_same)
+        code.startsWith("error:") -> stringResource(R.string.auto_error, code.removePrefix("error:"))
+        else -> return null
+    }
+    return stringResource(R.string.auto_last, whenText, what)
 }

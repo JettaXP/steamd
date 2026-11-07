@@ -23,12 +23,19 @@ class AutoRepatchWorker(context: Context, params: WorkerParameters) : CoroutineW
         val engine = PatchEngine(applicationContext)
         val steam = SteamApp.find(applicationContext) ?: return Result.success()
         if (engine.status(steam) != SteamStatus.Patched || engine.originalsFor(steam) == null) return Result.success()
-        if (engine.fingerprint(engine.currentOptions()) == settings.appliedFingerprint) return Result.success()
+        val fp = engine.fingerprint(engine.currentOptions())
+        val now = System.currentTimeMillis()
+        if (fp == settings.appliedFingerprint) { settings.lastAuto = "same|$now"; return Result.success() }
+        if (fp == settings.pendingFingerprint) { settings.lastAuto = "pending|$now"; return Result.success() }
         return try {
-            engine.run(steam, silent = true)
+            val applied = kotlinx.coroutines.withTimeout(5 * 60_000L) { engine.run(steam, silent = true) }
+            settings.lastAuto = (if (applied) "applied" else "pending") + "|$now"
             Result.success()
         } catch (e: Exception) {
+            settings.lastAuto = "error:${e.message ?: e.javaClass.simpleName}|$now"
             if (runAttemptCount < 2) Result.retry() else Result.failure()
+        } finally {
+            com.jettaxp.steamd.install.Installer.background = false
         }
     }
 
@@ -39,7 +46,7 @@ class AutoRepatchWorker(context: Context, params: WorkerParameters) : CoroutineW
         fun shouldRun(settings: Settings) =
             Build.VERSION.SDK_INT >= 31 && settings.autoRepatch && settings.colorSource == ColorSource.Wallpaper
 
-        private val constraints = Constraints.Builder().setRequiresBatteryNotLow(true).setRequiresStorageNotLow(true).build()
+        private val constraints = Constraints.Builder().setRequiresStorageNotLow(true).build()
 
         fun schedule(context: Context) {
             val wm = WorkManager.getInstance(context)
@@ -47,10 +54,10 @@ class AutoRepatchWorker(context: Context, params: WorkerParameters) : CoroutineW
                 wm.cancelUniqueWork(PERIODIC)
                 return
             }
-            val request = PeriodicWorkRequestBuilder<AutoRepatchWorker>(1, TimeUnit.HOURS)
+            val request = PeriodicWorkRequestBuilder<AutoRepatchWorker>(15, TimeUnit.MINUTES)
                 .setConstraints(constraints)
                 .build()
-            wm.enqueueUniquePeriodicWork(PERIODIC, ExistingPeriodicWorkPolicy.KEEP, request)
+            wm.enqueueUniquePeriodicWork(PERIODIC, ExistingPeriodicWorkPolicy.UPDATE, request)
         }
 
         fun checkNow(context: Context) {

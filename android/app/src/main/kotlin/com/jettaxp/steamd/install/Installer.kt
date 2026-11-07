@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.first
 import com.jettaxp.steamd.data.SteamApp
 import java.io.File
 
-data class InstallerResult(val action: String, val success: Boolean, val message: String?)
+data class InstallerResult(val action: String, val success: Boolean, val message: String?, val pending: Boolean = false)
 
 object Installer {
     private val events = MutableSharedFlow<InstallerResult>(extraBufferCapacity = 4)
@@ -21,12 +21,15 @@ object Installer {
 
     internal fun emit(r: InstallerResult) { events.tryEmit(r) }
 
+    @Volatile internal var background = false
+
     suspend fun uninstall(context: Context, packageName: String): InstallerResult {
         context.packageManager.packageInstaller.uninstall(packageName, sender(context, ACTION_UNINSTALL))
         return results.first { it.action == ACTION_UNINSTALL }
     }
 
     suspend fun install(context: Context, apks: List<File>, silent: Boolean = false): InstallerResult {
+        background = silent
         val pi = context.packageManager.packageInstaller
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
         if (Build.VERSION.SDK_INT >= 31) {
@@ -67,10 +70,24 @@ class InstallReceiver : BroadcastReceiver() {
                 @Suppress("DEPRECATION")
                 val confirm = if (Build.VERSION.SDK_INT >= 33) intent.getParcelableExtra(Intent.EXTRA_INTENT, Intent::class.java)
                               else intent.getParcelableExtra(Intent.EXTRA_INTENT)
-                confirm?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.let(context::startActivity)
+                if (confirm == null) {
+                    Installer.emit(InstallerResult(action, false, "no confirmation intent"))
+                } else if (Installer.background && action == Installer.ACTION_INSTALL) {
+                    Notifier.showConfirm(context, confirm)
+                    Installer.emit(InstallerResult(action, false, "waiting for confirmation", pending = true))
+                } else {
+                    context.startActivity(confirm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                }
             }
-            else -> Installer.emit(InstallerResult(action, status == PackageInstaller.STATUS_SUCCESS,
-                intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)))
+            else -> {
+                val ok = status == PackageInstaller.STATUS_SUCCESS
+                if (ok && action == Installer.ACTION_INSTALL) {
+                    val settings = com.jettaxp.steamd.data.Settings(context)
+                    settings.pendingFingerprint?.let { settings.appliedFingerprint = it; settings.pendingFingerprint = null }
+                    Notifier.cancel(context)
+                }
+                Installer.emit(InstallerResult(action, ok, intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)))
+            }
         }
     }
 }

@@ -33,7 +33,7 @@ sealed interface Compat {
 
 sealed interface PatchFlow {
     data object Idle : PatchFlow
-    data object Confirm : PatchFlow
+    data class Confirm(val update: Boolean) : PatchFlow
     data class Running(val step: Step, val needsUninstall: Boolean) : PatchFlow
     data object Done : PatchFlow
     data class Failed(val message: String) : PatchFlow
@@ -53,6 +53,7 @@ data class UiState(
     val language: AppLanguage = AppLanguage.System,
     val originalsBytes: Long = 0,
     val autoRepatch: Boolean = true,
+    val autoStatus: String? = null,
 )
 
 class SteamdViewModel(app: Application) : AndroidViewModel(app) {
@@ -79,7 +80,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         }
         _state.update {
             it.copy(steam = steam, status = status, compat = Compat.Checking, keyFingerprint = cert.take(16),
-                originalsBytes = saved, language = Settings.language)
+                originalsBytes = saved, language = Settings.language, autoStatus = settings.lastAuto)
         }
         if (steam != null) {
             val compat = withContext(Dispatchers.IO) { probe(steam, status) }
@@ -179,7 +180,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         refresh()
     }
 
-    fun startPatch() = _state.update { it.copy(flow = PatchFlow.Confirm) }
+    fun startPatch() = _state.update { it.copy(flow = PatchFlow.Confirm(update = it.status == SteamStatus.Patched)) }
     fun dismissFlow() = _state.update { it.copy(flow = PatchFlow.Idle) }.also { refresh() }
 
     fun runPatch() = viewModelScope.launch {
