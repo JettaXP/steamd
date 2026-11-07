@@ -218,3 +218,22 @@
   background: var(--sd-p) !important;
   color: var(--sd-on-p) !important;
 }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub a.Focusable:has(img, [style*="background-image"]) {
+  display: block;
+  margin: 8px 12px !important;
+  border-radius: var(--sd-r-l) !important;
+  overflow: hidden;
+  background-color: var(--sd-c) !important;
+  box-shadow: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub a.Focusable:has(img, [style*="background-image"]) img {
+  border-radius: var(--sd-r-m);
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub,
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub * {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub :is(h1, h2, h3, h4, [class*="Title"], [class*="Header"]) {
+  font-weight: 500 !important;
+}
