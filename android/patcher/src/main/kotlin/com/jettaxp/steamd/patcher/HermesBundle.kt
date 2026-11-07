@@ -156,6 +156,20 @@ class HermesBundle(original: ByteArray) {
 
     fun putInt(position: Int, value: Int) = buf.putInt(position, value)
 
+    fun putShort(position: Int, value: Int) = buf.putShort(position, value.toShort())
+
+    fun findInFile(signature: ByteArray): List<Int> {
+        val res = mutableListOf<Int>()
+        var p = 0
+        val end = pristine.size - signature.size
+        outer@ while (p <= end) {
+            for (k in signature.indices) if (pristine[p + k] != signature[k]) { p++; continue@outer }
+            res += p
+            p++
+        }
+        return res
+    }
+
     fun writeStorage(offset: Int, bytes: ByteArray) {
         System.arraycopy(bytes, 0, data, storageOffset + offset, bytes.size)
     }

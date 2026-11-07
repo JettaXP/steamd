@@ -82,6 +82,7 @@ object SteamThemePatch {
         val colors: Boolean = true,
         val storeTheme: Boolean = true,
         val radius: Pair<Int, Int>? = DEFAULT_RADIUS,
+        val uppercase: Boolean = false,
     )
 
     class Result(val bundle: ByteArray, val hermesVersion: Int, val colorsReplaced: Int, val storeTheme: Boolean,
@@ -93,7 +94,22 @@ object SteamThemePatch {
         val colors = if (options.colors) patchColors(hb, options.palette, log) else 0
         val store = if (options.storeTheme) patchWebView(hb, options.primary, options.cssUrl, log) else false
         val radius = options.radius?.let { patchRadius(hb, it, log) } ?: false
+        if (!options.uppercase) patchUppercase(hb, log)
         return Result(hb.finish(), hb.version, colors, store, radius, log)
+    }
+
+    private fun patchUppercase(hb: HermesBundle, log: MutableList<String>): Boolean {
+        val up = hb.findExact("uppercase")
+        val esm = hb.findExact("__esModule")
+        if (up.size != 1 || esm.size != 1 || up[0] > 0xFFFF || esm[0] > 0xFFFF) {
+            log += "skip uppercase: strings not found in this version"; return false
+        }
+        val sig = byteArrayOf(0x37, 0x00, 0x02, 0x05, (up[0] and 0xFF).toByte(), (up[0] shr 8).toByte(), 0x79, 0x01)
+        val hits = hb.findInFile(sig)
+        if (hits.size != 1) { log += "skip uppercase: text component not found (${hits.size} matches)"; return false }
+        hb.putShort(hits[0] + 4, esm[0])
+        log += "uppercase text: off"
+        return true
     }
 
     private fun patchRadius(hb: HermesBundle, radius: Pair<Int, Int>, log: MutableList<String>): Boolean {

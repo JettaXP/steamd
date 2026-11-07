@@ -271,8 +271,31 @@ def patch_radius(pt, radius):
     return True
 
 
+def patch_uppercase(pt):
+    """Sentence case everywhere: the shared Text component reads props.uppercase; make it read props.__esModule."""
+    S = pt.rd.strings
+    up = [i for i, s in enumerate(S) if s == "uppercase"]
+    esm = [i for i, s in enumerate(S) if s == "__esModule"]
+    if len(up) != 1 or len(esm) != 1 or up[0] > 0xFFFF or esm[0] > 0xFFFF:
+        print("  [skip] uppercase: strings not found in this version")
+        return False
+    sig = bytes([0x37, 0x00, 0x02, 0x05]) + up[0].to_bytes(2, "little") + bytes([0x79, 0x01])
+    data = bytes(pt.out)
+    hits = []
+    p = data.find(sig)
+    while p != -1:
+        hits.append(p)
+        p = data.find(sig, p + 1)
+    if len(hits) != 1:
+        print(f"  [skip] uppercase: text component not found ({len(hits)} matches)")
+        return False
+    pt.out[hits[0] + 4:hits[0] + 6] = esm[0].to_bytes(2, "little")
+    print("  uppercase text: off")
+    return True
+
+
 def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_url=DEFAULT_CSS,
-                 colors=True, store=True, radius=DEFAULT_RADIUS):
+                 colors=True, store=True, radius=DEFAULT_RADIUS, uppercase=False):
     if data[:8] != bytes.fromhex("c61fbc03c103191f"):
         sys.exit("Not a Hermes bundle")
     ver = int.from_bytes(data[8:12], "little")
@@ -282,6 +305,8 @@ def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_u
     n = patch_colors(pt, palette) if colors else 0
     s = patch_webview(pt, seed_primary, css_url) if store else False
     rr = patch_radius(pt, radius) if radius else False
+    if not uppercase:
+        patch_uppercase(pt)
     print(f"Hermes v{ver}: colours replaced: {n}; store theme: {'yes' if s else 'no'}; radius: {'yes' if rr else 'no'}")
     return pt.finish()
 
@@ -325,6 +350,7 @@ def main():
     ap.add_argument("--css-url", default=DEFAULT_CSS, help="stylesheet for the store and news")
     ap.add_argument("--radius", default="%d,%d" % DEFAULT_RADIUS,
                     help='corner radius "standard,large" in dp (Steam: 4,10), or "off"')
+    ap.add_argument("--keep-uppercase", action="store_true", help="keep Steam's UPPERCASE titles")
     ap.add_argument("--no-colors", action="store_true", help="keep the native theme colours")
     ap.add_argument("--no-store-theme", action="store_true", help="do not load CSS in the store and news")
     ap.add_argument("--check", action="store_true", help="patch a bare bundle (dry run unless dst is given)")
@@ -345,7 +371,8 @@ def main():
         except (ValueError, AssertionError):
             ap.error('--radius must look like "12,24" or "off"')
     kw = dict(palette=palette, seed_primary=primary, css_url=a.css_url,
-              colors=not a.no_colors, store=not a.no_store_theme, radius=radius)
+              colors=not a.no_colors, store=not a.no_store_theme, radius=radius,
+              uppercase=a.keep_uppercase)
 
     if a.check:
         out = patch_bundle(open(a.src, "rb").read(), **kw)
