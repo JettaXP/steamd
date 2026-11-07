@@ -6,27 +6,43 @@ import sys
 from hbcasm import Fn, load, fid_by_name, sid, ins, u16, u32
 
 
+LAYOUT_ANIMATION_MODULE = 395   # Metro id of react-native/Libraries/LayoutAnimation (checked against the __d call)
+
+
 def tab_bar_item(rd, data):
-    """BuiltinTabBarItem: drop the focus line and the debug warnings, wrap the icon in an M3 pill
-    (Box with borderRadius 'full', paddingX 'gutter', paddingY 'xxsmall', background 'neutral' when focused)."""
+    """BuiltinTabBarItem: Material 3 navigation bar item.
+    The focus line goes; the icon sits in a pill Box (borderRadius 'full', paddingY 'xxsmall'):
+    focused  -> paddingX 'gutter', marginX 'none', background 'neutral' (secondary container),
+    otherwise -> paddingX 'small', marginX 'xsmall' (same total width, so icons never shift).
+    On the focused item LayoutAnimation.easeInEaseOut() is armed, so the pill grows from the icon.
+    Room: the debug warnings, the focus line, hitSlop, the default position: relative, reloads of jsx."""
     f = Fn(rd.r, fid_by_name(rd, "BuiltinTabBarItem"), data)
-    pill_literal = bytes([0x02, 10]) + literal(rd, data, "PendingRequestDetails", "05000400", 85239)
-    add = (pill_literal
-           + ins("LoadConstUndefined", 16)
-           + ins("JmpFalse", 7, 15)
-           + ins("LoadConstString", 16, u16(sid(rd, "neutral")))
-           + ins("PutById", 10, 16, 0, u16(sid(rd, "background")))
-           + ins("LoadConstString", 16, u16(sid(rd, "gutter")))
-           + ins("PutById", 10, 16, 0, u16(sid(rd, "paddingX")))
-           + ins("PutNewOwnByIdShort", 10, 8, sid(rd, "children"))
-           + ins("LoadFromEnvironment", 16, 9, 14)
-           + ins("GetByIdShort", 16, 16, 0, sid(rd, "jsx"))
-           + ins("LoadFromEnvironment", 17, 9, 8)
-           + ins("GetByIdShort", 17, 17, 0, sid(rd, "Box"))
-           + ins("Call3", 8, 16, 3, 17, 10))
-    padding = bytes([0x6E, 0x00, 13])                          # paddingVertical 17 -> 13 for the taller pill
-    return f, f.rewrite(delete=[(0x9F, 0xBC), (0x115, 0x118), (0x171, 0x189), (0x1F3, 0x209)],
-                        insert={0x118: padding, 0x1B0: add})
+    S = lambda x: u16(sid(rd, x))
+    anim = (ins("GetGlobalObject", 17)
+            + ins("GetById", 17, 17, 0, S("__r"))
+            + ins("LoadConstInt", 14, u32(LAYOUT_ANIMATION_MODULE))
+            + ins("Call2", 17, 17, 3, 14)
+            + ins("GetByIdShort", 17, 17, 0, sid(rd, "default"))
+            + ins("GetById", 14, 17, 0, S("easeInEaseOut"))
+            + ins("Call1", 17, 14, 17))
+    focused = (ins("LoadConstString", 17, S("gutter")) + ins("PutById", 10, 17, 0, S("paddingX"))
+               + ins("LoadConstString", 16, S("none")) + ins("LoadConstString", 11, S("neutral")) + anim)
+    pill = (bytes([0x02, 10]) + literal(rd, data, "PendingRequestDetails", "05000400", 85239)
+            + ins("LoadConstString", 16, S("xsmall"))
+            + ins("LoadConstUndefined", 11)
+            + ins("JmpFalse", 3 + len(focused), 15)
+            + focused
+            + ins("PutById", 10, 16, 0, S("marginX"))
+            + ins("PutById", 10, 11, 0, S("background"))
+            + ins("PutNewOwnByIdShort", 10, 8, sid(rd, "children"))
+            + ins("Call3", 8, 2, 3, 5, 10))
+    return f, f.rewrite(
+        delete=[(0x9F, 0xBC), (0x113, 0x11D), (0x132, 0x13B), (0x14E, 0x152), (0x160, 0x189), (0x1BA, 0x1C3),
+                (0x1F3, 0x209)],
+        insert={0x13B: ins("Mov", 6, 2),
+                0x152: ins("LoadConstString", 16, S("small")) + ins("PutNewOwnById", 4, 16, S("paddingY")),
+                0x1B0: pill,
+                0x1C3: ins("Mov", 11, 2)})
 
 
 def row_style(rd, reg, tmp, tmp2):
