@@ -55,7 +55,7 @@ adb install-multiple signed/*.apk
 | `--css-url URL` | свой CSS для магазина и новостей (https) |
 | `--no-store-theme` | не подключать CSS в магазине и новостях |
 | `--no-colors` | оставить родные цвета приложения |
-| `--steam-icons` | оставить родные иконки вкладок и меню |
+| `--steam-icons` | оставить родные иконки нижней панели |
 
 Без `--seed` используется палитра `PALETTE` в начале `patch/patch_steam.py`.
 Проверить бандл без сборки APK:
@@ -85,7 +85,7 @@ python patch/patch_steam.py --check index.android.bundle
 - [kuska1/Material-Theme](https://github.com/kuska1/Material-Theme) (MIT), тема для Millennium, вдохновившая тему магазина.
 - [hermes-dec](https://github.com/P1sec/hermes-dec), разбор байткода Hermes.
 - [Google Sans](https://github.com/googlefonts/googlesans) (SIL OFL 1.1), шрифт для приложения Steam; статические начертания лежат в `android/app/src/main/assets/fonts`.
-- [Material Symbols](https://github.com/google/material-design-icons) (Apache-2.0), иконки вкладок и меню Steam (залитая у активной вкладки, контурная у остальных); пути лежат в `patch/patch_steam.py`, лицензия в `patch/LICENSE-MaterialSymbols.txt`.
+- [Material Symbols](https://github.com/google/material-design-icons) (Apache-2.0), иконки нижней панели Steam (залитая у активной вкладки, контурная у остальных); пути лежат в `patch/patch_steam.py`, лицензия в `patch/LICENSE-MaterialSymbols.txt`.
 - [Material Web](https://github.com/material-components/material-web) (Apache-2.0), компоненты сайта. Сборка лежит в `assets/material-web.js`, лицензии сохранены в конце файла.
 - [Material Color Utilities](https://github.com/material-foundation/material-color-utilities) (Apache-2.0), генерация палитры на сайте (`assets/color-utils.js`).
 

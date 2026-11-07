@@ -68,32 +68,30 @@ object SteamThemePatch {
 
     private val ICON_PATHS = listOf(
         Triple(
-            "M18.7666 10.6777L10.6777 18.7666L2.22217",
+            "M20 10.2216L10.2216 20L0 9.77837V0H9.77837",
             "m17.8 11.9l-6 6q-.2.2-.6.4t-.6.1q-.3 0-.6-.1t-.6-.4l-7.4-7.4q-.2-.2-.4-.5t-.1-.6l0-6q0-.7.5-1.2t1.2-.5l6 0q.3 0 .6.1t.5.4l7.3 7.4q.2.2 .4.6t.1.6q0 .3-.1.6t-.4.6zm-12.4-5.2q.5 0 .9-.4t.4-.9q0-.5-.4-.9t-.9-.4q-.5 0-.9.4t-.4.9q0 .5.4 .9t.9.4z",
             "m17.8 11.9l-6 6q-.2.2-.6.4t-.6.1q-.3 0-.6-.1t-.6-.4l-7.4-7.4q-.2-.2-.4-.5t-.1-.6l0-6q0-.7.5-1.2t1.2-.5l6 0q.3 0 .6.1t.5.4l7.3 7.4q.2.2 .4.6t.1.6q0 .3-.1.6t-.4.6zm-7.1 4.8l6-6l-7.4-7.4l-6 0l0 6l7.4 7.4zm-5.3-10q.5 0 .9-.4t.4-.9q0-.5-.4-.9t-.9-.4q-.5 0-.9.4t-.4.9q0 .5.4 .9t.9.4zm4.6 3.3z",
         ),
         Triple(
-            "M3.08634 17.7158H16.9428C17.8015 17.7158",
-            "m3.33 17.5q-.69 0-1.18-.49t-.49-1.18l0-12.83q0-.15.12-.2t.23.05l1.04 1.04l1.08-1.1q.12-.12.29-.12t.29.12l1.1 1.1l1.1-1.1q.12-.12.29-.12t.29.12l1.08 1.1l1.1-1.1q.12-.12.29-.12t.29.12l1.1 1.1l1.08-1.1q.12-.12.29-.12t.29.12l1.1 1.1l1.1-1.1q.12-.12.29-.12t.29.12l1.08 1.1l1.04-1.04q.1-.1.23-.05t.12.2l0 12.83q0 .69-.49 1.18t-1.18.49l-13.33 0zm0-1.67l5.83 0l0-5l-5.83 0l0 5zm7.5 0l5.83 0l0-1.67l-5.83 0l0 1.67zm0-3.33l5.83 0l0-1.67l-5.83 0l0 1.67zm-7.5-3.33l13.33 0l0-2.5l-13.33 0l0 2.5z",
+            "M33 3H3V33C3 33.5523 3.44772 34 4 34H32",
+            "m3.3 17.5q-.7 0-1.2-.5t-.5-1.2l0-12.8q0-.1.1-.2t.2.1l1 1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1-1q.1-.1.2-.1t.1.2l0 12.8q0 .7-.5 1.2t-1.2.5l-13.3 0zm0-1.7l5.8 0l0-5l-5.8 0l0 5zm7.5 0l5.8 0l0-1.7l-5.8 0l0 1.7zm0-3.3l5.8 0l0-1.7l-5.8 0l0 1.7zm-7.5-3.3l13.3 0l0-2.5l-13.3 0l0 2.5z",
             "m3.3 17.5q-.7 0-1.2-.5t-.5-1.2l0-12.8q0-.1.1-.2t.2.1l1 1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1.1-1.1q.1-.1.3-.1t.3.1l1.1 1.1l1-1q.1-.1.2-.1t.1.2l0 12.8q0 .7-.5 1.2t-1.2.5l-13.3 0zm0-1.7l5.8 0l0-5l-5.8 0l0 5zm7.5 0l5.8 0l0-1.7l-5.8 0l0 1.7zm0-3.3l5.8 0l0-1.7l-5.8 0l0 1.7zm-7.5-3.3l13.3 0l0-2.5l-13.3 0l0 2.5z",
         ),
         Triple(
-            "M3.54839 4.13364C4.64516 3.89862 5.66359",
-            "m10 18.25q-.15 0-.27-.02t-.25-.06q-2.81-.94-4.48-3.47t-1.67-5.45l0-3.94q0-.52.3-.94t.78-.6l5-1.88q.29-.1.58-.1t.58.1l5 1.88q.48.19 .78.6t.3.94l0 3.94q0 2.92-1.67 5.45t-4.48 3.47q-.12.04-.25.06t-.27.02z",
+            "M2.64516 3.68664C3.93548 3.41014 5.13364",
+            "m10 18.2q-.1 0-.3 0t-.2-.1q-2.8-.9-4.5-3.5t-1.7-5.4l0-3.9q0-.5.3-.9t.8-.6l5-1.9q.3-.1.6-.1t.6.1l5 1.9q.5.2 .8.6t.3.9l0 3.9q0 2.9-1.7 5.4t-4.5 3.5q-.1 0-.2.1t-.3 0z",
             "m10 18.2q-.1 0-.3 0t-.2-.1q-2.8-.9-4.5-3.5t-1.7-5.4l0-3.9q0-.5.3-.9t.8-.6l5-1.9q.3-.1.6-.1t.6.1l5 1.9q.5.2 .8.6t.3.9l0 3.9q0 2.9-1.7 5.4t-4.5 3.5q-.1 0-.2.1t-.3 0zm0-1.7q2.2-.7 3.6-2.8t1.4-4.6l0-3.9l-5-1.9l-5 1.9l0 3.9q0 2.5 1.4 4.6t3.6 2.8zm0-6.6z",
         ),
         Triple(
-            "M17.7777 13.3333V14.4444H2.22217V13.3333",
-            "m4.17 15.83q-.35 0-.59-.24t-.24-.59q0-.35.24-.59t.59-.24l.83 0l0-5.83q0-1.73 1.04-3.07t2.71-1.76l0-.58q0-.52.36-.89t.89-.36q.52 0 .89.36t.36.89l0 .58q1.67.42 2.71 1.76t1.04 3.07l0 5.83l.83 0q.35 0 .59.24t.24.59q0 .35-.24.59t-.59.24l-11.67 0zm5.83 2.5q-.69 0-1.18-.49t-.49-1.18l3.33 0q0 .69-.49 1.18t-1.18.49z",
+            "M18 13.75V15H2V13.75L4.28571 10.625V6.25",
+            "m4.2 15.8q-.4 0-.6-.2t-.2-.6q0-.4.2-.6t.6-.2l.8 0l0-5.8q0-1.7 1-3.1t2.7-1.8l0-.6q0-.5.4-.9t.9-.4q.5 0 .9.4t.4.9l0 .6q1.7.4 2.7 1.8t1 3.1l0 5.8l.8 0q.4 0 .6.2t.2.6q0 .4-.2.6t-.6.2l-11.7 0zm5.8 2.5q-.7 0-1.2-.5t-.5-1.2l3.3 0q0 .7-.5 1.2t-1.2.5z",
             "m4.2 15.8q-.4 0-.6-.2t-.2-.6q0-.4.2-.6t.6-.2l.8 0l0-5.8q0-1.7 1-3.1t2.7-1.8l0-.6q0-.5.4-.9t.9-.4q.5 0 .9.4t.4.9l0 .6q1.7.4 2.7 1.8t1 3.1l0 5.8l.8 0q.4 0 .6.2t.2.6q0 .4-.2.6t-.6.2l-11.7 0zm5.8-6.2zm0 8.8q-.7 0-1.2-.5t-.5-1.2l3.3 0q0 .7-.5 1.2t-1.2.5zm-3.3-4.2l6.7 0l0-5.8q0-1.4-1-2.4t-2.4-1q-1.4 0-2.4 1t-1 2.4l0 5.8z",
         ),
     )
     private const val SVG24 = "<svg width=24 height=24 viewBox=\"0 0 24 24\"fill=none xmlns=http://www.w3.org/2000/svg><path d=\""
     private val ICON_DONORS = listOf("M16 21H16.2", "M2.5 21.4998L8.", "M7.5 12L10.5 15", "M9 9L15 15M15 9").map { SVG24 + it }
-    private val ICON_FN_HEAD = hexBytes(
-        "03046e00193f0400d66c070108080459002c032900002e01000336030101a32e01000237020102c372030173" +
-            "05eb0e3f01051608080108070459042c032e04000336060401a32e000000370500035f57760002"
-    )
+    private const val ICON_SPARE_ENTRY = SVG24 + "M9 3H15M3 6H21M"
+    private val ICON_FN_HEAD = hexBytes("2900002e01000236030101a32e01000137020102c37203016c070108080159042c037305")
     private val ICON_FN_TAIL = hexBytes("54050600050473045b0046010504015400030002015c00")
 
     private val RADIUS_SIGNATURE = hexBytes(
@@ -172,23 +170,22 @@ object SteamThemePatch {
         return true
     }
 
-    private fun iconBody(head: ByteArray, literal: ByteArray, outline: Int, ids: Map<String, Int>): ByteArray {
+    private fun iconBody(p: Int, data: ByteArray, filled: Int, outline: Int, ids: Map<String, Int>): ByteArray {
         val b = java.io.ByteArrayOutputStream()
         fun w(vararg v: Int) = v.forEach { b.write(it) }
         fun u16(v: Int) = w(v and 0xFF, (v ushr 8) and 0xFF)
-        w(0x03, 0x01, 0x6E, 0x00, 0x19, 0x3F, 0x01, 0x00, ids.getValue("size"))
-        w(0x73, 0x05); b.write(head, 0x2D, 2)
+        fun u32(v: Int) { u16(v and 0xFFFF); u16(v ushr 16) }
+        b.write(data, p, 0x16)
+        w(0x03, 0x01, 0x73, 0x05); u16(ids.getValue("box"))
         w(0x3F, 0x01, 0x05, ids.getValue("viewBox"))
-        w(0x6C, 0x07, 0x01, 0x08, 0x08, 0x01, 0x59, 0x00, 0x2C, 0x03)
-        w(0x29, 0x00, 0x00, 0x2E, 0x02, 0x00, 0x03, 0x36, 0x03, 0x02, 0x01, ids.getValue("jsx"))
-        w(0x2E, 0x02, 0x00, 0x02, 0x37, 0x02, 0x02, 0x02); b.write(head, 0x27, 2)
-        w(0x2E, 0x00, 0x00, 0x00, 0x37, 0x05, 0x00, 0x03); b.write(head, 0x4E, 2)
-        w(0x76, 0x00); b.write(literal)
-        w(0x37, 0x06, 0x01, 0x00); u16(ids.getValue("tone"))
-        w(0x90, 0x0F, 0x06)
-        w(0x74, 0x06); u16(outline and 0xFFFF); u16(outline ushr 16)
-        w(0x3B, 0x04, 0x06, 0x00); u16(ids.getValue("d"))
-        w(0x54, 0x05, 0x03, 0x00, 0x05, 0x04)
+        w(0x6C, 0x07, 0x01, 0x08, 0x08, 0x01, 0x59, 0x04, 0x2C, 0x03)
+        w(0x2E, 0x00, 0x00, 0x00); b.write(data, p + 0x3C, 6)
+        w(0x03, 0x04, 0x37, 0x06, 0x01, 0x00); u16(ids.getValue("tone"))
+        w(0x74, 0x00); u32(filled)
+        w(0x90, 0x09, 0x06)
+        w(0x74, 0x00); u32(outline)
+        w(0x3F, 0x04, 0x00, ids.getValue("d"))
+        w(0x76, 0x00, 0x54, 0x05, 0x03, 0x00, 0x05, 0x04)
         w(0x3B, 0x01, 0x05, 0x00); u16(ids.getValue("children"))
         w(0x54, 0x00, 0x03, 0x00, 0x02, 0x01, 0x5C, 0x00)
         return b.toByteArray()
@@ -203,58 +200,73 @@ object SteamThemePatch {
         return -1
     }
 
-    private fun patchIcons(hb: HermesBundle, log: MutableList<String>): Boolean {
-        val ids = HashMap<String, Int>()
-        for (name in listOf("tone", "d", "children")) {
-            val l = hb.findExact(name)
-            if (l.size != 1 || l[0] > 0xFFFF) { log += "skip icons: strings not found"; return false }
-            ids[name] = l[0]
-        }
+    private fun matches(data: ByteArray, at: Int, sig: ByteArray) =
+        at + sig.size <= data.size && sig.indices.all { data[at + it] == sig[it] }
+
+    private fun u16At(data: ByteArray, at: Int) = (data[at].toInt() and 0xFF) or ((data[at + 1].toInt() and 0xFF) shl 8)
+
+    private fun iconFunctions(hb: HermesBundle): Map<Int, Int> {
         val data = hb.data
-        val fns = HashMap<Int, Pair<Int, ByteArray>>()
+        val fns = HashMap<Int, Int>()
         var p = indexOf(data, ICON_FN_HEAD, 0)
         while (p != -1) {
-            val lit = data.copyOfRange(p + 0x52, p + 0x60)
-            if (data.copyOfRange(p + 0x60, p + 0x77).contentEquals(ICON_FN_TAIL)) {
-                val v = hb.objectValuesOffset + ((lit[10].toInt() and 0xFF) or ((lit[11].toInt() and 0xFF) shl 8) or
-                    ((lit[12].toInt() and 0xFF) shl 16) or ((lit[13].toInt() and 0xFF) shl 24))
+            if (matches(data, p + 0x42, hexBytes("03047300")) && matches(data, p + 0x48, hexBytes("3f0400107600")) &&
+                matches(data, p + 0x4E, ICON_FN_TAIL)) {
+                fns[u16At(data, p + 0x46)] = p
+            } else if (matches(data, p + 0x42, hexBytes("76000204")) && matches(data, p + 0x52, ICON_FN_TAIL)) {
+                val v = hb.objectValuesOffset + (u16At(data, p + 0x4E) or (u16At(data, p + 0x50) shl 16))
                 val tag = data[v].toInt() and 0xFF
-                if (tag ushr 4 == 5) {
-                    val n = tag and 0xF
-                    fns[(data[v + 2 * n - 1].toInt() and 0xFF) or ((data[v + 2 * n].toInt() and 0xFF) shl 8)] = p to lit
-                }
+                if (tag ushr 4 == 5) fns[u16At(data, v + 2 * (tag and 0xF) - 1)] = p
             }
             p = indexOf(data, ICON_FN_HEAD, p + 1)
         }
-        val first = fns.values.firstOrNull() ?: run { log += "skip icons: original icons not found"; return false }
-        val head = data.copyOfRange(first.first, first.first + 0x52)
-        ids["size"] = head[8].toInt() and 0xFF
-        ids["viewBox"] = head[0x32].toInt() and 0xFF
-        ids["jsx"] = head[0x1E].toInt() and 0xFF
-        val targets = ICON_PATHS.map { (prefix, filled, outline) ->
+        return fns
+    }
+
+    private fun patchIcons(hb: HermesBundle, log: MutableList<String>): Boolean {
+        val ids = HashMap<String, Int>()
+        for ((key, name) in listOf("tone" to "tone", "d" to "d", "children" to "children", "viewBox" to "viewBox", "box" to "0 0 20 20")) {
+            val l = hb.findExact(name)
+            val max = if (key == "d" || key == "viewBox") 0xFF else 0xFFFF
+            if (l.size != 1 || l[0] > max) { log += "skip icons: strings not found"; return false }
+            ids[key] = l[0]
+        }
+        val fns = iconFunctions(hb)
+        val originals = ICON_PATHS.map { (prefix, _, _) ->
             val l = hb.findStartingWith(prefix)
-            if (l.size != 1 || l[0] !in fns) { log += "skip icons: original icons not found"; return false }
-            Triple(l[0], filled.toByteArray(Charsets.US_ASCII), outline.toByteArray(Charsets.US_ASCII))
+            if (l.size != 1 || l[0] !in fns) { log += "skip icons: tab icons not found"; return false }
+            l[0]
         }
         val donors = ICON_DONORS.map { prefix ->
-            val d = hb.findDonor(listOf(prefix), 1) ?: run { log += "skip icons: no donor strings"; return false }
-            d to intArrayOf(hb.storageOffsetOf(d), hb.storageOffsetOf(d) + hb.byteLength(d))
+            hb.findDonor(listOf(prefix), 1) ?: run { log += "skip icons: no donor strings"; return false }
         }
-        val jobs = targets.map { it.first to it.second } + targets.mapIndexed { k, t -> donors[k].first to t.third }
-        for ((i, raw) in jobs) {
-            val slot = donors.map { it.second }.firstOrNull { it[1] - it[0] >= raw.size }
-                ?: run { log += "skip icons: donors too small"; return false }
+        val spare = hb.findStartingWith(ICON_SPARE_ENTRY)
+        if (spare.size != 1) { log += "skip icons: no spare string entry"; return false }
+        val extras = ArrayDeque(donors + spare)
+        val paths = ICON_PATHS.flatMap { (_, f, o) -> listOf(f, o) }.map { it.toByteArray(Charsets.US_ASCII) }
+        val entry = IntArray(paths.size)
+        originals.forEachIndexed { n, orig ->
+            val fits = hb.isOverflow(orig) || paths[2 * n].size < 0xFF
+            entry[2 * n] = if (fits) orig else extras.removeFirstOrNull() ?: run { log += "skip icons: no string entries"; return false }
+            entry[2 * n + 1] = extras.removeFirstOrNull() ?: run { log += "skip icons: no string entries"; return false }
+        }
+        val slots = donors.map { intArrayOf(hb.storageOffsetOf(it), hb.storageOffsetOf(it) + hb.byteLength(it)) }
+        for (k in paths.indices.sortedWith(compareBy({ -paths[it].size }, { it }))) {
+            val raw = paths[k]
+            val slot = slots.firstOrNull { it[1] - it[0] >= raw.size } ?: run { log += "skip icons: donors too small"; return false }
             hb.writeStorage(slot[0], raw)
-            hb.repoint(i, slot[0], raw.size)
+            hb.repoint(entry[k], slot[0], raw.size)
             slot[0] += raw.size
         }
-        targets.forEachIndexed { k, t ->
-            val (pos, lit) = fns.getValue(t.first)
-            val body = iconBody(head, lit, donors[k].first, ids)
-            check(body.size <= 0x77)
-            System.arraycopy(body, 0, data, pos, body.size)
+        val bodies = originals.mapIndexed { n, orig ->
+            val p = fns.getValue(orig)
+            p to iconBody(p, hb.data, entry[2 * n], entry[2 * n + 1], ids)
         }
-        log += "icons: Material Symbols (filled when active)"
+        for ((p, body) in bodies) {
+            check(body.size == 0x65)
+            System.arraycopy(body, 0, hb.data, p, body.size)
+        }
+        log += "icons: Material Symbols on the tab bar (filled when active)"
         return true
     }
 
