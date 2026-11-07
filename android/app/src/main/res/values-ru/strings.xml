@@ -110,6 +110,6 @@
     <string name="auto_no_notif">Разрешите уведомления, чтобы steamd мог попросить подтвердить обновление</string>
     <string name="google_sans">Шрифт Google Sans</string>
     <string name="material_icons">Иконки Material</string>
-    <string name="material_icons_desc">Material Symbols на нижней панели Steam, у активной вкладки залитая. После изменения примените патч заново</string>
+    <string name="material_icons_desc">Material Symbols на нижней панели Steam и «таблетка» Material 3 у активной вкладки. После изменения примените патч заново</string>
     <string name="google_sans_desc">Заменяет Motiva Sans во всём приложении Steam. После изменения примените патч заново</string>
 </resources>
