@@ -95,7 +95,6 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Checks that the (original) bundle can be patched. */
     private fun probe(steam: SteamInfo, status: SteamStatus): Compat = runCatching {
         val base = if (status == SteamStatus.Patched) originalsFor(steam)?.first()
             ?: return Compat.Unsupported("original APKs of this version are not saved")
@@ -133,13 +132,11 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         _state.update { it.copy(appDynamicColor = on) }
     }
 
-    /** Applies the language; the activity is recreated by AndroidX. */
     fun setLanguage(language: AppLanguage) {
         _state.update { it.copy(language = language) }
         Settings.language = language
     }
 
-    /** Deletes the saved original APKs (re-patching then needs the official app again). */
     fun clearOriginals() = viewModelScope.launch {
         withContext(Dispatchers.IO) { originals.deleteRecursively() }
         refresh()
@@ -189,10 +186,6 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /**
-     * Keeps a copy of the official APKs (base first): after installing the patched app they are the
-     * only source for re-patching with other colours.
-     */
     private fun saveOriginals(steam: SteamInfo): List<File> {
         originalsFor(steam)?.let { return it }
         if (_state.value.status == SteamStatus.Patched) throw IllegalStateException("original APKs are not saved")
@@ -215,7 +208,6 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     private fun storedOfficialCert(): String? = File(originals, "official.cert").takeIf { it.exists() }?.readText()
 
     companion object {
-        // The key file lives in app-private storage; the password only satisfies the PKCS12 format.
         private val PASSWORD = "steamd".toCharArray()
     }
 }

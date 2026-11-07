@@ -3,7 +3,6 @@ package com.jettaxp.steamd.patcher
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-/** Reads family name, weight and italic flag from a TrueType/OpenType font. */
 data class FontInfo(val family: String, val weight: Int, val italic: Boolean) {
     companion object {
         fun read(bytes: ByteArray): FontInfo {

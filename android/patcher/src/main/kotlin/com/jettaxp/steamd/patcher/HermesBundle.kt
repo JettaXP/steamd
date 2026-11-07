@@ -4,20 +4,9 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.MessageDigest
 
-/**
- * Minimal reader/writer for the string table of a Hermes bytecode bundle.
- *
- * Only the string table is touched: entries can be repointed to other bytes in
- * the string storage. Bytecode, offsets and the file size stay the same, and the
- * SHA-1 footer is recomputed by [finish].
- *
- * Layout (bytecode v84-v96): 128-byte header, function headers (16 bytes each),
- * string kinds (4 bytes each), identifier hashes (4 bytes each),
- * small string table (4 bytes each), overflow string table (8 bytes each), string storage.
- */
 class HermesBundle(original: ByteArray) {
     val data: ByteArray = original.copyOf()
-    // Lookups always read the unmodified bytes, so earlier writes do not affect later searches.
+
     private val pristine: ByteArray = original
     private val buf: ByteBuffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN)
 
@@ -27,13 +16,11 @@ class HermesBundle(original: ByteArray) {
     private val overflowTableOffset: Int
     private val storageOffset: Int
 
-    // Per-string view of the ORIGINAL table (used for lookups and overlap checks).
     private val offsets: IntArray
-    private val lengths: IntArray      // in bytes
+    private val lengths: IntArray
     private val utf16: BooleanArray
     private val overflow: BooleanArray
 
-    // Overlap index: strings sorted by offset, with the two largest end positions so far.
     private val sorted: IntArray
     private val sortedOffsets: IntArray
     private val maxEnd1: IntArray
@@ -100,7 +87,6 @@ class HermesBundle(original: ByteArray) {
     fun isOverflow(i: Int) = overflow[i]
     fun byteLength(i: Int) = lengths[i]
 
-    /** Latin-1 value of string [i] in the original bundle (null for UTF-16 strings). */
     fun string(i: Int): String? =
         if (utf16[i]) null else String(pristine, storageOffset + offsets[i], lengths[i], Charsets.ISO_8859_1)
 
@@ -128,7 +114,6 @@ class HermesBundle(original: ByteArray) {
         return (0 until stringCount).filter { originalStartsWith(it, b) }
     }
 
-    /** True if any string other than [i] uses bytes in [a, b) of the storage. */
     fun isShared(i: Int, a: Int, b: Int): Boolean {
         var lo = 0; var hi = stringCount
         while (lo < hi) { val m = (lo + hi) ushr 1; if (sortedOffsets[m] < b) lo = m + 1 else hi = m }
@@ -138,7 +123,6 @@ class HermesBundle(original: ByteArray) {
         return best > a
     }
 
-    /** First string (in table order) that starts with one of [prefixes], is at least [need] bytes and shares no storage. */
     fun findDonor(prefixes: List<String>, need: Int): Int? {
         for (prefix in prefixes) {
             val pb = prefix.toByteArray(Charsets.ISO_8859_1)
@@ -155,7 +139,6 @@ class HermesBundle(original: ByteArray) {
         System.arraycopy(bytes, 0, data, storageOffset + offset, bytes.size)
     }
 
-    /** Point string [i] at storage bytes [offset, offset + length). */
     fun repoint(i: Int, offset: Int, length: Int) {
         val t = smallTableOffset + 4 * i
         val v = buf.getInt(t)
@@ -169,7 +152,6 @@ class HermesBundle(original: ByteArray) {
         }
     }
 
-    /** Recomputes the SHA-1 footer and returns the patched bundle. */
     fun finish(): ByteArray {
         System.arraycopy(sha1(data, data.size - 20), 0, data, data.size - 20, 20)
         return data

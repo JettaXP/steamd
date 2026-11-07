@@ -8,7 +8,6 @@ import com.jettaxp.steamd.data.AppTheme
 import com.jettaxp.steamd.data.ColorSource
 import com.jettaxp.steamd.data.Palettes
 
-/** The app itself follows the wallpaper on Android 12+ (unless turned off) and the steamd blue elsewhere. */
 @Composable
 fun SteamdTheme(
     theme: AppTheme = AppTheme.System,

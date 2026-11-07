@@ -17,7 +17,6 @@ dependencies {
 }
 
 tasks.test {
-    // Optional real-bundle tests: STEAMD_BUNDLE=/path/to/index.android.bundle ./gradlew :patcher:test
     System.getenv("STEAMD_BUNDLE")?.let { environment("STEAMD_BUNDLE", it) }
     System.getenv("STEAMD_EXPECTED")?.let { environment("STEAMD_EXPECTED", it) }
     maxHeapSize = "2g"

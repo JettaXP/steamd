@@ -1,9 +1,6 @@
-// Official Material Web components (https://github.com/material-components/material-web),
-// bundled locally into material-web.js (Apache-2.0, licences kept at the end of the file).
 import './material-web.js';
 import { argbFromHex, hexFromArgb, Hct, SchemeTonalSpot, MaterialDynamicColors } from './color-utils.js';
 
-/* ---------------- i18n ---------------- */
 const EN = {
   'nav.features': 'Features', 'nav.color': 'Colour', 'nav.install': 'Install', 'a11y.copy': 'Copy', 'nav.links': 'Links',
   'a11y.lang': 'Language', 'a11y.theme': 'Theme',
@@ -45,7 +42,6 @@ const EN = {
 };
 const TITLES = { ru: 'steamd — Material 3 для Steam на Android', en: 'steamd — Material 3 for Steam on Android' };
 
-// Russian is the source text in the HTML; remember it once.
 const RU = {};
 const textNodes = document.querySelectorAll('[data-i18n]');
 textNodes.forEach((el) => {
@@ -71,7 +67,6 @@ function setLang(lang) {
   try { localStorage.setItem('steamd-lang', lang); } catch (e) {}
 }
 
-/* ---------------- theme ---------------- */
 const THEME_ICON = { light: 'light_mode', dark: 'dark_mode', system: 'brightness_auto' };
 function setTheme(t) {
   document.documentElement.dataset.theme = t;
@@ -79,8 +74,6 @@ function setTheme(t) {
   try { localStorage.setItem('steamd-theme', t); } catch (e) {}
 }
 
-/* ---------------- colour (mirrors patch/patch_steam.py) ---------------- */
-// Default palette = PALETTE in patch_steam.py; with a seed = SEED_ROLES on a Material You dark scheme.
 const ROWS = [
   ['#2A2C34', '#26272B', 'surfaceContainer', 'Фон', 'Surface'],
   ['#1F2127', '#1B1B1F', 'surface', 'Фон: глубокий', 'Surface: deep'],
@@ -91,7 +84,7 @@ const ROWS = [
   ['#8B929A', '#C4C6D0', 'onSurfaceVariant', 'Вторичный текст', 'Secondary text'],
   ['#60636A', '#8E9099', 'outline', 'Разделитель', 'Divider'],
 ];
-// Site tokens recoloured from the seed (light and dark).
+
 const TOKENS = ['primary', 'onPrimary', 'primaryContainer', 'onPrimaryContainer', 'secondary', 'onSecondary',
   'secondaryContainer', 'onSecondaryContainer', 'tertiary', 'tertiaryContainer', 'onTertiaryContainer', 'error',
   'errorContainer', 'onErrorContainer', 'background', 'onBackground', 'surface', 'onSurface', 'surfaceVariant',
@@ -154,7 +147,6 @@ document.getElementById('copy-cmd').addEventListener('click', async () => {
   icon.textContent = 'check'; setTimeout(() => { icon.textContent = 'content_copy'; }, 1500);
 });
 
-/* ---------------- menus ---------------- */
 function bindMenu(btnId, menuId) {
   const btn = document.getElementById(btnId), menu = document.getElementById(menuId);
   btn.addEventListener('click', () => { menu.open = !menu.open; });
@@ -167,7 +159,6 @@ bindMenu('theme-btn', 'theme-menu').addEventListener('close-menu', (e) => {
   const t = e.detail.initiator?.dataset.themeValue; if (t) setTheme(t);
 });
 
-/* ---------------- demo code in the illustration ---------------- */
 const ALPHABET = '23456789BCDFGHJKMNPQRTVWXY';
 setInterval(() => {
   document.getElementById('demo-code').textContent =

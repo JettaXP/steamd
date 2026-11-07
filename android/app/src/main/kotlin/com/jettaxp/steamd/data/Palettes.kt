@@ -16,7 +16,6 @@ import com.google.android.material.color.utilities.SchemeTonalSpot
 import com.jettaxp.steamd.patcher.SteamThemePatch
 import com.jettaxp.steamd.patcher.SteamThemePatch.Role
 
-/** Where the patch colours come from. */
 sealed interface ColorSource {
     data object Default : ColorSource
     data object Wallpaper : ColorSource
@@ -28,7 +27,6 @@ object Palettes {
 
     fun dynamicAvailable() = Build.VERSION.SDK_INT >= 31
 
-    /** Compose colour scheme for a source (used by the app UI and the preview). */
     fun scheme(context: Context, source: ColorSource, dark: Boolean): ColorScheme = when (source) {
         ColorSource.Wallpaper -> if (dynamicAvailable()) {
             if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -37,7 +35,6 @@ object Palettes {
         is ColorSource.Seed -> fromSeed(source.argb, dark)
     }
 
-    /** Material You (tonal spot, 2021 spec) scheme from a seed, same as the website and patch_steam.py. */
     @Suppress("RestrictedApi")
     fun fromSeed(seed: Int, dark: Boolean): ColorScheme {
         val s: DynamicScheme = SchemeTonalSpot(Hct.fromInt(seed), dark, 0.0)
@@ -68,7 +65,6 @@ object Palettes {
         )
     }
 
-    /** Patch options for a colour source: Steam's native theme always uses the dark scheme. */
     fun patchOptions(context: Context, source: ColorSource, storeTheme: Boolean): SteamThemePatch.Options {
         if (source == ColorSource.Default) return SteamThemePatch.Options(storeTheme = storeTheme)
         val s = scheme(context, source, dark = true)
@@ -86,7 +82,6 @@ object Palettes {
         )
     }
 
-    /** Preset seeds offered in the UI (same as the website). */
     val PRESETS = listOf(
         0xFF6750A4.toInt(), 0xFF386A20.toInt(), 0xFFB5651D.toInt(), 0xFF984061.toInt(), 0xFF006A6A.toInt(),
     )

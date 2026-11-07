@@ -7,10 +7,8 @@ import com.jettaxp.steamd.patcher.SteamThemePatch
 
 enum class AppTheme { System, Light, Dark }
 
-/** App language: [System] follows the device language (English by default, Russian for Russian). */
 enum class AppLanguage(val tag: String) { System(""), English("en"), Russian("ru") }
 
-/** Small persistent settings. */
 class Settings(context: Context) {
     private val prefs = context.getSharedPreferences("steamd", Context.MODE_PRIVATE)
 
@@ -42,7 +40,6 @@ class Settings(context: Context) {
         get() = runCatching { AppTheme.valueOf(prefs.getString("app_theme", null) ?: "System") }.getOrDefault(AppTheme.System)
         set(value) = prefs.edit().putString("app_theme", value.name).apply()
 
-    /** The steamd app itself uses wallpaper colours (Android 12+). */
     var appDynamicColor: Boolean
         get() = prefs.getBoolean("app_dynamic", true)
         set(value) = prefs.edit().putBoolean("app_dynamic", value).apply()
@@ -50,7 +47,6 @@ class Settings(context: Context) {
     companion object {
         val CSS_URL = Regex("https://[\\w.\\-/~%]+\\.css")
 
-        /** Language is stored by AndroidX (per-app locales), not in our prefs. */
         var language: AppLanguage
             get() {
                 val tag = AppCompatDelegate.getApplicationLocales().toLanguageTags()

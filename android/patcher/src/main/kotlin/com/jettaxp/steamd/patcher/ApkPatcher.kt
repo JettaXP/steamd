@@ -6,10 +6,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
-/**
- * Rewrites base.apk: patches the Hermes bundle, optionally swaps fonts, drops the old
- * signature. The output is unsigned and unaligned: pass it to [ApkSigning.sign].
- */
 object ApkPatcher {
     const val BUNDLE_ENTRY = "assets/index.android.bundle"
 
@@ -18,7 +14,6 @@ object ApkPatcher {
     data class Report(val hermesVersion: Int, val colorsReplaced: Int, val storeTheme: Boolean,
                       val fontsReplaced: Int, val log: List<String>)
 
-    /** Reads the bundle from an APK without changing anything. */
     fun readBundle(apk: File): ByteArray = ZipFile(apk).use { z ->
         val e = z.getEntry(BUNDLE_ENTRY) ?: throw PatchException("No Hermes bundle in ${apk.name}")
         z.getInputStream(e).use { it.readBytes() }

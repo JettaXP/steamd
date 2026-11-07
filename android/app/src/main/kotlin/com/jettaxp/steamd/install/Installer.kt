@@ -12,13 +12,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import java.io.File
 
-/** Result of a PackageInstaller install or uninstall request. */
 data class InstallerResult(val action: String, val success: Boolean, val message: String?)
 
-/**
- * Installs and uninstalls packages through PackageInstaller.
- * Android always asks the user to confirm: the confirmation screen is started by [InstallReceiver].
- */
 object Installer {
     private val events = MutableSharedFlow<InstallerResult>(extraBufferCapacity = 4)
     val results: SharedFlow<InstallerResult> = events.asSharedFlow()
@@ -30,7 +25,6 @@ object Installer {
         return results.first { it.action == ACTION_UNINSTALL }
     }
 
-    /** Installs base + split APKs as one package. */
     suspend fun install(context: Context, apks: List<File>): InstallerResult {
         val pi = context.packageManager.packageInstaller
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)

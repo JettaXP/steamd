@@ -7,7 +7,6 @@ import android.os.Build
 import java.io.File
 import java.security.MessageDigest
 
-/** What we know about the Steam app installed on this device. */
 data class SteamInfo(
     val versionName: String,
     val versionCode: Long,

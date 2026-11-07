@@ -37,7 +37,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
+import com.jettaxp.steamd.ui.components.CheckSwitch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -185,7 +185,7 @@ private fun SwitchItem(icon: ImageVector, title: String, desc: String, checked: 
         headlineContent = { Text(title) },
         supportingContent = { Text(desc) },
         leadingContent = { Icon(icon, null) },
-        trailingContent = { Switch(checked = checked, onCheckedChange = null, enabled = enabled) },
+        trailingContent = { CheckSwitch(checked = checked, onCheckedChange = null, enabled = enabled) },
         modifier = Modifier.clickable(enabled = enabled, role = Role.Switch) { onChange(!checked) },
     )
 }

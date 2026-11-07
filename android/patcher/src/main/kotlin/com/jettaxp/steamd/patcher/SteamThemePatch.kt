@@ -1,32 +1,26 @@
 package com.jettaxp.steamd.patcher
 
-/**
- * The steamd theme patch for the Steam app's Hermes bundle.
- * Mirrors patch/patch_steam.py: the same inputs give a byte-identical bundle.
- */
 object SteamThemePatch {
     const val DEFAULT_CSS_URL = "https://steamd.jettax.xyz/theme/m3.css"
     const val DEFAULT_PRIMARY = "#AAC7FF"
 
-    /** Default palette: original SteamMobile theme colour -> new colour. */
     val DEFAULT_PALETTE: Map<String, String> = linkedMapOf(
-        "#1F2127" to "#1B1B1F",  // background.secondary
-        "#23252A" to "#1F1F23",  // background.tertiary
-        "#2A2C34" to "#26272B",  // background.primary
-        "#3C3F49" to "#3E4759",  // background.neutral
-        "#1A9FFF" to "#8AB4F8",  // background.brand
-        "#1A97FF" to "#8AB4F8",  // background.info
-        "#DFE3E6" to "#E3E2E6",  // foreground.standard
-        "#8B929A" to "#C4C6D0",  // foreground.secondary
-        "#3D4450" to "#44474F",  // foreground.neutral
-        "#30333A" to "#2B2C31",  // divider standard
-        "#60636A" to "#8E9099",  // divider bright
+        "#1F2127" to "#1B1B1F",
+        "#23252A" to "#1F1F23",
+        "#2A2C34" to "#26272B",
+        "#3C3F49" to "#3E4759",
+        "#1A9FFF" to "#8AB4F8",
+        "#1A97FF" to "#8AB4F8",
+        "#DFE3E6" to "#E3E2E6",
+        "#8B929A" to "#C4C6D0",
+        "#3D4450" to "#44474F",
+        "#30333A" to "#2B2C31",
+        "#60636A" to "#8E9099",
     )
 
     enum class Role { Primary, Surface, SurfaceContainerLow, SurfaceContainer, SurfaceContainerHigh,
         SecondaryContainer, OnSurface, OnSurfaceVariant, Outline, OutlineVariant }
 
-    /** Material 3 colour role each original colour takes in a generated scheme. */
     val ROLES: Map<String, Role> = linkedMapOf(
         "#1F2127" to Role.Surface,
         "#23252A" to Role.SurfaceContainerLow,
@@ -41,7 +35,6 @@ object SteamThemePatch {
         "#60636A" to Role.Outline,
     )
 
-    /** Builds the patch palette from a dark Material 3 colour scheme (ARGB per role). */
     fun paletteFrom(roles: Map<Role, Int>): Map<String, String> =
         ROLES.mapValuesTo(LinkedHashMap()) { (_, role) -> hex(roles.getValue(role)) }
 
@@ -50,7 +43,6 @@ object SteamThemePatch {
     private const val ORIGINAL_JS_START = "window.navigator.standalone = true;(function() {"
     private val ORIGINAL_JS_MARKERS = listOf("HistoryChanged", "history.pushState = wrap( history.pushState )")
 
-    // Same behaviour as the app's own script (history events) + theme loader.
     private const val WEBVIEW_JS =
         "window.navigator.standalone=true;(function(){" +
             "var m='{\"event_name\":\"HistoryChanged\"}'," +

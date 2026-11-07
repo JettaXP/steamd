@@ -32,7 +32,6 @@ import com.jettaxp.steamd.ui.screens.SettingsActions
 import com.jettaxp.steamd.ui.screens.SettingsScreen
 import com.jettaxp.steamd.ui.theme.SteamdTheme
 
-// AppCompatActivity: needed for per-app language (AppCompatDelegate.setApplicationLocales) on Android 12 and older.
 class MainActivity : AppCompatActivity() {
     private val vm: SteamdViewModel by viewModels()
 

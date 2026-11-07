@@ -14,12 +14,7 @@ import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.Date
 
-/**
- * The key steamd signs the patched Steam APKs with.
- * Keep it: an update signed with a different key cannot be installed over the patched app.
- */
 class SigningKey(val privateKey: PrivateKey, val certificate: X509Certificate) {
-
     fun save(file: File, password: CharArray) {
         val ks = KeyStore.getInstance("PKCS12")
         ks.load(null, null)
@@ -55,7 +50,6 @@ class SigningKey(val privateKey: PrivateKey, val certificate: X509Certificate) {
 }
 
 object ApkSigning {
-    /** Aligns and signs (v1 + v2 + v3) [input] into [output]. */
     fun sign(input: File, output: File, key: SigningKey, minSdk: Int? = null) {
         val config = ApkSigner.SignerConfig.Builder("steamd", key.privateKey, listOf(key.certificate)).build()
         ApkSigner.Builder(listOf(config))

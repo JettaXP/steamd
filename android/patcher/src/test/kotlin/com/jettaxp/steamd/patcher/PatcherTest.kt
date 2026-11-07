@@ -14,7 +14,6 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
 class PatcherTest {
-    // Steam's bundle is not part of the repository: tests that need it are skipped without it.
     private val bundleFile = System.getenv("STEAMD_BUNDLE")?.let(::File)?.takeIf { it.exists() }
 
     @Test
@@ -32,7 +31,7 @@ class PatcherTest {
     fun patchedBundleParsesAndStringsPointToNewValues() {
         assumeTrue(bundleFile != null)
         val r = SteamThemePatch.apply(bundleFile!!.readBytes(), SteamThemePatch.Options())
-        val hb = HermesBundle(r.bundle)  // validates header and SHA-1 footer
+        val hb = HermesBundle(r.bundle)
         assertEquals(96, hb.version)
         assertEquals(emptyList<Int>(), hb.findExact("#1A9FFF"))
         assertEquals(2, hb.findExact("#8AB4F8").size)
@@ -66,8 +65,7 @@ class PatcherTest {
         val key = SigningKey.loadOrCreate(File(dir, "key.p12"), "pw".toCharArray())
         val signed = File(dir, "signed.apk")
         ApkSigning.sign(unsigned, signed, key, minSdk = 26)
-        // Full verification needs a real AndroidManifest.xml (checked with apksigner on a real APK);
-        // here: v2/v3 signing block and a fresh v1 signature are present, the old one is gone.
+
         val bytes = signed.readBytes()
         assertTrue("APK Signing Block missing", String(bytes, Charsets.ISO_8859_1).contains("APK Sig Block 42"))
         ZipFile(signed).use { z ->
@@ -75,12 +73,11 @@ class PatcherTest {
             assertTrue(z.getEntry("META-INF/STEAMD.RSA") != null)
             HermesBundle(z.getInputStream(z.getEntry("assets/index.android.bundle")).readBytes())
         }
-        // Same key file -> same certificate (needed for updates of the patched app)
+
         assertEquals(key.certificate, SigningKey.load(File(dir, "key.p12"), "pw".toCharArray()).certificate)
         dir.deleteRecursively()
     }
 
-    /** End to end on a real APK (with a real manifest): STEAMD_REAL_APK=/path/to/any.apk */
     @Test
     fun patchesAndSignsRealApk() {
         assumeTrue(bundleFile != null)
@@ -88,7 +85,7 @@ class PatcherTest {
         assumeTrue("STEAMD_REAL_APK not set", real != null)
         val dir = Files.createTempDirectory("steamd-real").toFile()
         val base = File(dir, "base.apk")
-        // real APK + Steam's bundle
+
         ZipFile(real!!).use { zin ->
             ZipOutputStream(base.outputStream()).use { z ->
                 for (e in zin.entries()) {

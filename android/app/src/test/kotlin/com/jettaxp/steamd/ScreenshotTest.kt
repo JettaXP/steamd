@@ -21,7 +21,6 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.io.File
 
-/** Renders the screens to PNG (build/outputs/roborazzi) for a visual check: ./gradlew :app:recordRoborazziDebug */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [35], qualifiers = "w411dp-h891dp-night-xxhdpi")

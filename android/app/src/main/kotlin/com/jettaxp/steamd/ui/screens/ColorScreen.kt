@@ -29,13 +29,11 @@ import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.HorizontalDivider
@@ -131,7 +129,6 @@ private fun SeedPicker(seed: Int, onSeed: (Int) -> Unit) {
     )
 }
 
-/** A small mock of the patched Steam menu, drawn with the colours the patch will use. */
 @Composable
 private fun SteamPreview(s: ColorScheme) {
     Column(
