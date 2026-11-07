@@ -317,8 +317,20 @@
   border-bottom-left-radius: var(--sd-r-l) !important;
   border-bottom-right-radius: var(--sd-r-l) !important;
 }
-:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.commentthread_comment_avatar img, .playerAvatar:not(.profile_header_size) img) {
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.commentthread_comment_avatar, .commentthread_user_avatar, .friendBlock .playerAvatar) {
   border-radius: 50% !important;
+  overflow: hidden;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.commentthread_comment_avatar, .commentthread_user_avatar, .friendBlock .playerAvatar) img {
+  border-radius: 50% !important;
+  display: block;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.commentthread_comment_avatar, .commentthread_user_avatar, .friendBlock .playerAvatar) .profile_avatar_frame,
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .commentthread_comment_friendindicator {
+  display: none !important;
 }
 :root:is(.rn_mobile_app, .steamd-preview) body.profile_page .btn_profile_action {
   background: var(--sd-sec-c) !important;
@@ -353,4 +365,66 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 4px 12px;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_header_badgeinfo {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_header_badgeinfo .profile_header_actions {
+  order: -1;
+  display: flex !important;
+  gap: 8px;
+  position: static !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_header_actions .btn_profile_action {
+  flex: 1;
+  margin: 0 !important;
+  text-align: center;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_header_actions .btn_profile_action:has(.steamdb_self_profile) {
+  flex: 0 0 auto;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .commentthread_entry {
+  background: transparent !important;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .commentthread_textarea {
+  background: var(--sd-glass-high) !important;
+  border: 1px solid var(--sd-outline) !important;
+  border-radius: var(--sd-r-l) !important;
+  color: var(--sd-on) !important;
+  padding: 12px 16px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page :is(.commentthread_entry_quotebox, .commentthread_entry_submitlink) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  flex: 1;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.profile_page .profile_header_badgeinfo_badge_area {
+  background: transparent !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.showcase_slot.showcase_achievement img, .game_info_achievement img,
+  .achievement_icons img, .achieveImgHolder img, .achievement_image, .achievement_image_small, .communitylink_achievement img,
+  .achieveRow img, .game_info_achievement_plusmore, .achievement_icon img) {
+  border-radius: 12px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.showcase_slot.showcase_achievement, .game_info_achievement,
+  .achieveImgHolder, .communitylink_achievement, .game_info_achievement_plusmore) {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .achieveRow {
+  border-radius: var(--sd-r-m) !important;
+  background: var(--sd-c) !important;
+  overflow: hidden;
 }
