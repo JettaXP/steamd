@@ -77,8 +77,8 @@ python patch/patch_steam.py --check index.android.bundle
 
 Шрифты Motiva Sans заменяются файлами того же начертания.
 
-## Планы
-- Приложение для Android на Kotlin и Material 3, которое само патчит клиент на устройстве и берёт динамические цвета из обоев.
+## Приложение для Android
+В папке [`android/`](android/) — приложение на Kotlin, Jetpack Compose и Material 3, которое патчит Steam прямо на телефоне, без ПК: берёт цвета из обоев (Android 12+) или свой цвет, подписывает и устанавливает пропатченное приложение. Сейчас в разработке; тестовую сборку можно скачать в [GitHub Actions](https://github.com/JettaXP/steamd/actions) (артефакт `steamd-debug-apk`).
 
 ## Благодарности
 - [kuska1/Material-Theme](https://github.com/kuska1/Material-Theme) (MIT), тема для Millennium, вдохновившая тему магазина.

@@ -1,5 +1,6 @@
 package com.jettaxp.steamd.patcher
 
+import com.android.apksig.ApkVerifier
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -76,6 +77,41 @@ class PatcherTest {
         }
         // Same key file -> same certificate (needed for updates of the patched app)
         assertEquals(key.certificate, SigningKey.load(File(dir, "key.p12"), "pw".toCharArray()).certificate)
+        dir.deleteRecursively()
+    }
+
+    /** End to end on a real APK (with a real manifest): STEAMD_REAL_APK=/path/to/any.apk */
+    @Test
+    fun patchesAndSignsRealApk() {
+        assumeTrue(bundleFile != null)
+        val real = System.getenv("STEAMD_REAL_APK")?.let(::File)?.takeIf { it.exists() }
+        assumeTrue("STEAMD_REAL_APK not set", real != null)
+        val dir = Files.createTempDirectory("steamd-real").toFile()
+        val base = File(dir, "base.apk")
+        // real APK + Steam's bundle
+        ZipFile(real!!).use { zin ->
+            ZipOutputStream(base.outputStream()).use { z ->
+                for (e in zin.entries()) {
+                    if (e.name == ApkPatcher.BUNDLE_ENTRY) continue
+                    val data = zin.getInputStream(e).readBytes()
+                    z.putNextEntry(ZipEntry(e.name).apply {
+                        if (e.method == ZipEntry.STORED) {
+                            method = ZipEntry.STORED; size = data.size.toLong(); compressedSize = data.size.toLong()
+                            crc = CRC32().apply { update(data) }.value
+                        }
+                    }); z.write(data); z.closeEntry()
+                }
+                z.putNextEntry(ZipEntry(ApkPatcher.BUNDLE_ENTRY)); z.write(bundleFile!!.readBytes()); z.closeEntry()
+            }
+        }
+        val unsigned = File(dir, "unsigned.apk")
+        assertEquals(11, ApkPatcher.patch(base, unsigned, SteamThemePatch.Options()).colorsReplaced)
+        val signed = File(dir, "signed.apk")
+        ApkSigning.sign(unsigned, signed, SigningKey.generate())
+        val v = ApkVerifier.Builder(signed).build().verify()
+        assertTrue(v.errors.toString() + v.warnings.toString(), v.isVerified)
+        assertTrue(v.isVerifiedUsingV2Scheme)
+        System.getenv("STEAMD_KEEP")?.let { signed.copyTo(File(it), overwrite = true) }
         dir.deleteRecursively()
     }
 }

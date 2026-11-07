@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">steamd</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_color">Colour</string>
+    <string name="tab_about">About</string>
+
+    <string name="steam_not_installed">Steam is not installed</string>
+    <string name="steam_not_installed_hint">Install Steam from Google Play, then come back.</string>
+    <string name="steam_version">Steam %1$s</string>
+    <string name="status_official">Official app</string>
+    <string name="status_patched">Patched by steamd</string>
+    <string name="status_other">Signed by someone else</string>
+    <string name="checking">Checking compatibility…</string>
+    <string name="supported">Supported: Hermes v%1$d</string>
+    <string name="unsupported">Not supported yet: %1$s</string>
+
+    <string name="patch">Patch Steam</string>
+    <string name="repatch">Apply again</string>
+    <string name="refresh">Refresh</string>
+
+    <string name="guard_title">Save your Steam Guard recovery code first</string>
+    <string name="guard_text">The patched app is signed with a different key, so the official one must be uninstalled, and its Steam Guard data goes with it. The recovery code (R-xxxxx) is in Steam → Steam Guard.</string>
+    <string name="guard_confirm">I saved my recovery code</string>
+
+    <string name="step_copy">Copy Steam APKs</string>
+    <string name="step_patch">Patch the theme</string>
+    <string name="step_sign">Sign with the steamd key</string>
+    <string name="step_uninstall">Uninstall the official app</string>
+    <string name="step_install">Install the patched app</string>
+    <string name="patch_done">Done! Open Steam, sign in and set up Steam Guard again.</string>
+    <string name="patch_failed">Failed: %1$s</string>
+    <string name="continue_">Continue</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="open_steam">Open Steam</string>
+    <string name="uninstall_explain">Android will ask you to confirm uninstalling Steam. After that, steamd installs the patched version.</string>
+
+    <string name="color_source">Colour source</string>
+    <string name="color_dynamic">Wallpaper</string>
+    <string name="color_seed">Seed colour</string>
+    <string name="color_default">steamd</string>
+    <string name="dynamic_unavailable">Wallpaper colours need Android 12 or newer</string>
+    <string name="dynamic_note">Colours are taken from your wallpaper at patch time. Changed the wallpaper? Apply the patch again.</string>
+    <string name="preview">Preview</string>
+    <string name="hue">Hue</string>
+    <string name="store_theme">Store and news theme</string>
+    <string name="store_theme_desc">Loads the Material 3 stylesheet in the store and news</string>
+
+    <string name="about_text">steamd recolours the official Steam app with Material 3. Unofficial project, not affiliated with Valve Corporation. Steam is a trademark of Valve Corporation. Do not distribute patched APKs.</string>
+    <string name="link_site">Website</string>
+    <string name="link_source">Source code</string>
+    <string name="link_issues">Report a problem</string>
+    <string name="version">Version %1$s</string>
+    <string name="key_info">Signing key: %1$s</string>
+    <string name="licenses">MIT licence. Uses apksig and Material Components (Apache-2.0), Bouncy Castle (MIT).</string>
+
+    <string name="preview_menu">Menu</string>
+    <string name="preview_notifications">Notifications</string>
+    <string name="preview_confirmations">Confirmations</string>
+    <string name="preview_library">Library</string>
+    <string name="preview_news">News</string>
+    <string name="preview_shop">Shop</string>
+</resources>

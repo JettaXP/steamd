@@ -1,0 +1,42 @@
+package com.jettaxp.steamd
+
+import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onRoot
+import com.github.takahirom.roborazzi.captureRoboImage
+import com.jettaxp.steamd.data.ColorSource
+import com.jettaxp.steamd.data.SteamInfo
+import com.jettaxp.steamd.ui.screens.AboutScreen
+import com.jettaxp.steamd.ui.screens.ColorScreen
+import com.jettaxp.steamd.ui.screens.HomeScreen
+import com.jettaxp.steamd.ui.theme.SteamdTheme
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
+import java.io.File
+
+/** Renders the screens to PNG (build/outputs/roborazzi) for a visual check: ./gradlew :app:recordRoborazziDebug */
+@RunWith(RobolectricTestRunner::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [35], qualifiers = "w411dp-h891dp-night-xxhdpi")
+class ScreenshotTest {
+    @get:Rule val compose = createComposeRule()
+
+    private val steam = SteamInfo("3.10.11", 10928360, File("base.apk"), emptyList(), "x")
+    private val state = UiState(steam = steam, status = SteamStatus.Official, compat = Compat.Supported(96), keyFingerprint = "3f2a9c01b7e4d555")
+
+    private fun shot(name: String, content: @androidx.compose.runtime.Composable () -> Unit) {
+        compose.setContent { SteamdTheme { Scaffold { p -> androidx.compose.foundation.layout.Box(Modifier.padding(p)) { content() } } } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/$name.png")
+    }
+
+    @Test fun home() = shot("home") { HomeScreen(state, {}, {}) }
+    @Test fun colorSeed() = shot("color-seed") { ColorScreen(state.copy(colorSource = ColorSource.Seed(0xFFB5651D.toInt())), {}, {}) }
+    @Test fun colorDefault() = shot("color-default") { ColorScreen(state, {}, {}) }
+    @Test fun about() = shot("about") { AboutScreen(state) }
+}

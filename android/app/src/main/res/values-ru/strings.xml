@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Главная</string>
+    <string name="tab_color">Цвет</string>
+    <string name="tab_about">О проекте</string>
+
+    <string name="steam_not_installed">Steam не установлен</string>
+    <string name="steam_not_installed_hint">Установите Steam из Google Play и вернитесь сюда.</string>
+    <string name="steam_version">Steam %1$s</string>
+    <string name="status_official">Официальное приложение</string>
+    <string name="status_patched">Пропатчено steamd</string>
+    <string name="status_other">Подписано кем-то другим</string>
+    <string name="checking">Проверяю совместимость…</string>
+    <string name="supported">Поддерживается: Hermes v%1$d</string>
+    <string name="unsupported">Пока не поддерживается: %1$s</string>
+
+    <string name="patch">Пропатчить Steam</string>
+    <string name="repatch">Применить заново</string>
+    <string name="refresh">Обновить</string>
+
+    <string name="guard_title">Сначала запишите код восстановления Steam Guard</string>
+    <string name="guard_text">Пропатченное приложение подписано другим ключом, поэтому официальное нужно удалить. Вместе с ним удаляются данные Steam Guard. Код восстановления (R-xxxxx) находится в Steam → Steam Guard.</string>
+    <string name="guard_confirm">Я записал код восстановления</string>
+
+    <string name="step_copy">Копирование APK Steam</string>
+    <string name="step_patch">Патч темы</string>
+    <string name="step_sign">Подпись ключом steamd</string>
+    <string name="step_uninstall">Удаление официального приложения</string>
+    <string name="step_install">Установка пропатченного приложения</string>
+    <string name="patch_done">Готово! Откройте Steam, войдите в аккаунт и заново привяжите Steam Guard.</string>
+    <string name="patch_failed">Ошибка: %1$s</string>
+    <string name="continue_">Продолжить</string>
+    <string name="cancel">Отмена</string>
+    <string name="close">Закрыть</string>
+    <string name="open_steam">Открыть Steam</string>
+    <string name="uninstall_explain">Android попросит подтвердить удаление Steam. После этого steamd установит пропатченную версию.</string>
+
+    <string name="color_source">Источник цвета</string>
+    <string name="color_dynamic">Обои</string>
+    <string name="color_seed">Свой цвет</string>
+    <string name="color_default">steamd</string>
+    <string name="dynamic_unavailable">Цвета обоев доступны на Android 12 и новее</string>
+    <string name="dynamic_note">Цвета берутся из обоев в момент патча. Сменили обои? Примените патч заново.</string>
+    <string name="preview">Предпросмотр</string>
+    <string name="hue">Оттенок</string>
+    <string name="store_theme">Тема магазина и новостей</string>
+    <string name="store_theme_desc">Подключает стили Material 3 в магазине и новостях</string>
+
+    <string name="about_text">steamd перекрашивает официальное приложение Steam в Material 3. Неофициальный проект, не связан с Valve Corporation. Steam является товарным знаком Valve Corporation. Не распространяйте пропатченные APK.</string>
+    <string name="link_site">Сайт</string>
+    <string name="link_source">Исходный код</string>
+    <string name="link_issues">Сообщить о проблеме</string>
+    <string name="version">Версия %1$s</string>
+    <string name="key_info">Ключ подписи: %1$s</string>
+    <string name="licenses">Лицензия MIT. Используются apksig и Material Components (Apache-2.0), Bouncy Castle (MIT).</string>
+
+    <string name="preview_menu">Меню</string>
+    <string name="preview_notifications">Уведомления</string>
+    <string name="preview_confirmations">Подтверждения</string>
+    <string name="preview_library">Библиотека</string>
+    <string name="preview_news">Новости</string>
+    <string name="preview_shop">Магазин</string>
+</resources>
