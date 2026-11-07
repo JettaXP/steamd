@@ -62,7 +62,6 @@ import com.google.android.material.color.utilities.Hct
 fun ColorScreen(
     state: UiState,
     onSource: (ColorSource) -> Unit,
-    onStoreTheme: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -105,12 +104,6 @@ fun ColorScreen(
             val scheme = remember(source) { Palettes.scheme(context, source, dark = true) }
             SteamPreview(scheme)
 
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.store_theme)) },
-                supportingContent = { Text(stringResource(R.string.store_theme_desc)) },
-                trailingContent = { Switch(checked = state.storeTheme, onCheckedChange = onStoreTheme) },
-                modifier = Modifier.clip(MaterialTheme.shapes.large),
-            )
             Spacer(Modifier.height(16.dp))
         }
     }

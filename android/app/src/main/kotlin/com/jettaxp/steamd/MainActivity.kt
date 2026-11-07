@@ -1,18 +1,18 @@
 package com.jettaxp.steamd
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -25,21 +25,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jettaxp.steamd.ui.screens.AboutScreen
 import com.jettaxp.steamd.ui.screens.ColorScreen
 import com.jettaxp.steamd.ui.screens.HomeScreen
 import com.jettaxp.steamd.ui.screens.PatchSheet
+import com.jettaxp.steamd.ui.screens.SettingsActions
+import com.jettaxp.steamd.ui.screens.SettingsScreen
 import com.jettaxp.steamd.ui.theme.SteamdTheme
 
-class MainActivity : ComponentActivity() {
+// AppCompatActivity: needed for per-app language (AppCompatDelegate.setApplicationLocales) on Android 12 and older.
+class MainActivity : AppCompatActivity() {
     private val vm: SteamdViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            SteamdTheme {
-                val state by vm.state.collectAsStateWithLifecycle()
+            val state by vm.state.collectAsStateWithLifecycle()
+            SteamdTheme(theme = state.appTheme, dynamicColor = state.appDynamicColor) {
                 var tab by rememberSaveable { mutableIntStateOf(0) }
                 Scaffold(
                     bottomBar = {
@@ -47,7 +49,7 @@ class MainActivity : ComponentActivity() {
                             val items = listOf(
                                 Triple(R.string.tab_home, Icons.Filled.Home, Icons.Outlined.Home),
                                 Triple(R.string.tab_color, Icons.Filled.Palette, Icons.Outlined.Palette),
-                                Triple(R.string.tab_about, Icons.Filled.Info, Icons.Outlined.Info),
+                                Triple(R.string.tab_settings, Icons.Filled.Settings, Icons.Outlined.Settings),
                             )
                             items.forEachIndexed { i, (label, selectedIcon, icon) ->
                                 NavigationBarItem(
@@ -63,8 +65,15 @@ class MainActivity : ComponentActivity() {
                     val m = Modifier.padding(padding)
                     when (tab) {
                         0 -> HomeScreen(state, onPatch = vm::startPatch, onRefresh = vm::refresh, modifier = m)
-                        1 -> ColorScreen(state, onSource = vm::setColorSource, onStoreTheme = vm::setStoreTheme, modifier = m)
-                        else -> AboutScreen(state, modifier = m)
+                        1 -> ColorScreen(state, onSource = vm::setColorSource, modifier = m)
+                        else -> SettingsScreen(
+                            state,
+                            SettingsActions(
+                                onLanguage = vm::setLanguage, onTheme = vm::setAppTheme, onDynamicColor = vm::setAppDynamicColor,
+                                onStoreTheme = vm::setStoreTheme, onCssUrl = vm::setCssUrl, onClearOriginals = { vm.clearOriginals() },
+                            ),
+                            modifier = m,
+                        )
                     }
                 }
                 PatchSheet(state.flow, onConfirm = vm::runPatch, onDismiss = vm::dismissFlow)

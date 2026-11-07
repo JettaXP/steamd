@@ -8,7 +8,8 @@ import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.jettaxp.steamd.data.ColorSource
 import com.jettaxp.steamd.data.SteamInfo
-import com.jettaxp.steamd.ui.screens.AboutScreen
+import com.jettaxp.steamd.ui.screens.SettingsActions
+import com.jettaxp.steamd.ui.screens.SettingsScreen
 import com.jettaxp.steamd.ui.screens.ColorScreen
 import com.jettaxp.steamd.ui.screens.HomeScreen
 import com.jettaxp.steamd.ui.theme.SteamdTheme
@@ -36,7 +37,15 @@ class ScreenshotTest {
     }
 
     @Test fun home() = shot("home") { HomeScreen(state, {}, {}) }
-    @Test fun colorSeed() = shot("color-seed") { ColorScreen(state.copy(colorSource = ColorSource.Seed(0xFFB5651D.toInt())), {}, {}) }
-    @Test fun colorDefault() = shot("color-default") { ColorScreen(state, {}, {}) }
-    @Test fun about() = shot("about") { AboutScreen(state) }
+    private val noop = SettingsActions({}, {}, {}, {}, { true }, {})
+
+    @Test fun colorSeed() = shot("color-seed") { ColorScreen(state.copy(colorSource = ColorSource.Seed(0xFFB5651D.toInt())), {}) }
+    @Test fun colorDefault() = shot("color-default") { ColorScreen(state, {}) }
+    @Test fun settings() = shot("settings") { SettingsScreen(state.copy(originalsBytes = 152_000_000), noop) }
+
+    @Test @Config(qualifiers = "ru-w411dp-h891dp-night-xxhdpi")
+    fun settingsRu() = shot("settings-ru") { SettingsScreen(state.copy(originalsBytes = 152_000_000), noop) }
+
+    @Test @Config(qualifiers = "ru-w411dp-h891dp-notnight-xxhdpi")
+    fun homeRuLight() = shot("home-ru-light") { HomeScreen(state, {}, {}) }
 }

@@ -51,7 +51,6 @@
     <string name="link_source">Исходный код</string>
     <string name="link_issues">Сообщить о проблеме</string>
     <string name="version">Версия %1$s</string>
-    <string name="key_info">Ключ подписи: %1$s</string>
     <string name="licenses">Лицензия MIT. Используются apksig и Material Components (Apache-2.0), Bouncy Castle (MIT).</string>
 
     <string name="preview_menu">Меню</string>
@@ -60,4 +59,27 @@
     <string name="preview_library">Библиотека</string>
     <string name="preview_news">Новости</string>
     <string name="preview_shop">Магазин</string>
+    <string name="tab_settings">Настройки</string>
+    <string name="section_appearance">Внешний вид</string>
+    <string name="section_patch">Патч</string>
+    <string name="section_storage">Хранилище и ключ</string>
+    <string name="language">Язык</string>
+    <string name="follow_system">Как в системе</string>
+    <string name="app_theme">Тема</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="app_dynamic_color">Цвета обоев в steamd</string>
+    <string name="app_dynamic_color_desc">Красить это приложение в цвета Material You</string>
+    <string name="css_url">Адрес стилей</string>
+    <string name="css_url_desc">CSS, который загружают магазин и новости. Используется при патче: после изменения примените патч заново.</string>
+    <string name="css_url_error">Нужен https-адрес, заканчивающийся на .css</string>
+    <string name="originals">Сохранённые оригиналы APK</string>
+    <string name="originals_desc">%1$s · нужны, чтобы применить патч заново</string>
+    <string name="originals_empty">Ничего не сохранено</string>
+    <string name="originals_clear_title">Удалить оригиналы APK?</string>
+    <string name="originals_clear_text">Без них steamd не сможет заново пропатчить установленное приложение: сначала придётся переустановить Steam из Google Play.</string>
+    <string name="signing_key">Ключ подписи</string>
+    <string name="delete">Удалить</string>
+    <string name="save">Сохранить</string>
+    <string name="reset">Сбросить</string>
 </resources>

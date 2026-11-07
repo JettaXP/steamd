@@ -5,6 +5,7 @@ composeBom = "2025.07.00"
 activityCompose = "1.10.1"
 lifecycle = "2.9.2"
 coreKtx = "1.16.0"
+appcompat = "1.7.1"
 material = "1.12.0"
 apksig = "8.11.1"
 bouncycastle = "1.81"
@@ -14,6 +15,7 @@ roborazzi = "1.46.1"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }

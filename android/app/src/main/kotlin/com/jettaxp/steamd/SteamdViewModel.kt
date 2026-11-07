@@ -3,6 +3,8 @@ package com.jettaxp.steamd
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.jettaxp.steamd.data.AppLanguage
+import com.jettaxp.steamd.data.AppTheme
 import com.jettaxp.steamd.data.ColorSource
 import com.jettaxp.steamd.data.Palettes
 import com.jettaxp.steamd.data.Settings
@@ -48,6 +50,11 @@ data class UiState(
     val storeTheme: Boolean = true,
     val flow: PatchFlow = PatchFlow.Idle,
     val keyFingerprint: String = "",
+    val cssUrl: String = SteamThemePatch.DEFAULT_CSS_URL,
+    val appTheme: AppTheme = AppTheme.System,
+    val appDynamicColor: Boolean = true,
+    val language: AppLanguage = AppLanguage.System,
+    val originalsBytes: Long = 0,
 )
 
 class SteamdViewModel(app: Application) : AndroidViewModel(app) {
@@ -56,7 +63,10 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     private val originals = File(app.filesDir, "original")
     private val work = File(app.cacheDir, "patch")
 
-    private val _state = MutableStateFlow(UiState(colorSource = settings.colorSource, storeTheme = settings.storeTheme))
+    private val _state = MutableStateFlow(UiState(
+        colorSource = settings.colorSource, storeTheme = settings.storeTheme, cssUrl = settings.cssUrl,
+        appTheme = settings.appTheme, appDynamicColor = settings.appDynamicColor, language = Settings.language,
+    ))
     val state: StateFlow<UiState> = _state.asStateFlow()
 
     private var key: SigningKey? = null
@@ -74,7 +84,11 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
             steam.certSha256 == storedOfficialCert() || storedOfficialCert() == null -> SteamStatus.Official
             else -> SteamStatus.Other
         }
-        _state.update { it.copy(steam = steam, status = status, compat = Compat.Checking, keyFingerprint = ourCert.take(16)) }
+        val saved = withContext(Dispatchers.IO) { originals.walkTopDown().filter { it.isFile }.sumOf { it.length() } }
+        _state.update {
+            it.copy(steam = steam, status = status, compat = Compat.Checking, keyFingerprint = ourCert.take(16),
+                originalsBytes = saved, language = Settings.language)
+        }
         if (steam != null) {
             val compat = withContext(Dispatchers.IO) { probe(steam, status) }
             _state.update { it.copy(compat = compat) }
@@ -101,6 +115,36 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         _state.update { it.copy(storeTheme = on) }
     }
 
+    fun setCssUrl(url: String): Boolean {
+        val u = url.trim().ifEmpty { SteamThemePatch.DEFAULT_CSS_URL }
+        if (!Settings.CSS_URL.matches(u)) return false
+        settings.cssUrl = u
+        _state.update { it.copy(cssUrl = u) }
+        return true
+    }
+
+    fun setAppTheme(theme: AppTheme) {
+        settings.appTheme = theme
+        _state.update { it.copy(appTheme = theme) }
+    }
+
+    fun setAppDynamicColor(on: Boolean) {
+        settings.appDynamicColor = on
+        _state.update { it.copy(appDynamicColor = on) }
+    }
+
+    /** Applies the language; the activity is recreated by AndroidX. */
+    fun setLanguage(language: AppLanguage) {
+        _state.update { it.copy(language = language) }
+        Settings.language = language
+    }
+
+    /** Deletes the saved original APKs (re-patching then needs the official app again). */
+    fun clearOriginals() = viewModelScope.launch {
+        withContext(Dispatchers.IO) { originals.deleteRecursively() }
+        refresh()
+    }
+
     fun startPatch() = _state.update { it.copy(flow = PatchFlow.Confirm) }
     fun dismissFlow() = _state.update { it.copy(flow = PatchFlow.Idle) }.also { refresh() }
 
@@ -114,7 +158,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
             step(Step.Copy)
             val sources = withContext(Dispatchers.IO) { saveOriginals(steam) }
             step(Step.Patch)
-            val options = Palettes.patchOptions(ctx, s.colorSource, s.storeTheme)
+            val options = Palettes.patchOptions(ctx, s.colorSource, s.storeTheme).copy(cssUrl = s.cssUrl)
             val out = withContext(Dispatchers.IO) {
                 work.deleteRecursively(); work.mkdirs()
                 val unsigned = File(work, "base-unsigned.apk")
