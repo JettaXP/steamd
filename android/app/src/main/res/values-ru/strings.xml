@@ -109,5 +109,7 @@
     <string name="auto_error">ошибка (%1$s)</string>
     <string name="auto_no_notif">Разрешите уведомления, чтобы steamd мог попросить подтвердить обновление</string>
     <string name="google_sans">Шрифт Google Sans</string>
+    <string name="material_icons">Иконки Material</string>
+    <string name="material_icons_desc">Material Symbols на панели вкладок и в меню Steam. После изменения примените патч заново</string>
     <string name="google_sans_desc">Заменяет Motiva Sans во всём приложении Steam. После изменения примените патч заново</string>
 </resources>

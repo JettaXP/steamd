@@ -66,6 +66,19 @@ object SteamThemePatch {
         "<svg width=24 height=24 viewBox=\"0 0 24 24\"fill=none xmlns=http://www.w3.org/2000/svg><path class=copier",
     )
 
+    private val ICON_PATHS = listOf(
+        "M18.7666 10.6777L10.6777 18.7666L2.22217" to
+            "m17.8 11.9l-6 6q-.2.2-.6.4t-.6.1q-.3 0-.6-.1t-.6-.4l-7.4-7.4q-.2-.2-.4-.5t-.1-.6l0-6q0-.7.5-1.2t1.2-.5l6 0q.3 0 .6.1t.5.4l7.3 7.4q.2.2 .4.6t.1.6q0 .3-.1.6t-.4.6zm-12.4-5.2q.5 0 .9-.4t.4-.9q0-.5-.4-.9t-.9-.4q-.5 0-.9.4t-.4.9q0 .5.4 .9t.9.4z",
+        "M3.08634 17.7158H16.9428C17.8015 17.7158" to
+            "m3.33 17.5q-.69 0-1.18-.49t-.49-1.18l0-12.83q0-.15.12-.2t.23.05l1.04 1.04l1.08-1.1q.12-.12.29-.12t.29.12l1.1 1.1l1.1-1.1q.12-.12.29-.12t.29.12l1.08 1.1l1.1-1.1q.12-.12.29-.12t.29.12l1.1 1.1l1.08-1.1q.12-.12.29-.12t.29.12l1.1 1.1l1.1-1.1q.12-.12.29-.12t.29.12l1.08 1.1l1.04-1.04q.1-.1.23-.05t.12.2l0 12.83q0 .69-.49 1.18t-1.18.49l-13.33 0zm0-1.67l5.83 0l0-5l-5.83 0l0 5zm7.5 0l5.83 0l0-1.67l-5.83 0l0 1.67zm0-3.33l5.83 0l0-1.67l-5.83 0l0 1.67zm-7.5-3.33l13.33 0l0-2.5l-13.33 0l0 2.5z",
+        "M3.54839 4.13364C4.64516 3.89862 5.66359" to
+            "m10 18.25q-.15 0-.27-.02t-.25-.06q-2.81-.94-4.48-3.47t-1.67-5.45l0-3.94q0-.52.3-.94t.78-.6l5-1.88q.29-.1.58-.1t.58.1l5 1.88q.48.19 .78.6t.3.94l0 3.94q0 2.92-1.67 5.45t-4.48 3.47q-.12.04-.25.06t-.27.02z",
+        "M17.7777 13.3333V14.4444H2.22217V13.3333" to
+            "m4.17 15.83q-.35 0-.59-.24t-.24-.59q0-.35.24-.59t.59-.24l.83 0l0-5.83q0-1.73 1.04-3.07t2.71-1.76l0-.58q0-.52.36-.89t.89-.36q.52 0 .89.36t.36.89l0 .58q1.67.42 2.71 1.76t1.04 3.07l0 5.83l.83 0q.35 0 .59.24t.24.59q0 .35-.24.59t-.59.24l-11.67 0zm5.83 2.5q-.69 0-1.18-.49t-.49-1.18l3.33 0q0 .69-.49 1.18t-1.18.49z",
+    )
+    private const val SVG24 = "<svg width=24 height=24 viewBox=\"0 0 24 24\"fill=none xmlns=http://www.w3.org/2000/svg><path d=\""
+    private val ICON_DONORS = listOf(SVG24 + "M16 21H16.2", SVG24 + "M2.5 21.4998L8.")
+
     private val RADIUS_SIGNATURE = hexBytes(
         "73000000001c0200008403000072040000000a0000007428000000200000001800000012000000"
     )
@@ -85,6 +98,7 @@ object SteamThemePatch {
         val storeTheme: Boolean = true,
         val radius: Pair<Int, Int>? = DEFAULT_RADIUS,
         val uppercase: Boolean = false,
+        val materialIcons: Boolean = true,
     )
 
     class Result(val bundle: ByteArray, val hermesVersion: Int, val colorsReplaced: Int, val storeTheme: Boolean,
@@ -100,6 +114,7 @@ object SteamThemePatch {
         if (options.colors) patchTabMarker(hb, options.palette, colorOffsets, log)
         if (!options.uppercase) patchUppercase(hb, log)
         patchGuardCode(hb, log)
+        if (options.materialIcons) patchIcons(hb, log)
         return Result(hb.finish(), hb.version, colors, store, radius, log)
     }
 
@@ -137,6 +152,26 @@ object SteamThemePatch {
         if (hits.size != 1) { log += "skip guard code: style not found"; return false }
         hb.putShort(hits[0] + 3, ids.getValue("light"))
         log += "guard code: light"
+        return true
+    }
+
+    private fun patchIcons(hb: HermesBundle, log: MutableList<String>): Boolean {
+        val targets = ICON_PATHS.map { (prefix, path) ->
+            val l = hb.findStartingWith(prefix)
+            if (l.size != 1) { log += "skip icons: original paths not found"; return false }
+            l[0] to path.toByteArray(Charsets.US_ASCII)
+        }
+        val slots = ICON_DONORS.map { prefix ->
+            val d = hb.findDonor(listOf(prefix), 1) ?: run { log += "skip icons: no donor strings"; return false }
+            intArrayOf(hb.storageOffsetOf(d), hb.storageOffsetOf(d) + hb.byteLength(d))
+        }
+        for ((i, raw) in targets) {
+            val slot = slots.firstOrNull { it[1] - it[0] >= raw.size } ?: run { log += "skip icons: donors too small"; return false }
+            hb.writeStorage(slot[0], raw)
+            hb.repoint(i, slot[0], raw.size)
+            slot[0] += raw.size
+        }
+        log += "icons: Material Symbols"
         return true
     }
 

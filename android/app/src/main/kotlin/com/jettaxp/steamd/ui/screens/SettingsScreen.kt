@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DarkMode
@@ -76,6 +77,7 @@ class SettingsActions(
     val onCssUrl: (String) -> Boolean,
     val onAutoRepatch: (Boolean) -> Unit,
     val onGoogleSans: (Boolean) -> Unit = {},
+    val onMaterialIcons: (Boolean) -> Unit = {},
     val onClearOriginals: () -> Unit,
     val onExportKey: (android.net.Uri) -> Unit = {},
     val onImportKey: (android.net.Uri) -> Unit = {},
@@ -115,6 +117,8 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
                 checked = state.storeTheme, onChange = actions.onStoreTheme)
             SwitchItem(Icons.Filled.TextFields, stringResource(R.string.google_sans), stringResource(R.string.google_sans_desc),
                 checked = state.googleSans, onChange = actions.onGoogleSans)
+            SwitchItem(Icons.Filled.Category, stringResource(R.string.material_icons), stringResource(R.string.material_icons_desc),
+                checked = state.materialIcons, onChange = actions.onMaterialIcons)
             Item(Icons.Filled.Link, stringResource(R.string.css_url), state.cssUrl, enabled = state.storeTheme) { dialog = Dialog.CssUrl }
             SwitchItem(
                 Icons.Filled.Wallpaper, stringResource(R.string.auto_repatch),

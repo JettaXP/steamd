@@ -98,6 +98,16 @@ SCRIPT_DONORS = (
     '<svg width=24 height=24 viewBox="0 0 24 24"fill=none xmlns=http://www.w3.org/2000/svg><path class=copier',
 )
 
+# Material Symbols Rounded (Apache-2.0), filled, scaled to Steam's 20x20 icon box.
+ICON_PATHS = (
+    ("M18.7666 10.6777L10.6777 18.7666L2.22217", "m17.8 11.9l-6 6q-.2.2-.6.4t-.6.1q-.3 0-.6-.1t-.6-.4l-7.4-7.4q-.2-.2-.4-.5t-.1-.6l0-6q0-.7.5-1.2t1.2-.5l6 0q.3 0 .6.1t.5.4l7.3 7.4q.2.2 .4.6t.1.6q0 .3-.1.6t-.4.6zm-12.4-5.2q.5 0 .9-.4t.4-.9q0-.5-.4-.9t-.9-.4q-.5 0-.9.4t-.4.9q0 .5.4 .9t.9.4z"),
+    ("M3.08634 17.7158H16.9428C17.8015 17.7158", "m3.33 17.5q-.69 0-1.18-.49t-.49-1.18l0-12.83q0-.15.12-.2t.23.05l1.04 1.04l1.08-1.1q.12-.12.29-.12t.29.12l1.1 1.1l1.1-1.1q.12-.12.29-.12t.29.12l1.08 1.1l1.1-1.1q.12-.12.29-.12t.29.12l1.1 1.1l1.08-1.1q.12-.12.29-.12t.29.12l1.1 1.1l1.1-1.1q.12-.12.29-.12t.29.12l1.08 1.1l1.04-1.04q.1-.1.23-.05t.12.2l0 12.83q0 .69-.49 1.18t-1.18.49l-13.33 0zm0-1.67l5.83 0l0-5l-5.83 0l0 5zm7.5 0l5.83 0l0-1.67l-5.83 0l0 1.67zm0-3.33l5.83 0l0-1.67l-5.83 0l0 1.67zm-7.5-3.33l13.33 0l0-2.5l-13.33 0l0 2.5z"),
+    ("M3.54839 4.13364C4.64516 3.89862 5.66359", "m10 18.25q-.15 0-.27-.02t-.25-.06q-2.81-.94-4.48-3.47t-1.67-5.45l0-3.94q0-.52.3-.94t.78-.6l5-1.88q.29-.1.58-.1t.58.1l5 1.88q.48.19 .78.6t.3.94l0 3.94q0 2.92-1.67 5.45t-4.48 3.47q-.12.04-.25.06t-.27.02z"),
+    ("M17.7777 13.3333V14.4444H2.22217V13.3333", "m4.17 15.83q-.35 0-.59-.24t-.24-.59q0-.35.24-.59t.59-.24l.83 0l0-5.83q0-1.73 1.04-3.07t2.71-1.76l0-.58q0-.52.36-.89t.89-.36q.52 0 .89.36t.36.89l0 .58q1.67.42 2.71 1.76t1.04 3.07l0 5.83l.83 0q.35 0 .59.24t.24.59q0 .35-.24.59t-.59.24l-11.67 0zm5.83 2.5q-.69 0-1.18-.49t-.49-1.18l3.33 0q0 .69-.49 1.18t-1.18.49z"),
+)
+_SVG24 = '<svg width=24 height=24 viewBox="0 0 24 24"fill=none xmlns=http://www.w3.org/2000/svg><path d="'
+ICON_DONORS = (_SVG24 + "M16 21H16.2", _SVG24 + "M2.5 21.4998L8.")
+
 
 # ---------------------------------------------------------------------------
 class _Reader:
@@ -167,8 +177,8 @@ class _Patch:
         t = rd.table_start + 4 * i
         v = int.from_bytes(self.out[t:t + 4], "little")
         if (v >> 24) != 0xFF:                       # small entry: bit0 utf16, bits1-23 offset, bits24-31 length
-            if length >= 0xFF:
-                sys.exit(f"string #{i}: new value too long for a small entry")
+            if length >= 0xFF or off >= 1 << 23:
+                sys.exit(f"string #{i}: new value does not fit a small entry")
             v = (v & 0x00000001) | (off << 1) | (length << 24)
             self.out[t:t + 4] = v.to_bytes(4, "little")
         else:                                       # overflow entry: (offset u32, length u32)
@@ -323,6 +333,32 @@ def patch_guard_code(pt):
     return True
 
 
+def patch_icons(pt):
+    """Material Symbols on the tab bar and main menu (MenuIconStore/News/SteamGuard/Notifications)."""
+    S = pt.rd.strings
+    targets = []
+    for pref, d in ICON_PATHS:
+        l = [i for i, s in enumerate(S) if s.startswith(pref)]
+        if len(l) != 1:
+            print("  [skip] icons: original paths not found"); return False
+        targets.append((l[0], d.encode("ascii")))
+    donors = []
+    for pref in ICON_DONORS:
+        d = pt.rd.find_donor((pref,), 1)
+        if not d:
+            print("  [skip] icons: no donor strings"); return False
+        donors.append([d[1], d[1] + d[2]])
+    for i, raw in targets:
+        slot = next((d for d in donors if d[1] - d[0] >= len(raw)), None)
+        if slot is None:
+            print("  [skip] icons: donors too small"); return False
+        pt.write_storage(slot[0], raw)
+        pt.repoint(i, slot[0], len(raw))
+        slot[0] += len(raw)
+    print("  icons: Material Symbols")
+    return True
+
+
 def patch_uppercase(pt):
     """Sentence case everywhere: the shared Text component reads props.uppercase; make it read props.__esModule."""
     S = pt.rd.strings
@@ -347,7 +383,7 @@ def patch_uppercase(pt):
 
 
 def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_url=DEFAULT_CSS,
-                 colors=True, store=True, radius=DEFAULT_RADIUS, uppercase=False):
+                 colors=True, store=True, radius=DEFAULT_RADIUS, uppercase=False, icons=True):
     if data[:8] != bytes.fromhex("c61fbc03c103191f"):
         sys.exit("Not a Hermes bundle")
     ver = int.from_bytes(data[8:12], "little")
@@ -362,6 +398,8 @@ def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_u
     if not uppercase:
         patch_uppercase(pt)
     patch_guard_code(pt)
+    if icons:
+        patch_icons(pt)
     print(f"Hermes v{ver}: colours replaced: {n}; store theme: {'yes' if s else 'no'}; radius: {'yes' if rr else 'no'}")
     return pt.finish()
 
@@ -406,6 +444,7 @@ def main():
     ap.add_argument("--radius", default="%d,%d" % DEFAULT_RADIUS,
                     help='corner radius "standard,large" in dp (Steam: 4,10), or "off"')
     ap.add_argument("--keep-uppercase", action="store_true", help="keep Steam's UPPERCASE titles")
+    ap.add_argument("--steam-icons", action="store_true", help="keep Steam's own tab bar and menu icons")
     ap.add_argument("--no-colors", action="store_true", help="keep the native theme colours")
     ap.add_argument("--no-store-theme", action="store_true", help="do not load CSS in the store and news")
     ap.add_argument("--check", action="store_true", help="patch a bare bundle (dry run unless dst is given)")
@@ -427,7 +466,7 @@ def main():
             ap.error('--radius must look like "12,24" or "off"')
     kw = dict(palette=palette, seed_primary=primary, css_url=a.css_url,
               colors=not a.no_colors, store=not a.no_store_theme, radius=radius,
-              uppercase=a.keep_uppercase)
+              uppercase=a.keep_uppercase, icons=not a.steam_icons)
 
     if a.check:
         out = patch_bundle(open(a.src, "rb").read(), **kw)
