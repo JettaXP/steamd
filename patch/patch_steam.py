@@ -300,6 +300,29 @@ def patch_tab_marker(pt, palette):
     return True
 
 
+def patch_guard_code(pt):
+    """Lighter Steam Guard code (CircleCodeScreen heading weight medium -> light)."""
+    S = pt.rd.strings
+    ids = {}
+    for name in ("1", "medium", "light", "center"):
+        l = [i for i, s in enumerate(S) if s == name]
+        if len(l) != 1 or l[0] > 0xFFFF:
+            print("  [skip] guard code: strings not found"); return False
+        ids[name] = l[0]
+    h = pt.rd.r.header
+    align = lambda x: (x + 3) & ~3
+    values = align(align(align(pt.rd.storage_start + h.stringStorageSize) + h.arrayBufferSize) + h.objKeyBufferSize)
+    sig = (bytes([0x52]) + ids["1"].to_bytes(2, "little") + ids["medium"].to_bytes(2, "little")
+           + bytes([0x01, 0x51]) + ids["center"].to_bytes(2, "little"))
+    buf = bytes(pt.out[values:values + h.objValueBufferSize])
+    if buf.count(sig) != 1:
+        print("  [skip] guard code: style not found"); return False
+    p = values + buf.find(sig) + 3
+    pt.out[p:p + 2] = ids["light"].to_bytes(2, "little")
+    print("  guard code: light")
+    return True
+
+
 def patch_uppercase(pt):
     """Sentence case everywhere: the shared Text component reads props.uppercase; make it read props.__esModule."""
     S = pt.rd.strings
@@ -338,6 +361,7 @@ def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_u
         patch_tab_marker(pt, palette)
     if not uppercase:
         patch_uppercase(pt)
+    patch_guard_code(pt)
     print(f"Hermes v{ver}: colours replaced: {n}; store theme: {'yes' if s else 'no'}; radius: {'yes' if rr else 'no'}")
     return pt.finish()
 

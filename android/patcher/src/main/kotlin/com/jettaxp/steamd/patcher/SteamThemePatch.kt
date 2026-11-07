@@ -99,6 +99,7 @@ object SteamThemePatch {
         val radius = options.radius?.let { patchRadius(hb, it, log) } ?: false
         if (options.colors) patchTabMarker(hb, options.palette, colorOffsets, log)
         if (!options.uppercase) patchUppercase(hb, log)
+        patchGuardCode(hb, log)
         return Result(hb.finish(), hb.version, colors, store, radius, log)
     }
 
@@ -119,6 +120,23 @@ object SteamThemePatch {
         hb.putShort(hits[0] + 3, holder[0])
         hb.repoint(holder[0], offsets.getValue(accent), 7)
         log += "tab marker: $accent"
+        return true
+    }
+
+    private fun patchGuardCode(hb: HermesBundle, log: MutableList<String>): Boolean {
+        val ids = HashMap<String, Int>()
+        for (name in listOf("1", "medium", "light", "center")) {
+            val l = hb.findExact(name)
+            if (l.size != 1 || l[0] > 0xFFFF) { log += "skip guard code: strings not found"; return false }
+            ids[name] = l[0]
+        }
+        fun le(v: Int) = byteArrayOf((v and 0xFF).toByte(), (v shr 8).toByte())
+        val sig = byteArrayOf(0x52) + le(ids.getValue("1")) + le(ids.getValue("medium")) +
+            byteArrayOf(0x01, 0x51) + le(ids.getValue("center"))
+        val hits = hb.findInFile(sig).filter { it >= hb.objectValuesOffset && it < hb.objectValuesOffset + hb.objectValuesSize }
+        if (hits.size != 1) { log += "skip guard code: style not found"; return false }
+        hb.putShort(hits[0] + 3, ids.getValue("light"))
+        log += "guard code: light"
         return true
     }
 
