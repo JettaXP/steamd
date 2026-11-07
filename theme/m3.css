@@ -428,3 +428,23 @@
   background: var(--sd-c) !important;
   overflow: hidden;
 }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub :is(.hZ0IRZS-U9c-, [class*="-"]:has(> .Panel.Focusable > [class*="-"] > a[href*="/news/"])) {
+  background-color: color-mix(in oklab, var(--sd-surface) 92%, transparent) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 10;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub a.Focusable img,
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub a.Focusable [style*="background-image"] {
+  border-radius: var(--sd-r-m) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .DiscountsAndEventsReady > div:last-child {
+  margin: 12px 0 20px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.nw-DtQ670Sc-, .pnC74wQYjms- > div:first-child) {
+  border-radius: 8px 0 0 8px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .pnC74wQYjms- {
+  border-radius: 8px !important;
+  overflow: hidden;
+}
