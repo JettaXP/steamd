@@ -1,6 +1,10 @@
-# steamd
+<p align="center">
+  <img src="assets/icon.svg" alt="steamd" width="112" height="112">
+</p>
 
-Тема в стиле Material 3 для Android-приложения Steam.
+<h1 align="center">steamd</h1>
+
+<p align="center">Тема в стиле Material 3 для Android-приложения Steam.</p>
 
 Сайт проекта: **https://steamd.jettax.xyz**
 
