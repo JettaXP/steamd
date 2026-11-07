@@ -236,6 +236,24 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 .swatch md-icon { --md-icon-size: 18px; color: var(--md-sys-color-on-surface-variant); }
 .swatch .name { margin-left: auto; font-family: var(--md-ref-typeface-plain); color: var(--md-sys-color-on-surface-variant); }
 
+/* ---------- Colour picker ---------- */
+.seed-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-bottom: 20px; }
+.seed-picker {
+  display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+  height: 32px; padding: 0 14px 0 6px; border-radius: 8px;
+  border: 1px solid var(--md-sys-color-outline-variant); color: var(--md-sys-color-on-surface-variant);
+}
+.seed-picker input {
+  width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; overflow: hidden;
+  background: none; cursor: pointer;
+}
+.seed-picker input::-webkit-color-swatch-wrapper { padding: 0; }
+.seed-picker input::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.seed-picker input::-moz-color-swatch { border: 0; border-radius: 50%; }
+.command { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+.command pre { flex: 1; margin: 0; }
+.note { margin-top: 12px; }
+
 /* ---------- Warning ---------- */
 .warning {
   display: flex; gap: 16px; padding: 20px 24px; align-items: flex-start;

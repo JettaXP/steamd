@@ -1,0 +1,244 @@
+/*
+ * steamd — Material 3 theme for the Steam store and news inside the Android app.
+ * https://github.com/JettaXP/steamd · MIT
+ * Idea inspired by Material-Theme for Millennium (https://github.com/kuska1/Material-Theme, MIT).
+ *
+ * Only applies inside the app (html.rn_mobile_app) or with html.steamd-preview.
+ * The whole palette is derived from one seed colour, --sd-p, which the patched
+ * app sets on <html> (see patch/patch_steam.py --seed / --dynamic).
+ */
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..700&display=swap");
+
+:root:is(.rn_mobile_app, .steamd-preview) {
+  --sd-p: #aac7ff;                                    /* seed / primary (overridden by the app) */
+  --sd-base: #111318;
+
+  --sd-surface:   color-mix(in oklab, var(--sd-p) 4%,  #111318);
+  --sd-c-low:     color-mix(in oklab, var(--sd-p) 5%,  #191c20);
+  --sd-c:         color-mix(in oklab, var(--sd-p) 6%,  #1d2024);
+  --sd-c-high:    color-mix(in oklab, var(--sd-p) 7%,  #282a2f);
+  --sd-c-highest: color-mix(in oklab, var(--sd-p) 8%,  #33353a);
+  --sd-on:        color-mix(in oklab, var(--sd-p) 5%,  #e2e2e9);
+  --sd-on-var:    color-mix(in oklab, var(--sd-p) 10%, #c4c6d0);
+  --sd-outline:   color-mix(in oklab, var(--sd-p) 10%, #44474e);
+  --sd-on-p:      color-mix(in oklab, var(--sd-p) 22%, #06080c);
+  --sd-sec-c:     color-mix(in oklab, var(--sd-p) 22%, #30333a);
+  --sd-on-sec-c:  color-mix(in oklab, var(--sd-p) 18%, #e8e8f0);
+  --sd-tert:      color-mix(in oklab, var(--sd-p) 30%, #c3e8b4);
+
+  --sd-r-s: 12px;
+  --sd-r-m: 16px;
+  --sd-r-l: 24px;
+  --sd-font: "Roboto Flex", "Motiva Sans", system-ui, sans-serif;
+
+  color-scheme: dark;
+  background: var(--sd-surface) !important;
+}
+
+/* ---------- Base ---------- */
+:root:is(.rn_mobile_app, .steamd-preview) body {
+  background: var(--sd-surface) !important;
+  color: var(--sd-on) !important;
+  font-family: var(--sd-font) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(body, input, button, select, textarea, h1, h2, h3, h4, h5, h6, a, span, div, p) {
+  font-family: var(--sd-font) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.page_background_holder, .home_page_body_ctn, .responsive_page_template_content,
+  .page_content_ctn, .game_page_background, .responsive_page_frame, .home_tab_bg_ctn, .tab_content_ctn) {
+  background: transparent !important;
+  background-image: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) a { color: var(--sd-p); }
+:root:is(.rn_mobile_app, .steamd-preview) ::selection { background: var(--sd-sec-c); color: var(--sd-on-sec-c); }
+
+/* Section titles */
+:root:is(.rn_mobile_app, .steamd-preview) :is(.home_page_content h2, .home_page_content > h2, h2.home_page_content_title, .home_section_title) {
+  color: var(--sd-on) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* ---------- Header / nav ---------- */
+:root:is(.rn_mobile_app, .steamd-preview) :is(.responsive_header, #store_header, .store_header, .responsive_store_nav_ctn) {
+  background: var(--sd-c) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.store_nav .tab, .responsive_store_nav_ctn a, .store_nav_area a) {
+  color: var(--sd-on-var) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: 500 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.searchbox, #store_search, .store_nav .searchbox, [id^="searchSuggestions"]) {
+  background: var(--sd-c-high) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 28px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(#store_nav_search_term, input[type="text"], input[type="search"]) {
+  color: var(--sd-on) !important;
+}
+
+/* ---------- Cards / panels ---------- */
+:root:is(.rn_mobile_app, .steamd-preview) :is(.store_main_capsule, .home_discount_games_ctn, .SaleSectionCarousel,
+  .home_area_spotlight, .tab_row_item, .home_gift_card_link, .WidgetHeaderCtn, .store_capsule, .home_marketing_message,
+  .special, .recommended_creators_ctn, .home_page_sign_in_ctn) {
+  border-radius: var(--sd-r-l) !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.store_main_capsule .info, .home_discount_games_ctn, .SaleSectionCarousel,
+  .tab_row_item, .home_page_sign_in_ctn) {
+  background: var(--sd-c) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .store_main_capsule {
+  background: var(--sd-c) !important;
+  box-shadow: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .store_main_capsule .info { padding-bottom: 16px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .store_main_capsule .app_name,
+:root:is(.rn_mobile_app, .steamd-preview) .tab_item_name { color: var(--sd-on) !important; font-weight: 500 !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.capsule, .capsule_image_ctn, .tab_item_cap, .tab_item_cap img, .sale_capsule img, .store_capsule img) {
+  border-radius: var(--sd-r-m) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .main_capsule { border-radius: var(--sd-r-l) var(--sd-r-l) 0 0 !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .tab_row_item { margin-bottom: 8px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.tab_item_details, .tab_item_top_tags, .top_tag) { color: var(--sd-on-var) !important; }
+
+/* Gift card and promo banners: tonal instead of bright gradients */
+:root:is(.rn_mobile_app, .steamd-preview) .home_gift_card_link {
+  background: var(--sd-sec-c) !important;
+  color: var(--sd-on-sec-c) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .WidgetHeaderCtn { background: var(--sd-c-high) !important; }
+
+/* Carousel position indicators */
+:root:is(.rn_mobile_app, .steamd-preview) :is(.carousel_thumbs > div, .ScrollSnapCarousel [class*="Indicator"]) {
+  background: var(--sd-outline) !important;
+  border-radius: 4px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.carousel_thumbs > div.focus, .carousel_thumbs > .active) { background: var(--sd-p) !important; }
+
+/* ---------- Buttons ---------- */
+:root:is(.rn_mobile_app, .steamd-preview) :is(.btn_green_steamui, .btn_green_white_innerfade, .btn_blue_steamui,
+  .btnv6_blue_hoverfade, .btnv6_green_white_innerfade, .btn_medium, .btn_small, .btn_small_thin, .btn_large, .btn_grey_steamui) {
+  border-radius: 20px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.btn_green_steamui, .btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_blue_steamui) > span,
+:root:is(.rn_mobile_app, .steamd-preview) :is(.btn_green_steamui, .btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_blue_steamui) {
+  background: var(--sd-p) !important;
+  color: var(--sd-on-p) !important;
+  text-shadow: none !important;
+  border-radius: 20px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.btnv6_blue_hoverfade, .btn_grey_steamui) > span,
+:root:is(.rn_mobile_app, .steamd-preview) :is(.btnv6_blue_hoverfade, .btn_grey_steamui) {
+  background: var(--sd-sec-c) !important;
+  color: var(--sd-on-sec-c) !important;
+  border-radius: 20px !important;
+}
+/* "More" buttons under sections */
+:root:is(.rn_mobile_app, .steamd-preview) :is(.home_page_content .more_btn, .home_page_content a.btnv6_white_transparent, .btnv6_white_transparent) {
+  background: var(--sd-sec-c) !important;
+  color: var(--sd-on-sec-c) !important;
+  border-radius: 20px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.btnv6_white_transparent > span) { background: transparent !important; color: inherit !important; }
+
+/* ---------- Prices ---------- */
+:root:is(.rn_mobile_app, .steamd-preview) :is(.discount_block, .discount_prices, .StoreSalePriceWidgetContainer) {
+  border-radius: var(--sd-r-s) !important;
+  overflow: hidden;
+}
+:root:is(.rn_mobile_app, .steamd-preview) :is(.discount_prices, .discount_block .discount_prices) { background: var(--sd-c-highest) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.discount_final_price, .game_purchase_price, .price) { color: var(--sd-on) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.discount_original_price) { color: var(--sd-on-var) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) .discount_pct { border-radius: var(--sd-r-s) 0 0 var(--sd-r-s) !important; }
+
+/* ---------- Text ---------- */
+:root:is(.rn_mobile_app, .steamd-preview) :is(.game_review_summary.positive, .positive) { color: var(--sd-p) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) :is(.home_page_content, .tab_content, .page_content) { color: var(--sd-on); }
+
+/* ---------- Footer ---------- */
+:root:is(.rn_mobile_app, .steamd-preview) :is(#footer, .footer, #footer_spacer, .responsive_footer) {
+  background: var(--sd-c-low) !important;
+  background-image: none !important;
+  color: var(--sd-on-var) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) #footer a { color: var(--sd-on-var) !important; }
+
+/* ---------- Overlays and menus ---------- */
+:root:is(.rn_mobile_app, .steamd-preview) .responsive_page_menu,
+:root:is(.rn_mobile_app, .steamd-preview) .popup_body,
+:root:is(.rn_mobile_app, .steamd-preview) .newmodal_content_border {
+  background: var(--sd-c-high) !important;
+  background-image: none !important;
+  border-radius: var(--sd-r-l) !important;
+  border: 0 !important;
+}
+
+/* ---------- React widgets (hashed class names: matched by structure) ---------- */
+/* "More" buttons under carousels */
+:root:is(.rn_mobile_app, .steamd-preview) :is(.see_more_link > a, .DiscountsAndEventsReady > div:last-child > a,
+  .home_page_content div:has(> a:only-child:not(:has(img))) > a:only-child:not(:has(img)):not([class*="capsule"])) {
+  background: var(--sd-sec-c) !important;
+  background-image: none !important;
+  color: var(--sd-on-sec-c) !important;
+  border-radius: 20px !important;
+  border: 0 !important;
+  padding: 6px 16px !important;
+  line-height: 20px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .see_more_link > a > span { background: transparent !important; color: inherit !important; padding: 0 !important; }
+/* Sign-in widget: last child is the button */
+:root:is(.rn_mobile_app, .steamd-preview) .WidgetHeaderCtn {
+  background: var(--sd-c-high) !important;
+  background-image: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) .WidgetHeaderCtn > div:last-child:not(:first-child) {
+  background: var(--sd-p) !important;
+  color: var(--sd-on-p) !important;
+  border-radius: 20px !important;
+  padding: 10px 24px !important;
+  font-weight: 500 !important;
+}
+/* Discount badge: M3 tertiary container instead of neon green */
+:root:is(.rn_mobile_app, .steamd-preview) .discount_pct,
+:root:is(.rn_mobile_app, .steamd-preview) [class*="StoreSalePriceWidgetContainer"] [class*="Discount"]:not([class*="Price"]) {
+  background: color-mix(in oklab, var(--sd-tert) 30%, #1f3a1a) !important;
+  color: color-mix(in oklab, var(--sd-tert) 85%, #ffffff) !important;
+}
+
+/* ---------- News (events hub, React with hashed classes) ---------- */
+/* Flatten Steam's blue/grey panels onto the M3 surface (hashed class names end with "-"). */
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub :is([class$="-"], [class*="- "]):not(:has(> img)):not([style*="background-image"]) {
+  background-color: transparent !important;
+  border-color: var(--sd-outline) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub [class*="gradient"],
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub :is([class$="-"], [class*="- "]):not([style*="background-image"]) {
+  background-image: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub :is(h1, h2, h3, [class*="Title"]) {
+  color: var(--sd-on) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub a { color: var(--sd-p) !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub :is(button, [role="button"], .DialogButton) {
+  border-radius: 20px !important;
+  background-image: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub .DialogButton.Primary,
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub a[href*="login"] {
+  background: var(--sd-p) !important;
+  color: var(--sd-on-p) !important;
+}

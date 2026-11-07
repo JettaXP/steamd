@@ -1,10 +1,11 @@
 // Official Material Web components (https://github.com/material-components/material-web),
 // bundled locally into material-web.js (Apache-2.0, licences kept at the end of the file).
 import './material-web.js';
+import { argbFromHex, hexFromArgb, Hct, SchemeTonalSpot, MaterialDynamicColors } from './color-utils.js';
 
 /* ---------------- i18n ---------------- */
 const EN = {
-  'nav.features': 'Features', 'nav.install': 'Install', 'nav.links': 'Links',
+  'nav.features': 'Features', 'nav.color': 'Colour', 'nav.install': 'Install', 'a11y.copy': 'Copy', 'nav.links': 'Links',
   'a11y.lang': 'Language', 'a11y.theme': 'Theme',
   'theme.light': 'Light', 'theme.dark': 'Dark', 'theme.system': 'System',
   'chip.unofficial': 'Unofficial project',
@@ -18,15 +19,18 @@ const EN = {
   'f1.text': 'The app’s built-in theme gets dark tonal surfaces and a soft blue accent: menu, Steam Guard, navigation and headers.',
   'f2.title': 'Your font',
   'f2.text': 'Motiva Sans is replaced with any font that has the needed styles, e.g. Roboto. Weight and italics are matched automatically.',
-  'f3.title': 'Store theme', 'f3.soon': 'soon',
+  'f3.title': 'Store and news theme',
   'f3.text': 'Store and news run in a WebView. They load CSS from this site, so the theme can be updated without rebuilding the app.',
-  'palette.title': 'Palette',
-  'palette.text': 'Left: the original colour of the app theme. Right: the colour after the patch.',
+  'color.title': 'Colour',
+  'color.text': 'Pick a seed colour: the whole Material You palette is generated from it, just like on Android 12+. The site recolours instantly and the patch command appears below. Use your wallpaper colour to match Steam to your system.',
+  'seed.default': 'Default', 'seed.purple': 'Purple', 'seed.green': 'Green', 'seed.orange': 'Orange',
+  'seed.pink': 'Pink', 'seed.teal': 'Teal', 'seed.custom': 'Custom colour',
+  'color.dynamic': 'Fully automatic dynamic colours that follow your wallpaper need an app on the device. That is the next stage of the project.',
   'warn.title': 'Save your Steam Guard recovery code before installing',
   'warn.text': 'The patched app is signed with a different key, so the official one must be uninstalled, and its Steam Guard data goes with it. The recovery code (R-xxxxx) is in Steam → Steam Guard.',
   'install.title': 'Installation', 'install.req': 'You will need:',
   'install.fonts': 'and static TTF fonts (for example',
-  's1': 'Install dependencies', 's2': 'Pull all app APKs (base and splits)', 's3': 'Patch base.apk',
+  's1': 'Install dependencies', 's2': 'Pull all app APKs (base and splits)', 's3': 'Patch base.apk (custom colour: see the Colour section)',
   's4': 'Sign all APKs with one key', 's5': 'Replace the official app',
   'install.after': 'After installing, sign in and set up Steam Guard again. To roll back at any time, uninstall the patched app and install Steam from Google Play.',
   'limits.title': 'Limitations',
@@ -35,7 +39,7 @@ const EN = {
   'l3': 'Re-apply the patch after every Steam update',
   'links.title': 'Links', 'ln1.t': 'Repository', 'ln2.t': 'Report a problem',
   'ln2.s': 'Attach a log: adb logcat -d',
-  'ln3.s': 'Millennium theme the store theme is based on (MIT)',
+  'ln3.s': 'Millennium theme that inspired the store theme (MIT)',
   'ln4.s': 'Hermes bytecode parser',
   'footer': 'steamd is an unofficial project, not affiliated with Valve Corporation. Steam is a trademark of Valve Corporation. The script only modifies your own copy of the app. Do not distribute patched APKs.',
 };
@@ -51,6 +55,7 @@ document.querySelectorAll('[data-i18n-label]').forEach((el) => {
   RU[el.dataset.i18nLabel] = el.getAttribute('aria-label');
 });
 
+function setPaletteLang(l) { lang = l; if (document.getElementById('palette')) renderPalette(); }
 function setLang(lang) {
   const dict = lang === 'en' ? EN : RU;
   textNodes.forEach((el) => {
@@ -62,7 +67,7 @@ function setLang(lang) {
   });
   document.documentElement.lang = lang;
   document.title = TITLES[lang];
-  renderPalette(lang);
+  setPaletteLang(lang);
   try { localStorage.setItem('steamd-lang', lang); } catch (e) {}
 }
 
@@ -74,20 +79,61 @@ function setTheme(t) {
   try { localStorage.setItem('steamd-theme', t); } catch (e) {}
 }
 
-/* ---------------- palette (mirrors PALETTE in patch_steam.py) ---------------- */
-const PALETTE = [
-  ['#2A2C34', '#26272B', 'Фон', 'Surface'],
-  ['#1F2127', '#1B1B1F', 'Фон: глубокий', 'Surface: deep'],
-  ['#23252A', '#1F1F23', 'Фон: третичный', 'Surface: tertiary'],
-  ['#3C3F49', '#3E4759', 'Нейтральный', 'Neutral'],
-  ['#1A9FFF', '#8AB4F8', 'Акцент', 'Accent'],
-  ['#DFE3E6', '#E3E2E6', 'Текст', 'Text'],
-  ['#8B929A', '#C4C6D0', 'Вторичный текст', 'Secondary text'],
-  ['#60636A', '#8E9099', 'Разделитель', 'Divider'],
+/* ---------------- colour (mirrors patch/patch_steam.py) ---------------- */
+// Default palette = PALETTE in patch_steam.py; with a seed = SEED_ROLES on a Material You dark scheme.
+const ROWS = [
+  ['#2A2C34', '#26272B', 'surfaceContainer', 'Фон', 'Surface'],
+  ['#1F2127', '#1B1B1F', 'surface', 'Фон: глубокий', 'Surface: deep'],
+  ['#23252A', '#1F1F23', 'surfaceContainerLow', 'Фон: третичный', 'Surface: tertiary'],
+  ['#3C3F49', '#3E4759', 'secondaryContainer', 'Нейтральный', 'Neutral'],
+  ['#1A9FFF', '#8AB4F8', 'primary', 'Акцент', 'Accent'],
+  ['#DFE3E6', '#E3E2E6', 'onSurface', 'Текст', 'Text'],
+  ['#8B929A', '#C4C6D0', 'onSurfaceVariant', 'Вторичный текст', 'Secondary text'],
+  ['#60636A', '#8E9099', 'outline', 'Разделитель', 'Divider'],
 ];
-function renderPalette(lang) {
+// Site tokens recoloured from the seed (light and dark).
+const TOKENS = ['primary', 'onPrimary', 'primaryContainer', 'onPrimaryContainer', 'secondary', 'onSecondary',
+  'secondaryContainer', 'onSecondaryContainer', 'tertiary', 'tertiaryContainer', 'onTertiaryContainer', 'error',
+  'errorContainer', 'onErrorContainer', 'background', 'onBackground', 'surface', 'onSurface', 'surfaceVariant',
+  'onSurfaceVariant', 'outline', 'outlineVariant', 'surfaceContainerLowest', 'surfaceContainerLow',
+  'surfaceContainer', 'surfaceContainerHigh', 'surfaceContainerHighest', 'inverseSurface', 'inverseOnSurface'];
+const kebab = (n) => n.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
+let seed = '';
+let lang = 'ru';
+
+function scheme(hex, dark) {
+  return new SchemeTonalSpot(Hct.fromInt(argbFromHex(hex)), dark, 0);
+}
+function role(sch, name) {
+  return hexFromArgb(MaterialDynamicColors[name].getArgb(sch)).toUpperCase();
+}
+
+function applySeed(hex) {
+  seed = hex;
+  let style = document.getElementById('seed-style');
+  if (!style) { style = document.createElement('style'); style.id = 'seed-style'; document.head.appendChild(style); }
+  if (!hex) {
+    style.textContent = '';
+  } else {
+    const css = (sch) => TOKENS.map((t) => `--md-sys-color-${kebab(t)}:${role(sch, t)};`).join('');
+    const light = css(scheme(hex, false)), dark = css(scheme(hex, true));
+    style.textContent = `:root[data-theme="light"]{${light}}:root[data-theme="dark"]{${dark}}`
+      + `@media (prefers-color-scheme: light){:root[data-theme="system"]{${light}}}`
+      + `@media (prefers-color-scheme: dark){:root[data-theme="system"]{${dark}}}`;
+  }
+  document.querySelectorAll('#seed-chips md-filter-chip').forEach((c) => { c.selected = c.dataset.seed === hex; });
+  if (hex) document.getElementById('seed-input').value = hex.toLowerCase();
+  document.getElementById('seed-cmd').textContent =
+    'python patch/patch_steam.py apk/base.apk out/base.apk --fonts fonts/' + (hex ? ` --seed "${hex}"` : '');
+  renderPalette();
+  try { localStorage.setItem('steamd-seed', hex); } catch (e) {}
+}
+
+function renderPalette() {
+  const sch = seed ? scheme(seed, true) : null;
   const box = document.getElementById('palette');
-  box.replaceChildren(...PALETTE.map(([from, to, ru, en]) => {
+  box.replaceChildren(...ROWS.map(([from, def, r, ru, en]) => {
+    const to = sch ? role(sch, r) : def;
     const d = document.createElement('div');
     d.className = 'swatch';
     d.innerHTML = `<span class="chip" style="background:${from}"></span><md-icon>arrow_forward</md-icon>`
@@ -96,6 +142,17 @@ function renderPalette(lang) {
     return d;
   }));
 }
+
+document.getElementById('seed-chips').addEventListener('click', (e) => {
+  const chip = e.target.closest('md-filter-chip');
+  if (chip) applySeed(chip.dataset.seed);
+});
+document.getElementById('seed-input').addEventListener('input', (e) => applySeed(e.target.value.toUpperCase()));
+document.getElementById('copy-cmd').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(document.getElementById('seed-cmd').textContent); } catch (e) {}
+  const icon = document.querySelector('#copy-cmd md-icon');
+  icon.textContent = 'check'; setTimeout(() => { icon.textContent = 'content_copy'; }, 1500);
+});
 
 /* ---------------- menus ---------------- */
 function bindMenu(btnId, menuId) {
@@ -118,4 +175,7 @@ setInterval(() => {
 }, 30000);
 
 setTheme(document.documentElement.dataset.theme || 'system');
+let savedSeed = '';
+try { savedSeed = localStorage.getItem('steamd-seed') || ''; } catch (e) {}
+applySeed(/^#[0-9A-F]{6}$/i.test(savedSeed) ? savedSeed.toUpperCase() : '');
 setLang(document.documentElement.lang === 'en' ? 'en' : 'ru');
