@@ -37,15 +37,16 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/$name.png")
     }
 
+    @OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
     @Test fun wavyProgress() {
         compose.mainClock.autoAdvance = false
         compose.setContent {
             SteamdTheme {
                 androidx.compose.material3.Surface {
                     androidx.compose.foundation.layout.Column(Modifier.padding(24.dp)) {
-                        com.jettaxp.steamd.ui.components.WavyProgress(0.45f, Modifier.fillMaxWidth())
+                        androidx.compose.material3.LinearWavyProgressIndicator(progress = { 0.45f }, modifier = Modifier.fillMaxWidth())
                         androidx.compose.foundation.layout.Spacer(Modifier.padding(12.dp))
-                        com.jettaxp.steamd.ui.components.WavyProgress(0.9f, Modifier.fillMaxWidth())
+                        androidx.compose.material3.LinearWavyProgressIndicator(progress = { 0.9f }, modifier = Modifier.fillMaxWidth())
                     }
                 }
             }
