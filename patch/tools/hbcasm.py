@@ -12,7 +12,8 @@ from hermes_dec.parsers.hbc_bytecode_parser import parse_hbc_bytecode  # noqa: E
 
 OP = dict(NewObjectWithBufferLong=2, NewObject=3, GetByVal=73, LoadConstUInt8=110, PutOwnByIndex=68, LoadConstInt=111, GetGlobalObject=48, Call1=81, Call2=83, Jmp=142, NewArray=7, Mov=8, GetEnvironment=41, LoadFromEnvironment=46, GetByIdShort=54, GetById=55,
           PutById=59, PutNewOwnByIdShort=63, PutNewOwnById=64, Call3=84, Ret=92, LoadConstString=115,
-          LoadConstStringLongIndex=116, LoadConstUndefined=118, LoadConstNull=119, JmpTrue=144, JmpFalse=146, LoadConstZero=122)
+          LoadConstStringLongIndex=116, LoadConstUndefined=118, LoadConstNull=119, JmpTrue=144, JmpFalse=146, LoadConstZero=122,
+          JStrictNotEqual=190)
 
 
 def ins(name, *ops):

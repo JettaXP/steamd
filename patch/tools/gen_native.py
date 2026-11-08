@@ -60,18 +60,33 @@ def tab_bar_item(rd, data, label=False, size=None):
               0x1C3: ins("Mov", 11, 2)}
     if label:
         # <Text size="small" tone={focused ? 'info' : undefined}>{Localize(tab.name_token)}</Text> under the pill
+        # The menu tab's token (#MainMenuScreen_Title) has no translation; #MainMenu_Title is "Menu" / "Меню".
+        menu = sid(rd, "#MainMenu_Title")
         text = (ins("GetGlobalObject", 16) + ins("GetById", 16, 16, 0, S("__r"))
-                + ins("LoadConstInt", 14, u32(LOCALIZE_MODULE)) + ins("Call2", 10, 16, 3, 14)
-                + ins("GetById", 10, 10, 0, S("Localize"))
-                + ins("GetById", 14, 11, 0, S("name_token")) + ins("Call2", 14, 10, 3, 14)
+                + ins("GetById", 14, 11, 0, S("name_token"))
+                + ins("LoadConstString", 17, S("#MainMenuScreen_Title"))
+                + ins("JStrictNotEqual", 4 + 6, 14, 17) + ins("LoadConstStringLongIndex", 14, u32(menu))
+                + ins("LoadConstInt", 10, u32(LOCALIZE_MODULE)) + ins("Call2", 10, 16, 3, 10)
+                + ins("GetById", 10, 10, 0, S("Localize")) + ins("Call2", 14, 10, 3, 14)
                 + ins("LoadConstInt", 10, u32(TEXT_MODULE)) + ins("Call2", 10, 16, 3, 10)
                 + ins("GetByIdShort", 10, 10, 0, sid(rd, "Text"))
                 + ins("NewObject", 17) + ins("PutNewOwnByIdShort", 17, 14, sid(rd, "children"))
                 + ins("LoadConstString", 14, S("small")) + ins("PutNewOwnById", 17, 14, S("size"))
                 + ins("PutNewOwnById", 17, 15, S("tone"))
+                + ins("NewObject", 16)                                        # style: 12/16 like an M3 label
+                + ins("LoadConstUInt8", 14, 12) + ins("PutNewOwnById", 16, 14, S("fontSize"))
+                + ins("LoadConstUInt8", 14, 16) + ins("PutNewOwnById", 16, 14, S("lineHeight"))
+                + ins("PutNewOwnByIdShort", 17, 16, sid(rd, "style"))
+                + ins("LoadConstUInt8", 14, 1) + ins("PutNewOwnById", 17, 14, S("numberOfLines"))
                 + ins("Call3", 14, 2, 3, 10, 17) + ins("PutOwnByIndex", 7, 14, 3))
         insert[0x1B0] = text + pill
         delete.append((0x189, 0x18D)); insert[0x18D] = ins("NewArray", 7, u16(4))
+        # Equal tab widths: the root Column (flexGrow only) becomes a Box with style {flex: 1}.
+        assert f.original[0x12A] == 55 and f.original[0x12E:0x130] == S("Column")[0].to_bytes(2, "little")
+        delete.append((0x12A, 0x130))
+        insert[0x130] = ins("GetByIdShort", 1, 0, 0, sid(rd, "Box"))
+        insert[0x13B] = (ins("NewObject", 16) + ins("LoadConstUInt8", 17, 1) + ins("PutNewOwnById", 16, 17, S("flex"))
+                         + ins("PutNewOwnByIdShort", 0, 16, sid(rd, "style")) + insert[0x13B])
     return f, f.rewrite(delete=delete, insert=insert, size=size)
 
 
