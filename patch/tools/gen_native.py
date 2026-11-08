@@ -152,6 +152,14 @@ def persona_menu(rd, data):
     puts = [k for k, x in enumerate(L) if x[2] == "PutOwnByIndex" and o[x[0] + 1] == 22]
     assert [o[L[k][0] + 3] for k in puts] == list(range(14)), [o[L[k][0] + 3] for k in puts]
     delete, insert = [], {}
+    # the list container gets the dark surface, the "My Content" title loses its own band
+    box_id = sid(rd, "Box")
+    k16 = next(k for k, (a, b, n, _) in enumerate(L)
+               if n == "PutNewOwnByIdShort" and o[a + 1] == 16 and o[a + 3] == sid(rd, "flexDirection"))
+    insert[L[k16 + 1][0]] = (ins("LoadConstString", 22, u16(sid(rd, "secondary")))
+                             + ins("PutNewOwnById", 16, 22, u16(sid(rd, "background"))))
+    k22 = next(k for k in range(k16, len(L)) if L[k][2] == "NewObjectWithBufferLong" and o[L[k][0] + 1] == 22)
+    insert[L[k22 + 1][0]] = ins("PutById", 22, 3, 0, u16(sid(rd, "background")))
     first, last = L[puts[0]][0], L[puts[13]][0]
     # title: keep it in r35 instead of the list
     delete.append((first, L[puts[0]][1])); insert[L[puts[0]][1]] = ins("Mov", 35, 23)
