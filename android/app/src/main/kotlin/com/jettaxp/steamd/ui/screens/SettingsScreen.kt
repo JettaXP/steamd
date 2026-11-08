@@ -246,7 +246,7 @@ private fun UpdateBlock(update: UpdateState, versionCode: Long, actions: Setting
             trailingContent = { CircularWavyProgressIndicator(modifier = Modifier.size(32.dp)) },
         )
         is UpdateState.Available -> Item(Icons.Filled.Download, stringResource(R.string.update_available, update.release.tag),
-            stringResource(R.string.update_download, update.release.size / 1_048_576f), onClick = actions.onDownloadUpdate)
+            if (update.release.size > 0) stringResource(R.string.update_download, update.release.size / 1_048_576f) else stringResource(R.string.update_download_tap), onClick = actions.onDownloadUpdate)
         is UpdateState.Downloading -> Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
             Text(stringResource(R.string.update_downloading, update.release.tag), style = MaterialTheme.typography.bodyLarge)
             Spacer(Modifier.height(12.dp))

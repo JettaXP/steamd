@@ -30,18 +30,47 @@ object Updater {
         setRequestProperty("User-Agent", "steamd")
     }
 
+    private const val REPO_URL = "https://github.com/JettaXP/steamd"
+
+    /** Latest release: the GitHub API with a few retries, then the plain releases/latest redirect. */
     suspend fun latest(): Release? = withContext(Dispatchers.IO) {
+        var error: Exception? = null
+        repeat(3) { attempt ->
+            try {
+                return@withContext fromApi()
+            } catch (e: Exception) {
+                error = e
+                if (attempt < 2) delay(1500L * (attempt + 1))
+            }
+        }
+        runCatching { fromRedirect() }.getOrElse { throw error ?: it }
+    }
+
+    private fun fromApi(): Release? {
         val c = open(LATEST).apply { setRequestProperty("Accept", "application/vnd.github+json") }
         try {
-            if (c.responseCode == 404) return@withContext null
+            if (c.responseCode == 404) return null
             if (c.responseCode !in 200..299) throw IllegalStateException("GitHub: HTTP ${c.responseCode}")
             val j = JSONObject(c.inputStream.bufferedReader().use { it.readText() })
             val tag = j.getString("tag_name")
-            val version = tag.removePrefix("v").toLongOrNull() ?: return@withContext null
+            val version = tag.removePrefix("v").toLongOrNull() ?: return null
             val assets = j.getJSONArray("assets")
             val apk = (0 until assets.length()).map { assets.getJSONObject(it) }
-                .firstOrNull { it.getString("name").endsWith(".apk") } ?: return@withContext null
-            Release(version, tag, j.optString("body"), apk.getString("browser_download_url"), apk.getLong("size"))
+                .firstOrNull { it.getString("name").endsWith(".apk") } ?: return null
+            return Release(version, tag, j.optString("body"), apk.getString("browser_download_url"), apk.getLong("size"))
+        } finally {
+            c.disconnect()
+        }
+    }
+
+    /** github.com/.../releases/latest redirects to .../releases/tag/vN; the APK name follows from the tag. */
+    private fun fromRedirect(): Release? {
+        val c = open("$REPO_URL/releases/latest").apply { instanceFollowRedirects = false; requestMethod = "HEAD" }
+        try {
+            val location = c.getHeaderField("Location") ?: throw IllegalStateException("GitHub: HTTP ${c.responseCode}")
+            val tag = location.substringAfterLast("/tag/", "").takeIf { it.isNotEmpty() } ?: return null
+            val version = tag.removePrefix("v").toLongOrNull() ?: return null
+            return Release(version, tag, "", "$REPO_URL/releases/download/$tag/steamd-$tag.apk", 0)
         } finally {
             c.disconnect()
         }

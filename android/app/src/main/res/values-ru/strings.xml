@@ -122,6 +122,7 @@
     <string name="update_checking">Проверяю обновления…</string>
     <string name="update_available">Доступно обновление %1$s</string>
     <string name="update_download">Нажмите, чтобы скачать (%1$.1f МБ)</string>
+    <string name="update_download_tap">Нажмите, чтобы скачать</string>
     <string name="update_downloading">Скачиваю %1$s</string>
     <string name="update_ready">%1$s скачано</string>
     <string name="update_install">Обновить</string>
