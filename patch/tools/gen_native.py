@@ -128,11 +128,13 @@ def main_menu(rd, data):
 
 def list_item(rd, data):
     """Profile menu ListItem (Friend Activity, Friends, ...): 4dp corners, like the main menu rows.
-    Room: the pressed opacity, a jsx reload and the undefined `this` (jsx ignores it)."""
+    Room: the pressed opacity (pressedProps becomes an empty object), a jsx reload and the undefined `this`."""
     f = Fn(rd.r, fid_by_name(rd, "ListItem", 138), data)
     o = f.original
     style = (ins("NewObject", 5) + ins("LoadConstUInt8", 6, 4) + ins("PutNewOwnById", 5, 6, u16(sid(rd, "borderRadius")))
-             + ins("PutById", 1, 5, 0, u16(sid(rd, "style"))))
+             + ins("PutById", 1, 5, 0, u16(sid(rd, "style")))
+             # the Box literal has pressedProps: null and Box reads pressedProps.style, so it needs an object
+             + ins("NewObject", 6) + ins("PutById", 1, 6, 0, u16(sid(rd, "pressedProps"))))
     calls = [x for x in f.ins if x[2] == "Call3"]
     assert len(calls) == 2
     c1, c2 = calls
