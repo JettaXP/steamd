@@ -12,43 +12,46 @@ LAYOUT_ANIMATION_MODULE = 395   # Metro id of react-native/Libraries/LayoutAnima
 REANIMATED_MODULE = 572          # Metro id of react-native-reanimated's index (checked against the __d call)
 
 
+def fill_literal(rd, data):
+    """Operands of a short {'position': 'absolute', 'left': 0, 'right': 0, 'top': 0, 'bottom': 0} literal."""
+    f = Fn(rd.r, 3287, data)
+    for a, b, name, _ in f.ins:
+        raw = f.original[a:b]
+        if name == "NewObjectWithBuffer" and raw[2:10] == bytes.fromhex("050005002d008d42"):
+            return raw[2:]
+    raise LookupError("absolute fill literal")
+
+
 def tab_bar_item(rd, data):
-    """BuiltinTabBarItem: Material 3 navigation bar item with an animated pill.
-    The focus line goes; the icon sits in a pill Box (borderRadius 'full', paddingY 'xxsmall',
-    background 'neutral' and paddingX 'gutter' when focused, paddingX 'small' otherwise) inside a Reanimated
-    Animated.View with layout={LinearTransition} and overflow: hidden. The wrapper carries marginHorizontal
-    8 (unfocused) or 0 (focused), so every item keeps its width while the wrapper's frame animates and clips
-    the pill: it grows out of the icon. (LayoutAnimation is off on Android in this React Native build.)
+    """BuiltinTabBarItem: Material 3 navigation bar item.
+    The focus line goes; the icon sits in a 64x32 pill Box (borderRadius 'full', padding 'xxsmall',
+    paddingX 'gutter') that is the same on every tab, so nothing shifts. On the focused tab a Reanimated
+    Animated.View fills the pill behind the icon (absolute fill, radius 16, '#3C3F49' = secondary container
+    after the palette) and enters with StretchInX, so the indicator grows out from the centre while the icon
+    stays put. (LayoutAnimation is off on Android in this React Native build.)
     Room: the debug warnings, the focus line, hitSlop, the default position: relative, jsx reloads and the
     object-tab check (an unknown tab already returns null through the undefined check)."""
     f = Fn(rd.r, fid_by_name(rd, "BuiltinTabBarItem"), data)
     S = lambda x: u16(sid(rd, x))
-    focused = (ins("LoadConstString", 17, S("gutter")) + ins("PutById", 10, 17, 0, S("paddingX"))
-               + ins("LoadConstZero", 16)
-               + ins("LoadConstString", 11, S("neutral")))
-    pill = (bytes([0x02, 10]) + literal(rd, data, "PendingRequestDetails", "05000400", 85239)
-            + ins("LoadConstUInt8", 16, 8)
-            + ins("LoadConstUndefined", 11)
-            + ins("JmpFalse", 3 + len(focused), 15)
-            + focused
-            + ins("PutById", 10, 11, 0, S("background"))
-            + ins("PutNewOwnByIdShort", 10, 8, sid(rd, "children"))
-            + ins("Call3", 8, 2, 3, 5, 10)                                       # r8 = <Box pill>
-            + ins("NewObject", 10)                                               # wrapper style
-            + ins("LoadConstString", 11, S("hidden")) + ins("PutNewOwnById", 10, 11, S("overflow"))
-            + ins("PutNewOwnById", 10, 16, S("marginHorizontal"))
-            + ins("NewObject", 11)                                               # wrapper props
-            + ins("PutNewOwnByIdShort", 11, 10, sid(rd, "style"))
-            + ins("PutNewOwnByIdShort", 11, 8, sid(rd, "children"))
-            + ins("GetGlobalObject", 17)
-            + ins("GetById", 17, 17, 0, S("__r"))
-            + ins("LoadConstInt", 14, u32(REANIMATED_MODULE))
-            + ins("Call2", 17, 17, 3, 14)                                        # r17 = reanimated
-            + ins("GetById", 14, 17, 0, S("LinearTransition"))
-            + ins("PutNewOwnById", 11, 14, S("layout"))
-            + ins("GetByIdShort", 17, 17, 0, sid(rd, "default"))
-            + ins("GetById", 17, 17, 0, S("View"))
-            + ins("Call3", 8, 2, 3, 17, 11))                                     # r8 = <Animated.View>
+    paging = Fn(rd.r, fid_by_name(rd, "PagingDots"), data)
+    pill_lit = next(paging.original[a + 2:b] for a, b, n, _ in paging.ins
+                    if n == "NewObjectWithBufferLong" and paging.original[a + 2:a + 6] == bytes.fromhex("03000200"))
+    bg = (bytes([0x01, 16]) + fill_literal(rd, data)                              # r16 = absolute fill style
+          + ins("LoadConstUInt8", 17, 16) + ins("PutNewOwnById", 16, 17, S("borderRadius"))
+          + ins("LoadConstString", 17, S("#3C3F49")) + ins("PutNewOwnById", 16, 17, S("backgroundColor"))
+          + ins("NewObject", 11) + ins("PutNewOwnByIdShort", 11, 16, sid(rd, "style"))
+          + ins("GetGlobalObject", 17) + ins("GetById", 17, 17, 0, S("__r"))
+          + ins("LoadConstInt", 16, u32(REANIMATED_MODULE)) + ins("Call2", 17, 17, 3, 16)
+          + ins("GetById", 16, 17, 0, S("StretchInX")) + ins("PutNewOwnById", 11, 16, S("entering"))
+          + ins("GetByIdShort", 17, 17, 0, sid(rd, "default")) + ins("GetById", 17, 17, 0, S("View"))
+          + ins("Call3", 11, 2, 3, 17, 11)                                       # r11 = <Animated.View>
+          + ins("PutOwnByIndex", 14, 11, 0))
+    pill = (bytes([0x02, 10]) + pill_lit
+            + ins("LoadConstString", 11, S("gutter")) + ins("PutNewOwnById", 10, 11, S("paddingX"))
+            + ins("NewArray", 14, u16(2)) + ins("PutOwnByIndex", 14, 8, 1)
+            + ins("JmpFalse", 3 + len(bg), 15) + bg
+            + ins("PutNewOwnByIdShort", 10, 14, sid(rd, "children"))
+            + ins("Call3", 8, 2, 3, 5, 10))
     return f, f.rewrite(
         delete=[(0x76, 0x8A), (0x9F, 0xBC), (0x113, 0x11D), (0x132, 0x13B), (0x14E, 0x152), (0x160, 0x189),
                 (0x1BA, 0x1C3), (0x1F3, 0x20D)],
