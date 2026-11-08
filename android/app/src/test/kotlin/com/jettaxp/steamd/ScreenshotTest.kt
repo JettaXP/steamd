@@ -37,6 +37,13 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/$name.png")
     }
 
+    @Test fun tabsDialog() {
+        compose.setContent {
+            SteamdTheme { com.jettaxp.steamd.ui.screens.TabsDialog(listOf("store", "guard", "notifications"), {}, {}) }
+        }
+        com.github.takahirom.roborazzi.captureScreenRoboImage("build/outputs/roborazzi/tabs.png")
+    }
+
     @Test fun wavyProgress() {
         compose.mainClock.autoAdvance = false
         compose.setContent {

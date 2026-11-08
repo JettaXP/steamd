@@ -60,6 +60,7 @@ adb install-multiple signed/*.apk
 | `--no-store-theme` | не подключать CSS в магазине и новостях |
 | `--no-colors` | оставить родные цвета приложения |
 | `--steam-icons` | оставить родные иконки и полоску нижней панели |
+| `--tabs store,guard,library` | нижняя панель: от 1 до 4 вкладок из store, news, guard, notifications, confirmations, library, wishlist, profile, friendactivity, market, inventory, communityhome (меню всегда последнее) |
 
 Без `--seed` используется палитра `PALETTE` в начале `patch/patch_steam.py`.
 Проверить бандл без сборки APK:

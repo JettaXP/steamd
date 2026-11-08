@@ -44,9 +44,13 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("google_sans", true)
         set(value) = prefs.edit().putBoolean("google_sans", value).apply()
 
-    var hideNews: Boolean
-        get() = prefs.getBoolean("hide_news", false)
-        set(value) = prefs.edit().putBoolean("hide_news", value).apply()
+    /** Steam tab bar: 1..4 of SteamThemePatch.TAB_NAMES in order. An older "hide news" switch is carried over. */
+    var tabs: List<String>
+        get() = prefs.getString("tabs", null)?.split(',')?.filter { it in com.jettaxp.steamd.patcher.SteamThemePatch.TAB_NAMES }
+            ?.takeIf { it.size in 1..4 }
+            ?: if (prefs.getBoolean("hide_news", false)) listOf("store", "guard", "notifications")
+            else com.jettaxp.steamd.patcher.SteamThemePatch.DEFAULT_TABS
+        set(value) = prefs.edit().putString("tabs", value.joinToString(",")).remove("hide_news").apply()
 
     var materialIcons: Boolean
         get() = prefs.getBoolean("material_icons", true)

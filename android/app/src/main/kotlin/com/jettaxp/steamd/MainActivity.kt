@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
                                 SettingsActions(
                                     onLanguage = vm::setLanguage, onTheme = vm::setAppTheme, onDynamicColor = vm::setAppDynamicColor,
                                     onStoreTheme = vm::setStoreTheme, onCssUrl = vm::setCssUrl,
-                                    onAutoRepatch = vm::setAutoRepatch, onGoogleSans = vm::setGoogleSans, onMaterialIcons = vm::setMaterialIcons, onHideNews = vm::setHideNews, onClearOriginals = { vm.clearOriginals() },
+                                    onAutoRepatch = vm::setAutoRepatch, onGoogleSans = vm::setGoogleSans, onMaterialIcons = vm::setMaterialIcons, onTabs = vm::setTabs, onClearOriginals = { vm.clearOriginals() },
                                     onExportKey = { vm.exportKey(it) }, onImportKey = { vm.importKey(it) },
                                     onCheckUpdate = { vm.checkUpdate() }, onDownloadUpdate = { vm.downloadUpdate() },
                                     onInstallUpdate = { vm.installUpdate() },

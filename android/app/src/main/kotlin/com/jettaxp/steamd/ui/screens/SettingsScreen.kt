@@ -34,7 +34,11 @@ import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Upload
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.ViewWeek
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material3.AlertDialog
@@ -86,7 +90,7 @@ class SettingsActions(
     val onAutoRepatch: (Boolean) -> Unit,
     val onGoogleSans: (Boolean) -> Unit = {},
     val onMaterialIcons: (Boolean) -> Unit = {},
-    val onHideNews: (Boolean) -> Unit = {},
+    val onTabs: (List<String>) -> Unit = {},
     val onClearOriginals: () -> Unit,
     val onExportKey: (android.net.Uri) -> Unit = {},
     val onImportKey: (android.net.Uri) -> Unit = {},
@@ -95,7 +99,7 @@ class SettingsActions(
     val onInstallUpdate: () -> Unit = {},
 )
 
-private enum class Dialog { None, Language, Theme, CssUrl, ClearOriginals, ImportKey }
+private enum class Dialog { None, Language, Theme, CssUrl, ClearOriginals, ImportKey, Tabs }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,8 +135,7 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
                 checked = state.googleSans, onChange = actions.onGoogleSans)
             SwitchItem(Icons.Filled.Category, stringResource(R.string.material_icons), stringResource(R.string.material_icons_desc),
                 checked = state.materialIcons, onChange = actions.onMaterialIcons)
-            SwitchItem(Icons.Filled.VisibilityOff, stringResource(R.string.hide_news), stringResource(R.string.hide_news_desc),
-                checked = state.hideNews, onChange = actions.onHideNews)
+            Item(Icons.Filled.ViewWeek, stringResource(R.string.tabs), state.tabs.map { tabLabel(it) }.joinToString(" · ")) { dialog = Dialog.Tabs }
             Item(Icons.Filled.Link, stringResource(R.string.css_url), state.cssUrl, enabled = state.storeTheme) { dialog = Dialog.CssUrl }
             SwitchItem(
                 Icons.Filled.Wallpaper, stringResource(R.string.auto_repatch),
@@ -194,6 +197,7 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
             onDismiss = { dialog = Dialog.None },
         )
         Dialog.CssUrl -> CssUrlDialog(state.cssUrl, actions.onCssUrl) { dialog = Dialog.None }
+        Dialog.Tabs -> TabsDialog(state.tabs, actions.onTabs) { dialog = Dialog.None }
         Dialog.ClearOriginals -> AlertDialog(
             onDismissRequest = { dialog = Dialog.None },
             icon = { Icon(Icons.Filled.DeleteOutline, null) },
@@ -357,6 +361,69 @@ private fun CssUrlDialog(current: String, onSave: (String) -> Boolean, onDismiss
         confirmButton = { TextButton(onClick = { if (onSave(text)) onDismiss() else error = true }) { Text(stringResource(R.string.save)) } },
         dismissButton = {
             TextButton(onClick = { onSave(SteamThemePatch.DEFAULT_CSS_URL); onDismiss() }) { Text(stringResource(R.string.reset)) }
+        },
+    )
+}
+
+@Composable
+private fun tabLabel(tab: String): String = stringResource(when (tab) {
+    "store" -> R.string.steam_tab_store
+    "news" -> R.string.steam_tab_news
+    "guard" -> R.string.steam_tab_guard
+    "notifications" -> R.string.steam_tab_notifications
+    "confirmations" -> R.string.steam_tab_confirmations
+    "library" -> R.string.steam_tab_library
+    "wishlist" -> R.string.steam_tab_wishlist
+    "profile" -> R.string.steam_tab_profile
+    "friendactivity" -> R.string.steam_tab_friendactivity
+    "market" -> R.string.steam_tab_market
+    "inventory" -> R.string.steam_tab_inventory
+    else -> R.string.steam_tab_communityhome
+})
+
+/** Up to four Steam tabs: tick to show, arrows to reorder. The menu always stays last. */
+@Composable
+internal fun TabsDialog(current: List<String>, onSave: (List<String>) -> Unit, onDismiss: () -> Unit) {
+    var tabs by remember { mutableStateOf(current) }
+    val rows = tabs + SteamThemePatch.TAB_NAMES.filter { it !in tabs }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Filled.ViewWeek, null) },
+        title = { Text(stringResource(R.string.tabs)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(stringResource(R.string.tabs_desc), style = MaterialTheme.typography.bodyMedium)
+                Spacer(Modifier.height(8.dp))
+                rows.forEach { tab ->
+                    val i = tabs.indexOf(tab)
+                    val on = i >= 0
+                    val canToggle = if (on) tabs.size > 1 else tabs.size < 4
+                    Row(
+                        Modifier.fillMaxWidth().clickable(enabled = canToggle, role = Role.Checkbox) {
+                            tabs = if (on) tabs - tab else tabs + tab
+                        },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(checked = on, onCheckedChange = null, enabled = canToggle, modifier = Modifier.padding(12.dp))
+                        Text(
+                            tabLabel(tab), Modifier.weight(1f),
+                            color = if (on || canToggle) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                        )
+                        if (on) {
+                            IconButton(onClick = { tabs = tabs.toMutableList().apply { add(i - 1, removeAt(i)) } }, enabled = i > 0) {
+                                Icon(Icons.Filled.KeyboardArrowUp, stringResource(R.string.move_up))
+                            }
+                            IconButton(onClick = { tabs = tabs.toMutableList().apply { add(i + 1, removeAt(i)) } }, enabled = i < tabs.size - 1) {
+                                Icon(Icons.Filled.KeyboardArrowDown, stringResource(R.string.move_down))
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { onSave(tabs); onDismiss() }) { Text(stringResource(R.string.save)) } },
+        dismissButton = {
+            TextButton(onClick = { tabs = SteamThemePatch.DEFAULT_TABS }) { Text(stringResource(R.string.reset)) }
         },
     )
 }

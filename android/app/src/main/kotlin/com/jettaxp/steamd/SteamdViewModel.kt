@@ -66,7 +66,7 @@ data class UiState(
     val autoStatus: String? = null,
     val googleSans: Boolean = true,
     val materialIcons: Boolean = true,
-    val hideNews: Boolean = false,
+    val tabs: List<String> = com.jettaxp.steamd.patcher.SteamThemePatch.DEFAULT_TABS,
     val update: UpdateState = UpdateState.Idle,
     val versionCode: Long = 0,
 )
@@ -78,7 +78,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     private val _state = MutableStateFlow(UiState(
         colorSource = settings.colorSource, storeTheme = settings.storeTheme, cssUrl = settings.cssUrl,
         appTheme = settings.appTheme, appDynamicColor = settings.appDynamicColor, language = Settings.language,
-        autoRepatch = settings.autoRepatch, googleSans = settings.googleSans, materialIcons = settings.materialIcons, hideNews = settings.hideNews,
+        autoRepatch = settings.autoRepatch, googleSans = settings.googleSans, materialIcons = settings.materialIcons, tabs = settings.tabs,
     ))
     val state: StateFlow<UiState> = _state.asStateFlow()
 
@@ -180,9 +180,9 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         r.getOrNull()?.takeIf { !it.success }?.let { res -> _state.update { it.copy(update = UpdateState.Failed(res.message ?: "install cancelled")) } }
     }
 
-    fun setHideNews(on: Boolean) {
-        settings.hideNews = on
-        _state.update { it.copy(hideNews = on) }
+    fun setTabs(tabs: List<String>) {
+        settings.tabs = tabs
+        _state.update { it.copy(tabs = settings.tabs) }
     }
 
     fun setMaterialIcons(on: Boolean) {

@@ -873,32 +873,47 @@ def patch_native_group(pt, label, names):
     return True
 
 
-def patch_hide_news(pt):
-    """Default tab bar without News: ['store', 'news', 'guard', 'notifications'] -> ['store', 'guard', 'notifications'].
-    Only the default changes; a tab layout the user saved in Steam stays as it is."""
+TAB_NAMES = ("store", "news", "guard", "notifications", "confirmations", "library", "wishlist", "profile",
+             "friendactivity", "market", "inventory", "communityhome")
+DEFAULT_TABS = ("store", "news", "guard", "notifications")
+TABS_STORAGE_KEY = "Settings_Tabs_Empty"   # unused string, becomes the AsyncStorage key of the tab layout
+
+
+def patch_tabs(pt, tabs):
+    """Default tab bar layout: 1..4 of TAB_NAMES in the given order (the menu stays last).
+    The layout is also stored under another key, so a layout saved earlier in Steam's own
+    "Customize tabs" no longer overrides it (that setting keeps working, with the new key)."""
+    tabs = tuple(tabs)
+    if not 1 <= len(tabs) <= 4 or len(set(tabs)) != len(tabs) or any(t not in TAB_NAMES for t in tabs):
+        print("  [skip] tabs: 1 to 4 different tabs of " + ", ".join(TAB_NAMES)); return False
+    if tabs == DEFAULT_TABS:
+        return False
     S = pt.rd.strings
-    ids = []
-    for name in ("store", "news", "guard", "notifications"):
+    def one(name):
         l = [i for i, s in enumerate(S) if s == name]
-        if len(l) != 1 or l[0] > 0xFFFF:
-            print("  [skip] hide news: strings not found"); return False
-        ids.append(l[0])
+        return l[0] if len(l) == 1 and l[0] <= 0xFFFF else None
+    ids = {n: one(n) for n in DEFAULT_TABS + tabs + ("Setting_Tabs", TABS_STORAGE_KEY)}
+    if None in ids.values():
+        print("  [skip] tabs: strings not found"); return False
     h = pt.rd.r.header
     arrays = (pt.rd.storage_start + h.stringStorageSize + 3) & ~3
-    sig = bytes([0x54]) + b"".join(i.to_bytes(2, "little") for i in ids)
+    sig = bytes([0x54]) + b"".join(ids[n].to_bytes(2, "little") for n in DEFAULT_TABS)
     buf = bytes(pt.out[arrays:arrays + h.arrayBufferSize])
     if buf.count(sig) != 1:
-        print("  [skip] hide news: default tab list not found"); return False
+        print("  [skip] tabs: default tab list not found"); return False
     off = buf.find(sig)
-    ins = bytes.fromhex("04000400") + off.to_bytes(4, "little")
+    # useTabBarLayout: LoadConstString r1, 'Setting_Tabs'; NewArrayWithBufferLong r0, 4, 4, off
+    use = (bytes([115, 1]) + ids["Setting_Tabs"].to_bytes(2, "little")
+           + bytes([6, 0]) + bytes.fromhex("04000400") + off.to_bytes(4, "little"))
     data = bytes(pt.out)
-    if data.count(ins) != 1:
-        print("  [skip] hide news: tab list user not found"); return False
-    p = data.find(ins)
-    pt.out[p:p + 4] = bytes.fromhex("03000300")
-    new = bytes([0x53]) + b"".join(i.to_bytes(2, "little") for i in (ids[0], ids[2], ids[3]))
+    if data.count(use) != 1:
+        print("  [skip] tabs: tab list user not found"); return False
+    p = data.find(use)
+    pt.out[p + 2:p + 4] = ids[TABS_STORAGE_KEY].to_bytes(2, "little")
+    pt.out[p + 6:p + 10] = (len(tabs) * 0x10001).to_bytes(4, "little")
+    new = bytes([0x50 | len(tabs)]) + b"".join(ids[t].to_bytes(2, "little") for t in tabs)
     pt.out[arrays + off:arrays + off + len(new)] = new
-    print("  hide news: on")
+    print("  tabs: " + ", ".join(tabs))
     return True
 
 
@@ -926,7 +941,7 @@ def patch_uppercase(pt):
 
 
 def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_url=DEFAULT_CSS,
-                 colors=True, store=True, radius=DEFAULT_RADIUS, uppercase=False, icons=True, hide_news=False):
+                 colors=True, store=True, radius=DEFAULT_RADIUS, uppercase=False, icons=True, tabs=DEFAULT_TABS):
     if data[:8] != bytes.fromhex("c61fbc03c103191f"):
         sys.exit("Not a Hermes bundle")
     ver = int.from_bytes(data[8:12], "little")
@@ -944,8 +959,7 @@ def patch_bundle(data, palette=PALETTE, seed_primary=DEFAULT_SEED_PRIMARY, css_u
     if icons:
         patch_icons(pt)
         patch_native_group(pt, "tab bar labels", ("tab item code", "tab item header", "tab item closure"))
-    if hide_news:
-        patch_hide_news(pt)
+    patch_tabs(pt, tabs)
     if radius:
         for name in ("menu sections", "menu rows", "menu dividers", "profile rows", "profile menu", "guard ring", "guard track"):
             patch_native(pt, name)
@@ -993,7 +1007,8 @@ def main():
     ap.add_argument("--radius", default="%d,%d" % DEFAULT_RADIUS,
                     help='corner radius "standard,large" in dp (Steam: 4,10), or "off"')
     ap.add_argument("--keep-uppercase", action="store_true", help="keep Steam's UPPERCASE titles")
-    ap.add_argument("--hide-news", action="store_true", help="drop News from the default tab bar")
+    ap.add_argument("--tabs", help="tab bar, 1 to 4 of " + ",".join(TAB_NAMES) + " (the menu stays last)")
+    ap.add_argument("--hide-news", action="store_true", help="same as --tabs store,guard,notifications")
     ap.add_argument("--steam-icons", action="store_true", help="keep Steam's own tab bar icons and focus line")
     ap.add_argument("--no-colors", action="store_true", help="keep the native theme colours")
     ap.add_argument("--no-store-theme", action="store_true", help="do not load CSS in the store and news")
@@ -1016,7 +1031,8 @@ def main():
             ap.error('--radius must look like "12,24" or "off"')
     kw = dict(palette=palette, seed_primary=primary, css_url=a.css_url,
               colors=not a.no_colors, store=not a.no_store_theme, radius=radius,
-              uppercase=a.keep_uppercase, icons=not a.steam_icons, hide_news=a.hide_news)
+              uppercase=a.keep_uppercase, icons=not a.steam_icons,
+              tabs=a.tabs.split(",") if a.tabs else ("store", "guard", "notifications") if a.hide_news else DEFAULT_TABS)
 
     if a.check:
         out = patch_bundle(open(a.src, "rb").read(), **kw)

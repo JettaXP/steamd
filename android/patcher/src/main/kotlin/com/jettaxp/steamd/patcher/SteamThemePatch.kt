@@ -525,7 +525,7 @@ object SteamThemePatch {
         val radius: Pair<Int, Int>? = DEFAULT_RADIUS,
         val uppercase: Boolean = false,
         val materialIcons: Boolean = true,
-        val hideNews: Boolean = false,
+        val tabs: List<String> = DEFAULT_TABS,
     )
 
     class Result(val bundle: ByteArray, val hermesVersion: Int, val colorsReplaced: Int, val storeTheme: Boolean,
@@ -545,7 +545,7 @@ object SteamThemePatch {
             patchIcons(hb, log)
             patchNativeGroup(hb, "tab bar labels", listOf("tab item code", "tab item header", "tab item closure"), log)
         }
-        if (options.hideNews) patchHideNews(hb, log)
+        patchTabs(hb, options.tabs, log)
         if (options.radius != null) listOf("menu sections", "menu rows", "menu dividers", "profile rows", "profile menu", "guard ring", "guard track").forEach { patchNative(hb, it, log) }
         return Result(hb.finish(), hb.version, colors, store, radius, log)
     }
@@ -709,28 +709,42 @@ object SteamThemePatch {
         return true
     }
 
-    private fun patchHideNews(hb: HermesBundle, log: MutableList<String>): Boolean {
-        val ids = listOf("store", "news", "guard", "notifications").map { name ->
+    val TAB_NAMES = listOf("store", "news", "guard", "notifications", "confirmations", "library", "wishlist", "profile",
+        "friendactivity", "market", "inventory", "communityhome")
+    val DEFAULT_TABS = listOf("store", "news", "guard", "notifications")
+    private const val TABS_STORAGE_KEY = "Settings_Tabs_Empty"
+
+    /** Default tab bar: 1..4 of [TAB_NAMES] in order (the menu stays last), stored under another key so a
+     *  layout saved earlier in Steam's own "Customize tabs" does not override it. */
+    private fun patchTabs(hb: HermesBundle, tabs: List<String>, log: MutableList<String>): Boolean {
+        if (tabs.size !in 1..4 || tabs.toSet().size != tabs.size || tabs.any { it !in TAB_NAMES }) {
+            log += "skip tabs: 1 to 4 different tabs"; return false
+        }
+        if (tabs == DEFAULT_TABS) return false
+        val ids = (DEFAULT_TABS + tabs + listOf("Setting_Tabs", TABS_STORAGE_KEY)).associateWith { name ->
             val l = hb.findExact(name)
-            if (l.size != 1 || l[0] > 0xFFFF) { log += "skip hide news: strings not found"; return false }
+            if (l.size != 1 || l[0] > 0xFFFF) { log += "skip tabs: strings not found"; return false }
             l[0]
         }
-        fun shorts(tag: Int, v: List<Int>) = byteArrayOf(tag.toByte()) + v.flatMap { listOf(it.toByte(), (it ushr 8).toByte()) }.toByteArray()
-        val sig = shorts(0x54, ids)
+        fun le(v: Int, n: Int) = ByteArray(n) { (v ushr (8 * it)).toByte() }
+        fun shorts(tag: Int, v: List<Int>) = byteArrayOf(tag.toByte()) + v.flatMap { le(it, 2).toList() }.toByteArray()
+        val sig = shorts(0x54, DEFAULT_TABS.map { ids.getValue(it) })
         val data = hb.data
         val inArrays = { p: Int -> p >= hb.arraysOffset && p + sig.size <= hb.arraysOffset + hb.arraysSize }
         val p0 = mutableListOf<Int>()
         var q = indexOf(data, sig, 0)
         while (q != -1) { if (inArrays(q)) p0 += q; q = indexOf(data, sig, q + 1) }
-        if (p0.size != 1) { log += "skip hide news: default tab list not found"; return false }
+        if (p0.size != 1) { log += "skip tabs: default tab list not found"; return false }
         val off = p0[0] - hb.arraysOffset
-        val ins = hexBytes("04000400") + byteArrayOf(off.toByte(), (off ushr 8).toByte(), (off ushr 16).toByte(), (off ushr 24).toByte())
-        val p = indexOf(data, ins, 0)
-        if (p == -1 || indexOf(data, ins, p + 1) != -1) { log += "skip hide news: tab list user not found"; return false }
-        System.arraycopy(hexBytes("03000300"), 0, data, p, 4)
-        val new = shorts(0x53, listOf(ids[0], ids[2], ids[3]))
+        // useTabBarLayout: LoadConstString r1, 'Setting_Tabs'; NewArrayWithBufferLong r0, 4, 4, off
+        val use = byteArrayOf(115, 1) + le(ids.getValue("Setting_Tabs"), 2) + byteArrayOf(6, 0) + hexBytes("04000400") + le(off, 4)
+        val p = indexOf(data, use, 0)
+        if (p == -1 || indexOf(data, use, p + 1) != -1) { log += "skip tabs: tab list user not found"; return false }
+        System.arraycopy(le(ids.getValue(TABS_STORAGE_KEY), 2), 0, data, p + 2, 2)
+        System.arraycopy(le(tabs.size * 0x10001, 4), 0, data, p + 6, 4)
+        val new = shorts(0x50 or tabs.size, tabs.map { ids.getValue(it) })
         System.arraycopy(new, 0, data, p0[0], new.size)
-        log += "hide news: on"
+        log += "tabs: " + tabs.joinToString(", ")
         return true
     }
 
