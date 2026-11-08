@@ -64,9 +64,7 @@ import androidx.compose.ui.unit.dp
 import com.jettaxp.steamd.BuildConfigInfo
 import androidx.compose.material3.CircularProgressIndicator
 import com.jettaxp.steamd.R
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.LinearWavyProgressIndicator
-import androidx.compose.material3.CircularWavyProgressIndicator
+import com.jettaxp.steamd.ui.components.WavyProgress
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.Button
@@ -232,7 +230,6 @@ private fun themeLabel(t: AppTheme) = stringResource(when (t) {
     AppTheme.Dark -> R.string.theme_dark
 })
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun UpdateBlock(update: UpdateState, versionCode: Long, actions: SettingsActions) {
     val current = stringResource(R.string.update_current, versionCode)
@@ -243,7 +240,7 @@ private fun UpdateBlock(update: UpdateState, versionCode: Long, actions: Setting
             headlineContent = { Text(stringResource(R.string.update_checking)) },
             supportingContent = { Text(current) },
             leadingContent = { Icon(Icons.Filled.SystemUpdate, null) },
-            trailingContent = { CircularWavyProgressIndicator(modifier = Modifier.size(32.dp)) },
+            trailingContent = { CircularProgressIndicator(modifier = Modifier.size(24.dp)) },
         )
         is UpdateState.Available -> Item(Icons.Filled.Download, stringResource(R.string.update_available, update.release.tag),
             if (update.release.size > 0) stringResource(R.string.update_download, update.release.size / 1_048_576f) else stringResource(R.string.update_download_tap), onClick = actions.onDownloadUpdate)
@@ -251,7 +248,7 @@ private fun UpdateBlock(update: UpdateState, versionCode: Long, actions: Setting
             Text(stringResource(R.string.update_downloading, update.release.tag), style = MaterialTheme.typography.bodyLarge)
             Spacer(Modifier.height(12.dp))
             val progress by animateFloatAsState(update.progress, label = "update")
-            LinearWavyProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
+            WavyProgress(progress, Modifier.fillMaxWidth())
             Spacer(Modifier.height(4.dp))
             Text("${(update.progress * 100).toInt()}%", style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)

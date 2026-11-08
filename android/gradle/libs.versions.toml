@@ -2,7 +2,6 @@
 agp = "8.11.1"
 kotlin = "2.2.0"
 composeBom = "2025.07.00"
-material3 = "1.5.0-alpha18"
 activityCompose = "1.10.1"
 lifecycle = "2.9.2"
 coreKtx = "1.16.0"
@@ -26,7 +25,7 @@ compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeB
 compose-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
 compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 apksig = { module = "com.android.tools.build:apksig", version.ref = "apksig" }
