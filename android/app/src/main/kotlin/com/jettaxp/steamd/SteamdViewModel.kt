@@ -35,7 +35,7 @@ sealed interface PatchFlow {
     data object Idle : PatchFlow
     data class Confirm(val update: Boolean) : PatchFlow
     data class Running(val step: Step, val needsUninstall: Boolean) : PatchFlow
-    data object Done : PatchFlow
+    data class Done(val update: Boolean) : PatchFlow
     data class Failed(val message: String) : PatchFlow
 }
 
@@ -56,6 +56,7 @@ data class UiState(
     val autoStatus: String? = null,
     val googleSans: Boolean = true,
     val materialIcons: Boolean = true,
+    val hideNews: Boolean = false,
 )
 
 class SteamdViewModel(app: Application) : AndroidViewModel(app) {
@@ -65,7 +66,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     private val _state = MutableStateFlow(UiState(
         colorSource = settings.colorSource, storeTheme = settings.storeTheme, cssUrl = settings.cssUrl,
         appTheme = settings.appTheme, appDynamicColor = settings.appDynamicColor, language = Settings.language,
-        autoRepatch = settings.autoRepatch, googleSans = settings.googleSans, materialIcons = settings.materialIcons,
+        autoRepatch = settings.autoRepatch, googleSans = settings.googleSans, materialIcons = settings.materialIcons, hideNews = settings.hideNews,
     ))
     val state: StateFlow<UiState> = _state.asStateFlow()
 
@@ -130,6 +131,11 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         settings.cssUrl = u
         _state.update { it.copy(cssUrl = u) }
         return true
+    }
+
+    fun setHideNews(on: Boolean) {
+        settings.hideNews = on
+        _state.update { it.copy(hideNews = on) }
     }
 
     fun setMaterialIcons(on: Boolean) {
@@ -201,7 +207,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         val needsUninstall = s.status != SteamStatus.Patched
         try {
             engine.run(steam, silent = false) { st -> _state.update { it.copy(flow = PatchFlow.Running(st, needsUninstall)) } }
-            _state.update { it.copy(flow = PatchFlow.Done) }
+            _state.update { it.copy(flow = PatchFlow.Done(update = !needsUninstall)) }
         } catch (e: Exception) {
             _state.update { it.copy(flow = PatchFlow.Failed(e.message ?: e.javaClass.simpleName)) }
         }

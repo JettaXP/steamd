@@ -28,6 +28,16 @@ class PatcherTest {
     }
 
     @Test
+    fun hideNewsMatchesPythonPatcher() {
+        assumeTrue(bundleFile != null)
+        val expected = System.getenv("STEAMD_EXPECTED_HIDE_NEWS")?.let(::File)?.takeIf { it.exists() }
+        assumeTrue("STEAMD_EXPECTED_HIDE_NEWS not set", expected != null)
+        val r = SteamThemePatch.apply(bundleFile!!.readBytes(), SteamThemePatch.Options(hideNews = true))
+        assertTrue(r.log.toString(), "hide news: on" in r.log)
+        assertArrayEquals(expected!!.readBytes(), r.bundle)
+    }
+
+    @Test
     fun patchedBundleParsesAndStringsPointToNewValues() {
         assumeTrue(bundleFile != null)
         val r = SteamThemePatch.apply(bundleFile!!.readBytes(), SteamThemePatch.Options())

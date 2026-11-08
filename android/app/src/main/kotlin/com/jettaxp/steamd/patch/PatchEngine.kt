@@ -76,11 +76,11 @@ class PatchEngine(private val context: Context) {
     }
 
     fun currentOptions(): SteamThemePatch.Options =
-        Palettes.patchOptions(app, settings.colorSource, settings.storeTheme).copy(cssUrl = settings.cssUrl, materialIcons = settings.materialIcons)
+        Palettes.patchOptions(app, settings.colorSource, settings.storeTheme).copy(cssUrl = settings.cssUrl, materialIcons = settings.materialIcons, hideNews = settings.hideNews)
 
     fun fingerprint(options: SteamThemePatch.Options): String =
         listOf(options.palette.values.joinToString(","), options.primary, options.cssUrl, options.storeTheme, options.radius,
-            settings.googleSans, options.materialIcons).joinToString("|")
+            settings.googleSans, options.materialIcons, options.hideNews).joinToString("|")
 
     private fun fonts(): List<ApkPatcher.FontReplacement> {
         if (!settings.googleSans) return emptyList()

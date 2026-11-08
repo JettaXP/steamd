@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material3.AlertDialog
@@ -78,6 +79,7 @@ class SettingsActions(
     val onAutoRepatch: (Boolean) -> Unit,
     val onGoogleSans: (Boolean) -> Unit = {},
     val onMaterialIcons: (Boolean) -> Unit = {},
+    val onHideNews: (Boolean) -> Unit = {},
     val onClearOriginals: () -> Unit,
     val onExportKey: (android.net.Uri) -> Unit = {},
     val onImportKey: (android.net.Uri) -> Unit = {},
@@ -119,6 +121,8 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
                 checked = state.googleSans, onChange = actions.onGoogleSans)
             SwitchItem(Icons.Filled.Category, stringResource(R.string.material_icons), stringResource(R.string.material_icons_desc),
                 checked = state.materialIcons, onChange = actions.onMaterialIcons)
+            SwitchItem(Icons.Filled.VisibilityOff, stringResource(R.string.hide_news), stringResource(R.string.hide_news_desc),
+                checked = state.hideNews, onChange = actions.onHideNews)
             Item(Icons.Filled.Link, stringResource(R.string.css_url), state.cssUrl, enabled = state.storeTheme) { dialog = Dialog.CssUrl }
             SwitchItem(
                 Icons.Filled.Wallpaper, stringResource(R.string.auto_repatch),

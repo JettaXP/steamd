@@ -49,8 +49,8 @@ fun PatchSheet(flow: PatchFlow, onConfirm: () -> Unit, onDismiss: () -> Unit) {
             when (flow) {
                 is PatchFlow.Confirm -> if (flow.update) UpdateContent(onConfirm, onDismiss) else ConfirmContent(onConfirm, onDismiss)
                 is PatchFlow.Running -> Steps(flow)
-                PatchFlow.Done -> {
-                    Text(stringResource(R.string.patch_done), style = MaterialTheme.typography.titleMedium)
+                is PatchFlow.Done -> {
+                    Text(stringResource(if (flow.update) R.string.update_done else R.string.patch_done), style = MaterialTheme.typography.titleMedium)
                     val ctx = LocalContext.current
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(onClick = { SteamApp.launch(ctx); onDismiss() }) { Text(stringResource(R.string.open_steam)) }

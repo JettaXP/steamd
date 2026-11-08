@@ -44,6 +44,10 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("google_sans", true)
         set(value) = prefs.edit().putBoolean("google_sans", value).apply()
 
+    var hideNews: Boolean
+        get() = prefs.getBoolean("hide_news", false)
+        set(value) = prefs.edit().putBoolean("hide_news", value).apply()
+
     var materialIcons: Boolean
         get() = prefs.getBoolean("material_icons", true)
         set(value) = prefs.edit().putBoolean("material_icons", value).apply()

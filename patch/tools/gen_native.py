@@ -126,6 +126,63 @@ def main_menu(rd, data):
     return f, f.rewrite(delete=delete, insert=insert)
 
 
+def list_item(rd, data):
+    """Profile menu ListItem (Friend Activity, Friends, ...): 4dp corners, like the main menu rows.
+    Room: the pressed opacity, a jsx reload and the undefined `this` (jsx ignores it)."""
+    f = Fn(rd.r, fid_by_name(rd, "ListItem", 138), data)
+    o = f.original
+    style = (ins("NewObject", 5) + ins("LoadConstUInt8", 6, 4) + ins("PutNewOwnById", 5, 6, u16(sid(rd, "borderRadius")))
+             + ins("PutById", 1, 5, 0, u16(sid(rd, "style"))))
+    calls = [x for x in f.ins if x[2] == "Call3"]
+    assert len(calls) == 2
+    c1, c2 = calls
+    return f, f.rewrite(delete=[(0x36, 0x5B), (0x76, 0x78), (c1[0], c1[1]), (c2[0], c2[1])],
+                        insert={0x5B: style, c1[1]: ins("Call3", 4, 3, 3, 5, 4), c2[1]: ins("Call3", 0, 3, 3, 2, 1)})
+
+
+def persona_menu(rd, data):
+    """PersonaMenuScreenContent: the My Content rows form one group like the main menu
+    (24dp clipping Box, 12dp side margins, 4dp spacers instead of dividers); the title stays above
+    and the account rows below. Room: jsx is taken from r19 (jsxs) and Box from r18."""
+    f = Fn(rd.r, fid_by_name(rd, "PersonaMenuScreenContent"), data)
+    o, L = f.original, f.ins
+    div, jsx = sid(rd, "Divider"), sid(rd, "jsx")
+    puts = [k for k, x in enumerate(L) if x[2] == "PutOwnByIndex" and o[x[0] + 1] == 22]
+    assert [o[L[k][0] + 3] for k in puts] == list(range(14)), [o[L[k][0] + 3] for k in puts]
+    delete, insert = [], {}
+    first, last = L[puts[0]][0], L[puts[13]][0]
+    # title: keep it in r35 instead of the list
+    delete.append((first, L[puts[0]][1])); insert[L[puts[0]][1]] = ins("Mov", 35, 23)
+    # the divider after Inventory goes
+    delete.append((L[puts[11]][1], L[puts[12]][1]))
+    lo, hi = L[puts[0]][1], L[puts[11]][1]
+    for k, (a, b, n, _) in enumerate(L):
+        if not (lo <= a < hi):
+            continue
+        if n == "LoadFromEnvironment" and o[a + 2] == 17 and o[a + 3] == 25 and L[k + 1][2] == "GetByIdShort" \
+                and o[L[k + 1][0] + 4] == jsx:
+            delete.append((a, L[k + 1][1])); insert[L[k + 1][1]] = ins("Mov", o[L[k + 1][0] + 1], 19)
+        if n == "GetById" and int.from_bytes(o[a + 4:a + 6], "little") == div:
+            le, no = L[k - 1], L[k + 1]
+            assert le[2] == "LoadFromEnvironment" and no[2] == "NewObject"
+            rd_, ro = o[a + 1], o[no[0] + 1]
+            delete.append((le[0], no[1]))
+            insert[no[1]] = (ins("NewObject", ro) + ins("LoadConstString", rd_, u16(sid(rd, "xxsmall")))
+                             + ins("PutNewOwnById", ro, rd_, u16(sid(rd, "paddingTop"))) + ins("Mov", rd_, 18))
+    S = lambda x: u16(sid(rd, x))
+    group = (ins("Mov", 36, 23) + ins("NewObject", 23)
+             + ins("LoadConstString", 24, S("large")) + ins("PutNewOwnById", 23, 24, S("borderRadius"))
+             + ins("LoadConstString", 24, S("hidden")) + ins("PutNewOwnById", 23, 24, S("overflow"))
+             + ins("LoadConstString", 24, S("small")) + ins("PutNewOwnById", 23, 24, S("marginX"))
+             + ins("PutNewOwnByIdShort", 23, 22, sid(rd, "children"))
+             + ins("Call3", 23, 19, 3, 18, 23)
+             + ins("NewArray", 22, u16(3))
+             + ins("PutOwnByIndex", 22, 35, 0) + ins("PutOwnByIndex", 22, 23, 1) + ins("PutOwnByIndex", 22, 36, 2))
+    delete.append((last, L[puts[13]][1])); insert[L[puts[13]][1]] = group
+    # the list array no longer holds 14 items
+    return f, f.rewrite(delete=delete, insert=insert)
+
+
 def literal(rd, data, fn, counts, values):
     """Operands (after the register) of an existing NewObjectWithBufferLong literal in function fn."""
     f = Fn(rd.r, fid_by_name(rd, fn), data)
@@ -139,7 +196,7 @@ def literal(rd, data, fn, counts, values):
 
 if __name__ == "__main__":
     rd, data = load(sys.argv[1])
-    for name, gen in (("TAB_ITEM", tab_bar_item), ("LINK_SECTION", link_section), ("HEADER_LINK", header_link), ("MAIN_MENU", main_menu)):
+    for name, gen in (("TAB_ITEM", tab_bar_item), ("LINK_SECTION", link_section), ("HEADER_LINK", header_link), ("MAIN_MENU", main_menu), ("LIST_ITEM", list_item), ("PERSONA_MENU", persona_menu)):
         f, body = gen(rd, data)
         print(f"{name}_ORIGINAL = \"{f.original.hex()}\"")
         print(f"{name}_PATCHED = \"{body.hex()}\"")

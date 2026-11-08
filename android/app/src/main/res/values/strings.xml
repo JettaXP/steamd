@@ -28,6 +28,7 @@
     <string name="step_sign">Sign with the steamd key</string>
     <string name="step_uninstall">Uninstall the official app</string>
     <string name="step_install">Install the patched app</string>
+    <string name="update_done">Done! Steam is updated, your account and Steam Guard stay as they were.</string>
     <string name="patch_done">Done! Open Steam, sign in and set up Steam Guard again.</string>
     <string name="patch_failed">Failed: %1$s</string>
     <string name="continue_">Continue</string>
@@ -110,6 +111,8 @@
     <string name="auto_error">error (%1$s)</string>
     <string name="auto_no_notif">Allow notifications so steamd can ask you to confirm updates</string>
     <string name="google_sans">Google Sans font</string>
+    <string name="hide_news">Hide News</string>
+    <string name="hide_news_desc">Removes the News tab from Steam\'s tab bar, the other tabs spread out evenly. Apply the patch again after changing</string>
     <string name="material_icons">Material icons</string>
     <string name="material_icons_desc">Material Symbols on Steam\'s tab bar with a Material 3 pill behind the active tab. Apply the patch again after changing</string>
     <string name="google_sans_desc">Replaces Motiva Sans in the whole Steam app. Apply the patch again after changing</string>

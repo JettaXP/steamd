@@ -9,7 +9,8 @@ import sys
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 PY = os.path.join(ROOT, "patch", "patch_steam.py")
 KT = os.path.join(ROOT, "android", "patcher", "src", "main", "kotlin", "com", "jettaxp", "steamd", "patcher", "SteamThemePatch.kt")
-NAMES = [("tab pill", "TAB_ITEM"), ("menu sections", "LINK_SECTION"), ("menu rows", "HEADER_LINK"), ("menu dividers", "MAIN_MENU")]
+NAMES = [("tab pill", "TAB_ITEM"), ("menu sections", "LINK_SECTION"), ("menu rows", "HEADER_LINK"), ("menu dividers", "MAIN_MENU"),
+         ("profile rows", "LIST_ITEM"), ("profile menu", "PERSONA_MENU")]
 
 nat = dict(re.findall(r'(\w+) = "([0-9a-f]+)"', open(sys.argv[1]).read()))
 chunks = lambda h: [h[i:i + 100] for i in range(0, len(h), 100)]
