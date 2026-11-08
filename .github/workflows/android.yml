@@ -76,3 +76,23 @@ jobs:
           cp "$APK" "out/steamd-$TAG.apk"
           git log -1 --pretty=%B | grep -v -E '^(Co-Authored-By|Claude-Session):' > "$RUNNER_TEMP/notes.md"
           gh release create "$TAG" "out/steamd-$TAG.apk" --title "steamd $TAG" --notes-file "$RUNNER_TEMP/notes.md" --target "$GITHUB_SHA" --latest
+      - name: Telegram
+        if: ${{ github.event_name != 'pull_request' }}
+        continue-on-error: true
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then
+            echo "::notice::TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID are not set, skipping"
+            exit 0
+          fi
+          APK="out/steamd-v${{ github.run_number }}.apk"
+          [ -f "$APK" ] || APK="$(ls out/*.apk | head -1)"
+          CAPTION="steamd v${{ github.run_number }}: $(git log -1 --pretty=%s)"
+          curl -sS --fail-with-body --retry 3 \
+            -F chat_id="$TG_CHAT" \
+            -F document=@"$APK;type=application/vnd.android.package-archive" \
+            -F caption="$CAPTION" \
+            "https://api.telegram.org/bot$TG_TOKEN/sendDocument" -o "$RUNNER_TEMP/tg.json"
+          python3 -c "import json,sys; j=json.load(open(sys.argv[1])); print('sent' if j.get('ok') else j)" "$RUNNER_TEMP/tg.json"
