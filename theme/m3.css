@@ -656,3 +656,91 @@
 :root:is(.rn_mobile_app, .steamd-preview) a.game_area_details_specs_ctn .icon { padding: 0 8px 0 14px !important; }
 :root:is(.rn_mobile_app, .steamd-preview) a.game_area_details_specs_ctn .label { padding: 10px 12px 10px 4px !important; }
 :root:is(.rn_mobile_app, .steamd-preview) .GMZfIVrEZB0- { min-height: 44px; display: flex !important; align-items: center; }
+
+/* News, Material 3 concept: chips, small section titles, full-bleed cards with tonal action chips */
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .Xu2D-jOAvXU- { align-items: center; gap: 8px; padding: 0 4px; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .Xu2D-jOAvXU- > a { padding: 0 !important; margin: 0 !important; height: auto !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .FfLcl-LcD3M- {
+  display: inline-flex; align-items: center;
+  height: 32px; padding: 0 16px !important; box-sizing: border-box;
+  border-radius: 8px !important;
+  background: var(--sd-sec-c) !important; color: var(--sd-on-sec-c) !important;
+  font-size: 14px !important; font-weight: 500 !important;
+  border: 0 !important; box-shadow: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .FfLcl-LcD3M-::after { display: none !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .FfLcl-LcD3M-.OH3M5fhybLw- {
+  background: var(--sd-p) !important; color: var(--sd-on-p) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .AWm6RNWZdM4- > span {
+  font-size: 14px !important; font-weight: 500 !important; color: var(--sd-on) !important; letter-spacing: .1px;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .Vi2EIPmgpxw- { display: none !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) a.Focusable:has(> .bOEXfqM27eQ-):not(.EventTileCarouselCtn *) {
+  background: var(--sd-c-high) !important;
+  border-radius: var(--sd-r-l) !important;
+  overflow: hidden;
+  padding-bottom: 60px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .bOEXfqM27eQ-:not(.EventTileCarouselCtn *) .OHAAoz1G1I4- { padding: 0 !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .bOEXfqM27eQ-:not(.EventTileCarouselCtn *) .ym2tgXthxzw- { padding: 0 16px !important; width: 100% !important; box-sizing: border-box; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .bOEXfqM27eQ-:not(.EventTileCarouselCtn *) .lSYF-snjG-M- { margin: 0 -16px 12px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .bOEXfqM27eQ-:not(.EventTileCarouselCtn *) .lSYF-snjG-M- :is(img, div) { border-radius: 0 !important; width: 100% !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .bOEXfqM27eQ-:not(.EventTileCarouselCtn *) .SlFMYJwWSU4- {
+  font-size: 22px !important; line-height: 28px !important; font-weight: 500 !important; color: var(--sd-on) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .bOEXfqM27eQ-:not(.EventTileCarouselCtn *) ._9lDmRzgjqs4- { color: var(--sd-on-var) !important; font-size: 14px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .KQCQvl8Sul0-:not(.EventTileCarouselCtn *) {
+  position: relative; z-index: 1;
+  width: auto !important; margin: -56px 12px 16px 28px !important; height: 40px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) ._79iz6FtxgOc- { justify-content: flex-start !important; gap: 8px; width: 100% !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .CakmFSjnZaQ- {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 32px; padding: 0 14px !important; width: auto !important; flex: 0 0 auto !important;
+  border-radius: 8px !important; background: var(--sd-sec-c) !important; color: var(--sd-on-sec-c) !important;
+  font-size: 14px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .CakmFSjnZaQ- :is(a, span) { color: inherit !important; display: inline-flex; align-items: center; gap: 8px; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .CakmFSjnZaQ- svg { fill: currentColor !important; color: inherit; width: 18px !important; height: 18px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .CakmFSjnZaQ-.ozmBXi7xV-Y- {
+  margin-left: auto !important; background: transparent !important; padding: 0 8px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .CakmFSjnZaQ-.ozmBXi7xV-Y- svg { background: transparent !important; transform: rotate(90deg); }
+
+/* Store home, Material 3 concept: small section titles, no group panels, separate game cards, underline tabs */
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) :is(.home_title, .txCSzBxQT1Q-) {
+  font-size: 14px !important; font-weight: 500 !important; color: var(--sd-on) !important;
+  letter-spacing: .1px !important; text-transform: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_discounts_block .home_title { text-transform: lowercase !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_discounts_block .home_title::first-letter { text-transform: uppercase; }
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_section_subtitle { color: var(--sd-on-var) !important; font-size: 12px !important; }
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) :is(.home_discount_games_ctn, .tW10-at9cMc-, .DiscountsAndEventsReady .SaleSectionCarousel) {
+  background: transparent !important; padding: 0 !important; border-radius: 0 !important; overflow: visible !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_discount_games_ctn { gap: 12px; }
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_discount_games_ctn .sale_capsule {
+  background: var(--sd-c-high) !important;
+  border-radius: var(--sd-r-m) !important;
+  overflow: hidden;
+  padding-bottom: 10px !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_discount_games_ctn .sale_capsule :is(.capsule_image_ctn, img) {
+  border-radius: 0 !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_discount_games_ctn .sale_capsule .discount_block {
+  margin: 10px 10px 0 auto !important; position: static !important; width: fit-content;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_tabs_row_ctn {
+  border-bottom: 1px solid var(--sd-outline) !important; background: transparent !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_tab_button {
+  background: transparent !important; border: 0 !important; border-radius: 0 !important;
+  color: var(--sd-on-var) !important; box-shadow: none !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_tab_button .tab_content { color: inherit !important; font-weight: 500; }
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .home_tab_button.active {
+  color: var(--sd-p) !important; box-shadow: inset 0 -3px 0 var(--sd-p) !important;
+}
+:root:is(.rn_mobile_app, .steamd-preview) body:not(#sd) .DiscountsAndEventsReady .SaleSectionCarousel :is(img, [class*="Capsule"]) { border-radius: var(--sd-r-m) !important; }
