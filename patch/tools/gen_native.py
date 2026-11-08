@@ -9,36 +9,49 @@ from hbcasm import Fn, load, fid_by_name, sid, ins, u16, u32
 LAYOUT_ANIMATION_MODULE = 395   # Metro id of react-native/Libraries/LayoutAnimation (checked against the __d call)
 
 
+REANIMATED_MODULE = 572          # Metro id of react-native-reanimated's index (checked against the __d call)
+
+
 def tab_bar_item(rd, data):
-    """BuiltinTabBarItem: Material 3 navigation bar item.
-    The focus line goes; the icon sits in a pill Box (borderRadius 'full', paddingY 'xxsmall'):
-    focused  -> paddingX 'gutter', marginX 'none', background 'neutral' (secondary container),
-    otherwise -> paddingX 'small', marginX 'xsmall' (same total width, so icons never shift).
-    On the focused item LayoutAnimation.easeInEaseOut() is armed, so the pill grows from the icon.
-    Room: the debug warnings, the focus line, hitSlop, the default position: relative, reloads of jsx."""
+    """BuiltinTabBarItem: Material 3 navigation bar item with an animated pill.
+    The focus line goes; the icon sits in a pill Box (borderRadius 'full', paddingY 'xxsmall',
+    background 'neutral' and paddingX 'gutter' when focused, paddingX 'small' otherwise) inside a Reanimated
+    Animated.View with layout={LinearTransition} and overflow: hidden. The wrapper carries marginHorizontal
+    8 (unfocused) or 0 (focused), so every item keeps its width while the wrapper's frame animates and clips
+    the pill: it grows out of the icon. (LayoutAnimation is off on Android in this React Native build.)
+    Room: the debug warnings, the focus line, hitSlop, the default position: relative, jsx reloads and the
+    object-tab check (an unknown tab already returns null through the undefined check)."""
     f = Fn(rd.r, fid_by_name(rd, "BuiltinTabBarItem"), data)
     S = lambda x: u16(sid(rd, x))
-    anim = (ins("GetGlobalObject", 17)
-            + ins("GetById", 17, 17, 0, S("__r"))
-            + ins("LoadConstInt", 14, u32(LAYOUT_ANIMATION_MODULE))
-            + ins("Call2", 17, 17, 3, 14)
-            + ins("GetByIdShort", 17, 17, 0, sid(rd, "default"))
-            + ins("GetById", 14, 17, 0, S("easeInEaseOut"))
-            + ins("Call1", 17, 14, 17))
     focused = (ins("LoadConstString", 17, S("gutter")) + ins("PutById", 10, 17, 0, S("paddingX"))
-               + ins("LoadConstString", 16, S("none")) + ins("LoadConstString", 11, S("neutral")) + anim)
+               + ins("LoadConstZero", 16)
+               + ins("LoadConstString", 11, S("neutral")))
     pill = (bytes([0x02, 10]) + literal(rd, data, "PendingRequestDetails", "05000400", 85239)
-            + ins("LoadConstString", 16, S("xsmall"))
+            + ins("LoadConstUInt8", 16, 8)
             + ins("LoadConstUndefined", 11)
             + ins("JmpFalse", 3 + len(focused), 15)
             + focused
-            + ins("PutById", 10, 16, 0, S("marginX"))
             + ins("PutById", 10, 11, 0, S("background"))
             + ins("PutNewOwnByIdShort", 10, 8, sid(rd, "children"))
-            + ins("Call3", 8, 2, 3, 5, 10))
+            + ins("Call3", 8, 2, 3, 5, 10)                                       # r8 = <Box pill>
+            + ins("NewObject", 10)                                               # wrapper style
+            + ins("LoadConstString", 11, S("hidden")) + ins("PutNewOwnById", 10, 11, S("overflow"))
+            + ins("PutNewOwnById", 10, 16, S("marginHorizontal"))
+            + ins("NewObject", 11)                                               # wrapper props
+            + ins("PutNewOwnByIdShort", 11, 10, sid(rd, "style"))
+            + ins("PutNewOwnByIdShort", 11, 8, sid(rd, "children"))
+            + ins("GetGlobalObject", 17)
+            + ins("GetById", 17, 17, 0, S("__r"))
+            + ins("LoadConstInt", 14, u32(REANIMATED_MODULE))
+            + ins("Call2", 17, 17, 3, 14)                                        # r17 = reanimated
+            + ins("GetById", 14, 17, 0, S("LinearTransition"))
+            + ins("PutNewOwnById", 11, 14, S("layout"))
+            + ins("GetByIdShort", 17, 17, 0, sid(rd, "default"))
+            + ins("GetById", 17, 17, 0, S("View"))
+            + ins("Call3", 8, 2, 3, 17, 11))                                     # r8 = <Animated.View>
     return f, f.rewrite(
-        delete=[(0x9F, 0xBC), (0x113, 0x11D), (0x132, 0x13B), (0x14E, 0x152), (0x160, 0x189), (0x1BA, 0x1C3),
-                (0x1F3, 0x209)],
+        delete=[(0x76, 0x8A), (0x9F, 0xBC), (0x113, 0x11D), (0x132, 0x13B), (0x14E, 0x152), (0x160, 0x189),
+                (0x1BA, 0x1C3), (0x1F3, 0x20D)],
         insert={0x13B: ins("Mov", 6, 2),
                 0x152: ins("LoadConstString", 16, S("small")) + ins("PutNewOwnById", 4, 16, S("paddingY")),
                 0x1B0: pill,
