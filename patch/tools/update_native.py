@@ -9,7 +9,8 @@ import sys
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 PY = os.path.join(ROOT, "patch", "patch_steam.py")
 KT = os.path.join(ROOT, "android", "patcher", "src", "main", "kotlin", "com", "jettaxp", "steamd", "patcher", "SteamThemePatch.kt")
-NAMES = [("tab pill", "TAB_ITEM"), ("menu sections", "LINK_SECTION"), ("menu rows", "HEADER_LINK"), ("menu dividers", "MAIN_MENU"),
+NAMES = [("tab item code", "TAB_BODY"), ("tab item header", "TAB_HEADER"), ("tab item closure", "TAB_CLOSURE"),
+         ("menu sections", "LINK_SECTION"), ("menu rows", "HEADER_LINK"), ("menu dividers", "MAIN_MENU"),
          ("profile rows", "LIST_ITEM"), ("profile menu", "PERSONA_MENU"),
          ("guard ring", "GUARD_RING"), ("guard track", "GUARD_TIMER")]
 

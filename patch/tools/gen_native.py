@@ -22,7 +22,7 @@ def fill_literal(rd, data):
     raise LookupError("absolute fill literal")
 
 
-def tab_bar_item(rd, data):
+def tab_bar_item(rd, data, label=False, size=None):
     """BuiltinTabBarItem: Material 3 navigation bar item.
     The focus line goes; the icon sits in a 64x32 pill Box (borderRadius 'full', padding 'xxsmall',
     paddingX 'gutter') that is the same on every tab, so nothing shifts. On the focused tab a Reanimated
@@ -52,13 +52,54 @@ def tab_bar_item(rd, data):
             + ins("JmpFalse", 3 + len(bg), 15) + bg
             + ins("PutNewOwnByIdShort", 10, 14, sid(rd, "children"))
             + ins("Call3", 8, 2, 3, 5, 10))
-    return f, f.rewrite(
-        delete=[(0x76, 0x8A), (0x9F, 0xBC), (0x113, 0x11D), (0x132, 0x13B), (0x14E, 0x152), (0x160, 0x189),
-                (0x1BA, 0x1C3), (0x1F3, 0x20D)],
-        insert={0x13B: ins("Mov", 6, 2),
-                0x152: ins("LoadConstString", 16, S("small")) + ins("PutNewOwnById", 4, 16, S("paddingY")),
-                0x1B0: pill,
-                0x1C3: ins("Mov", 11, 2)})
+    delete = [(0x76, 0x8A), (0x9F, 0xBC), (0x113, 0x11D), (0x132, 0x13B), (0x14E, 0x152), (0x160, 0x189),
+              (0x1BA, 0x1C3), (0x1F3, 0x20D)]
+    insert = {0x13B: ins("Mov", 6, 2),
+              0x152: ins("LoadConstString", 16, S("small")) + ins("PutNewOwnById", 4, 16, S("paddingY")),
+              0x1B0: pill,
+              0x1C3: ins("Mov", 11, 2)}
+    if label:
+        # <Text size="small" tone={focused ? 'info' : undefined}>{Localize(tab.name_token)}</Text> under the pill
+        text = (ins("GetGlobalObject", 16) + ins("GetById", 16, 16, 0, S("__r"))
+                + ins("LoadConstInt", 14, u32(LOCALIZE_MODULE)) + ins("Call2", 10, 16, 3, 14)
+                + ins("GetById", 10, 10, 0, S("Localize"))
+                + ins("GetById", 14, 11, 0, S("name_token")) + ins("Call2", 14, 10, 3, 14)
+                + ins("LoadConstInt", 10, u32(TEXT_MODULE)) + ins("Call2", 10, 16, 3, 10)
+                + ins("GetByIdShort", 10, 10, 0, sid(rd, "Text"))
+                + ins("NewObject", 17) + ins("PutNewOwnByIdShort", 17, 14, sid(rd, "children"))
+                + ins("LoadConstString", 14, S("small")) + ins("PutNewOwnById", 17, 14, S("size"))
+                + ins("PutNewOwnById", 17, 15, S("tone"))
+                + ins("Call3", 14, 2, 3, 10, 17) + ins("PutOwnByIndex", 7, 14, 3))
+        insert[0x1B0] = text + pill
+        delete.append((0x189, 0x18D)); insert[0x18D] = ins("NewArray", 7, u16(4))
+    return f, f.rewrite(delete=delete, insert=insert, size=size)
+
+
+LOCALIZE_MODULE = 1450          # exports.Localize
+TEXT_MODULE = 1589              # exports.Text (design system)
+TAB_DONOR = "FormZoo"           # Developer Zoo screen, only reachable for Valve staff
+
+
+def tab_bar_relocated(rd, data):
+    """BuiltinTabBarItem with labels does not fit its 525 bytes, so it is written over the body of an unused
+    function (FormZoo) and the tab bar module creates the tab item closure from that function instead.
+    Returns three byte replacements: donor body, donor function header, closure in the tab bar module."""
+    import struct
+    zoo_id, tab_id = fid_by_name(rd, TAB_DONOR), fid_by_name(rd, "BuiltinTabBarItem")
+    zoo = Fn(rd.r, zoo_id, data)
+    _, body = tab_bar_item(rd, data, label=True, size=zoo.size)
+    hz, ht = 128 + 16 * zoo_id, 128 + 16 * tab_id
+    old_hdr, tab_hdr = data[hz:hz + 16], data[ht:ht + 16]
+    w0, w1, w2 = struct.unpack("<III", tab_hdr[:12])
+    new_hdr = struct.pack("<III", (zoo.offset & 0x1FFFFFF) | (w0 & ~0x1FFFFFF), (zoo.size & 0x7FFF) | (w1 & ~0x7FFF), w2) + tab_hdr[12:]
+    assert struct.unpack("<I", old_hdr[:4])[0] & 0x1FFFFFF == zoo.offset
+    mod = Fn(rd.r, fid_by_name(rd, "useTabBarLayout") - 22, data)   # the tab bar module function (24934)
+    assert any(x[2] == "CreateClosure" and int.from_bytes(mod.original[x[0] + 3:x[0] + 5], "little") == tab_id for x in mod.ins)
+    k = next(k for k, x in enumerate(mod.ins) if x[2] == "CreateClosure" and int.from_bytes(mod.original[x[0] + 3:x[0] + 5], "little") == tab_id)
+    a, b = mod.ins[k][0], mod.ins[k + 1][1]
+    old_cl = bytes(mod.original[a:b])
+    new_cl = bytearray(old_cl); new_cl[3:5] = zoo_id.to_bytes(2, "little")
+    return (zoo.original, body), (old_hdr, new_hdr), (old_cl, bytes(new_cl))
 
 
 def row_style(rd, reg, tmp, tmp2):
@@ -270,6 +311,9 @@ def literal(rd, data, fn, counts, values):
 
 if __name__ == "__main__":
     rd, data = load(sys.argv[1])
+    for name, (old, new) in zip(("TAB_BODY", "TAB_HEADER", "TAB_CLOSURE"), tab_bar_relocated(rd, data)):
+        print(f"{name}_ORIGINAL = \"{old.hex()}\"")
+        print(f"{name}_PATCHED = \"{new.hex()}\"")
     for name, gen in (("TAB_ITEM", tab_bar_item), ("LINK_SECTION", link_section), ("HEADER_LINK", header_link), ("MAIN_MENU", main_menu), ("LIST_ITEM", list_item), ("PERSONA_MENU", persona_menu),
                       ("GUARD_RING", circular_progress), ("GUARD_TIMER", circular_timer)):
         f, body = gen(rd, data)

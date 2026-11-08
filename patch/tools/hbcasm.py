@@ -36,7 +36,7 @@ class Fn:
         self.ins = [(p.original_pos, p.next_pos, p.inst.name, [o.operand_type.name for o in p.inst.operands])
                     for p in parse_hbc_bytecode(h, reader)]
 
-    def rewrite(self, delete=(), insert=None):
+    def rewrite(self, delete=(), insert=None, size=None):
         """delete: [(start, end)] original byte ranges; insert: {original offset: bytes placed before it}."""
         insert = insert or {}
         dead = lambda a: any(s <= a < e for s, e in delete)
@@ -66,9 +66,10 @@ class Fn:
                 nrel = target(a + rel) - (newpos[a] + len(insert.get(a, b"")))
                 raw[1:1 + w] = nrel.to_bytes(w, "little", signed=True)
             body += raw
-        if len(body) > self.size:
-            raise ValueError(f"body grew: {len(body)} > {self.size}")
-        return bytes(body) + bytes(self.size - len(body))
+        size = size or self.size
+        if len(body) > size:
+            raise ValueError(f"body grew: {len(body)} > {size}")
+        return bytes(body) + bytes(size - len(body))
 
 
 def load(path):
