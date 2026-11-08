@@ -162,8 +162,10 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         val release = (_state.value.update as? UpdateState.Available)?.release ?: return@launch
         _state.update { it.copy(update = UpdateState.Downloading(release, 0f)) }
         try {
-            val file = com.jettaxp.steamd.update.Updater.download(getApplication(), release) { p ->
-                _state.update { s -> if (s.update is UpdateState.Downloading) s.copy(update = UpdateState.Downloading(release, p)) else s }
+            val file = withContext(Dispatchers.IO) {
+                com.jettaxp.steamd.update.Updater.download(getApplication(), release) { p ->
+                    _state.update { s -> if (s.update is UpdateState.Downloading) s.copy(update = UpdateState.Downloading(release, p)) else s }
+                }
             }
             _state.update { it.copy(update = UpdateState.Ready(release, file)) }
         } catch (e: Exception) {
