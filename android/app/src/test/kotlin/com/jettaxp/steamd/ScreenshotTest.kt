@@ -3,6 +3,8 @@ package com.jettaxp.steamd
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
@@ -33,6 +35,23 @@ class ScreenshotTest {
     private fun shot(name: String, content: @androidx.compose.runtime.Composable () -> Unit) {
         compose.setContent { SteamdTheme { Scaffold { p -> androidx.compose.foundation.layout.Box(Modifier.padding(p)) { content() } } } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/$name.png")
+    }
+
+    @Test fun wavyProgress() {
+        compose.mainClock.autoAdvance = false
+        compose.setContent {
+            SteamdTheme {
+                androidx.compose.material3.Surface {
+                    androidx.compose.foundation.layout.Column(Modifier.padding(24.dp)) {
+                        com.jettaxp.steamd.ui.components.WavyProgress(0.45f, Modifier.fillMaxWidth())
+                        androidx.compose.foundation.layout.Spacer(Modifier.padding(12.dp))
+                        com.jettaxp.steamd.ui.components.WavyProgress(0.9f, Modifier.fillMaxWidth())
+                    }
+                }
+            }
+        }
+        compose.mainClock.advanceTimeBy(250)
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/wavy.png")
     }
 
     @Test fun home() = shot("home") { HomeScreen(state, {}, {}) }

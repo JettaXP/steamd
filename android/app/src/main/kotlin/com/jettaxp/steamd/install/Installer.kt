@@ -52,6 +52,24 @@ object Installer {
         return results.first { it.action == ACTION_INSTALL }
     }
 
+    /** Installs a newer steamd over itself; Android shows its own update dialog. */
+    suspend fun installSelf(context: Context, apk: File): InstallerResult {
+        background = false
+        val pi = context.packageManager.packageInstaller
+        val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+        if (Build.VERSION.SDK_INT >= 31) params.setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_REQUIRED)
+        params.setAppPackageName(context.packageName)
+        val id = pi.createSession(params)
+        pi.openSession(id).use { session ->
+            session.openWrite("base.apk", 0, apk.length()).use { out ->
+                apk.inputStream().use { it.copyTo(out) }
+                session.fsync(out)
+            }
+            session.commit(sender(context, ACTION_SELF_UPDATE))
+        }
+        return results.first { it.action == ACTION_SELF_UPDATE }
+    }
+
     private fun sender(context: Context, action: String) = PendingIntent.getBroadcast(
         context, action.hashCode(),
         Intent(context, InstallReceiver::class.java).setAction(action),
@@ -60,6 +78,7 @@ object Installer {
 
     const val ACTION_INSTALL = "com.jettaxp.steamd.INSTALL"
     const val ACTION_UNINSTALL = "com.jettaxp.steamd.UNINSTALL"
+    const val ACTION_SELF_UPDATE = "com.jettaxp.steamd.SELF_UPDATE"
 }
 
 class InstallReceiver : BroadcastReceiver() {

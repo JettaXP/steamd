@@ -62,7 +62,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.jettaxp.steamd.BuildConfigInfo
+import androidx.compose.material3.CircularProgressIndicator
 import com.jettaxp.steamd.R
+import com.jettaxp.steamd.ui.components.WavyProgress
+import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material3.Button
+import androidx.compose.animation.core.animateFloatAsState
+import com.jettaxp.steamd.UpdateState
 import com.jettaxp.steamd.UiState
 import com.jettaxp.steamd.data.AppLanguage
 import com.jettaxp.steamd.data.AppTheme
@@ -83,6 +90,9 @@ class SettingsActions(
     val onClearOriginals: () -> Unit,
     val onExportKey: (android.net.Uri) -> Unit = {},
     val onImportKey: (android.net.Uri) -> Unit = {},
+    val onCheckUpdate: () -> Unit = {},
+    val onDownloadUpdate: () -> Unit = {},
+    val onInstallUpdate: () -> Unit = {},
 )
 
 private enum class Dialog { None, Language, Theme, CssUrl, ClearOriginals, ImportKey }
@@ -164,6 +174,8 @@ fun SettingsScreen(state: UiState, actions: SettingsActions, modifier: Modifier 
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(16.dp),
             )
+            Section(R.string.section_updates)
+            UpdateBlock(state.update, state.versionCode, actions)
             Spacer(Modifier.height(8.dp))
         }
     }
@@ -217,6 +229,43 @@ private fun themeLabel(t: AppTheme) = stringResource(when (t) {
     AppTheme.Light -> R.string.theme_light
     AppTheme.Dark -> R.string.theme_dark
 })
+
+@Composable
+private fun UpdateBlock(update: UpdateState, versionCode: Long, actions: SettingsActions) {
+    val current = stringResource(R.string.update_current, versionCode)
+    when (update) {
+        UpdateState.Idle, UpdateState.UpToDate -> Item(Icons.Filled.SystemUpdate, stringResource(R.string.update_check),
+            if (update == UpdateState.UpToDate) stringResource(R.string.update_latest, current) else current, onClick = actions.onCheckUpdate)
+        UpdateState.Checking -> ListItem(
+            headlineContent = { Text(stringResource(R.string.update_checking)) },
+            supportingContent = { Text(current) },
+            leadingContent = { Icon(Icons.Filled.SystemUpdate, null) },
+            trailingContent = { CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp) },
+        )
+        is UpdateState.Available -> Item(Icons.Filled.Download, stringResource(R.string.update_available, update.release.tag),
+            stringResource(R.string.update_download, update.release.size / 1_048_576f), onClick = actions.onDownloadUpdate)
+        is UpdateState.Downloading -> Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Text(stringResource(R.string.update_downloading, update.release.tag), style = MaterialTheme.typography.bodyLarge)
+            Spacer(Modifier.height(12.dp))
+            val progress by animateFloatAsState(update.progress, label = "update")
+            WavyProgress(progress, Modifier.fillMaxWidth())
+            Spacer(Modifier.height(4.dp))
+            Text("${(update.progress * 100).toInt()}%", style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        is UpdateState.Ready -> Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Text(stringResource(R.string.update_ready, update.release.tag), style = MaterialTheme.typography.bodyLarge)
+            Spacer(Modifier.height(12.dp))
+            Button(onClick = actions.onInstallUpdate, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Filled.SystemUpdate, null)
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(R.string.update_install))
+            }
+        }
+        is UpdateState.Failed -> Item(Icons.Filled.ErrorOutline, stringResource(R.string.update_failed),
+            update.message, onClick = actions.onCheckUpdate)
+    }
+}
 
 @Composable
 private fun Section(title: Int) {

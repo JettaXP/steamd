@@ -116,4 +116,15 @@
     <string name="material_icons">Material icons</string>
     <string name="material_icons_desc">Material Symbols on Steam\'s tab bar with a Material 3 pill behind the active tab. Apply the patch again after changing</string>
     <string name="google_sans_desc">Replaces Motiva Sans in the whole Steam app. Apply the patch again after changing</string>
+    <string name="section_updates">Updates</string>
+    <string name="update_current">steamd v%1$d</string>
+    <string name="update_check">Check for updates</string>
+    <string name="update_latest">You have the latest version: %1$s</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_available">Update %1$s available</string>
+    <string name="update_download">Tap to download (%1$.1f MB)</string>
+    <string name="update_downloading">Downloading %1$s</string>
+    <string name="update_ready">%1$s is downloaded</string>
+    <string name="update_install">Update</string>
+    <string name="update_failed">Could not update, tap to retry</string>
 </resources>

@@ -31,6 +31,16 @@ sealed interface Compat {
     data object ForeignPatch : Compat
 }
 
+sealed interface UpdateState {
+    data object Idle : UpdateState
+    data object Checking : UpdateState
+    data object UpToDate : UpdateState
+    data class Available(val release: com.jettaxp.steamd.update.Release) : UpdateState
+    data class Downloading(val release: com.jettaxp.steamd.update.Release, val progress: Float) : UpdateState
+    data class Ready(val release: com.jettaxp.steamd.update.Release, val file: java.io.File) : UpdateState
+    data class Failed(val message: String) : UpdateState
+}
+
 sealed interface PatchFlow {
     data object Idle : PatchFlow
     data class Confirm(val update: Boolean) : PatchFlow
@@ -57,6 +67,8 @@ data class UiState(
     val googleSans: Boolean = true,
     val materialIcons: Boolean = true,
     val hideNews: Boolean = false,
+    val update: UpdateState = UpdateState.Idle,
+    val versionCode: Long = 0,
 )
 
 class SteamdViewModel(app: Application) : AndroidViewModel(app) {
@@ -73,6 +85,7 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
     init {
         refresh()
         AutoRepatchWorker.schedule(app)
+        checkUpdate()
     }
 
     fun refresh() = viewModelScope.launch {
@@ -131,6 +144,38 @@ class SteamdViewModel(app: Application) : AndroidViewModel(app) {
         settings.cssUrl = u
         _state.update { it.copy(cssUrl = u) }
         return true
+    }
+
+    fun checkUpdate() = viewModelScope.launch {
+        val ctx = getApplication<Application>()
+        _state.update { it.copy(update = UpdateState.Checking, versionCode = com.jettaxp.steamd.update.Updater.currentVersion(ctx)) }
+        val next = runCatching { com.jettaxp.steamd.update.Updater.latest() }
+        _state.update { s ->
+            s.copy(update = next.fold(
+                onSuccess = { r -> if (r != null && r.version > s.versionCode) UpdateState.Available(r) else UpdateState.UpToDate },
+                onFailure = { UpdateState.Failed(it.message ?: it.javaClass.simpleName) },
+            ))
+        }
+    }
+
+    fun downloadUpdate() = viewModelScope.launch {
+        val release = (_state.value.update as? UpdateState.Available)?.release ?: return@launch
+        _state.update { it.copy(update = UpdateState.Downloading(release, 0f)) }
+        try {
+            val file = com.jettaxp.steamd.update.Updater.download(getApplication(), release) { p ->
+                _state.update { s -> if (s.update is UpdateState.Downloading) s.copy(update = UpdateState.Downloading(release, p)) else s }
+            }
+            _state.update { it.copy(update = UpdateState.Ready(release, file)) }
+        } catch (e: Exception) {
+            _state.update { it.copy(update = UpdateState.Failed(e.message ?: e.javaClass.simpleName)) }
+        }
+    }
+
+    fun installUpdate() = viewModelScope.launch {
+        val ready = _state.value.update as? UpdateState.Ready ?: return@launch
+        val r = runCatching { com.jettaxp.steamd.install.Installer.installSelf(getApplication(), ready.file) }
+        r.exceptionOrNull()?.let { e -> _state.update { it.copy(update = UpdateState.Failed(e.message ?: e.javaClass.simpleName)) } }
+        r.getOrNull()?.takeIf { !it.success }?.let { res -> _state.update { it.copy(update = UpdateState.Failed(res.message ?: "install cancelled")) } }
     }
 
     fun setHideNews(on: Boolean) {
