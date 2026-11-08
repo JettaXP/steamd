@@ -193,6 +193,54 @@ def persona_menu(rd, data):
     return f, f.rewrite(delete=delete, insert=insert)
 
 
+def circular_progress(rd, data):
+    """CircularProgress (Steam Guard code ring): a 4dp progress arc with round ends over a thin dashed track,
+    as in the Material 3 concept. Room: Math is read once into r16, HermesInternal.concat is reused from r17."""
+    f = Fn(rd.r, fid_by_name(rd, "CircularProgress", 531), data)
+    o, L = f.original, f.ins
+    math, concat, hi = sid(rd, "Math"), sid(rd, "concat"), sid(rd, "HermesInternal")
+    delete, insert = [], {}
+    # stroke width 10 -> 4 (also the radius inset)
+    k = next(k for k, x in enumerate(L) if x[2] == "LoadConstUInt8" and o[x[0] + 1] == 10 and o[x[0] + 2] == 10)
+    delete.append((L[k][0], L[k][1])); insert[L[k][1]] = ins("LoadConstUInt8", 10, 4)
+    # Math: keep it in r16
+    first = True
+    for a, b, n, _ in L:
+        if n == "TryGetById" and int.from_bytes(o[a + 4:a + 6], "little") == math:
+            if first:
+                delete.append((a, b)); insert[b] = bytes(o[a:a + 1]) + bytes([16]) + bytes(o[a + 2:b]) + ins("Mov", o[a + 1], 16)
+                first = False
+            else:
+                delete.append((a, b)); insert[b] = ins("Mov", o[a + 1], 16)
+    # second HermesInternal.concat -> r17 (still holds concat from the path string)
+    his = [k for k, x in enumerate(L) if x[2] == "TryGetById" and int.from_bytes(o[x[0] + 4:x[0] + 6], "little") == hi]
+    assert len(his) == 2
+    k = his[1]
+    assert L[k + 1][2] == "GetByIdShort" and o[L[k + 1][0] + 4] == concat
+    delete.append((L[k][0], L[k + 1][1])); insert[L[k + 1][1]] = ins("Mov", o[L[k + 1][0] + 1], 17)
+    # track: thin dashed line
+    k = next(k for k, x in enumerate(L) if x[2] == "PutById" and int.from_bytes(o[x[0] + 4:x[0] + 6], "little") == sid(rd, "d")
+             and o[x[0] + 1] == 7)
+    insert[L[k][1]] = (ins("LoadConstUInt8", 4, 3) + ins("PutById", 7, 4, 0, u16(sid(rd, "strokeWidth")))
+                       + ins("LoadConstStringLongIndex", 4, u32(sid(rd, "12 12")))
+                       + ins("PutNewOwnById", 7, 4, u16(sid(rd, "strokeDasharray"))))
+    # progress arc: round ends
+    k = next(k for k, x in enumerate(L) if x[2] == "LoadConstString" and int.from_bytes(o[x[0] + 2:x[0] + 4], "little") == sid(rd, "square"))
+    delete.append((L[k][0], L[k][1])); insert[L[k][1]] = ins("LoadConstString", o[L[k][0] + 1], u16(sid(rd, "round")))
+    return f, f.rewrite(delete=delete, insert=insert)
+
+
+def circular_timer(rd, data):
+    """CircularTimer: the track uses the neutral (secondary container) background instead of the near-black one."""
+    f = Fn(rd.r, fid_by_name(rd, "CircularTimer", 179), data)
+    body = bytearray(f.original)
+    sec = sid(rd, "secondary").to_bytes(2, "little")
+    hits = [a for a, b, n, _ in f.ins if n == "GetById" and bytes(f.original[a + 4:a + 6]) == sec]
+    assert len(hits) == 1
+    body[hits[0] + 4:hits[0] + 6] = sid(rd, "neutral").to_bytes(2, "little")
+    return f, bytes(body)
+
+
 def literal(rd, data, fn, counts, values):
     """Operands (after the register) of an existing NewObjectWithBufferLong literal in function fn."""
     f = Fn(rd.r, fid_by_name(rd, fn), data)
@@ -206,7 +254,8 @@ def literal(rd, data, fn, counts, values):
 
 if __name__ == "__main__":
     rd, data = load(sys.argv[1])
-    for name, gen in (("TAB_ITEM", tab_bar_item), ("LINK_SECTION", link_section), ("HEADER_LINK", header_link), ("MAIN_MENU", main_menu), ("LIST_ITEM", list_item), ("PERSONA_MENU", persona_menu)):
+    for name, gen in (("TAB_ITEM", tab_bar_item), ("LINK_SECTION", link_section), ("HEADER_LINK", header_link), ("MAIN_MENU", main_menu), ("LIST_ITEM", list_item), ("PERSONA_MENU", persona_menu),
+                      ("GUARD_RING", circular_progress), ("GUARD_TIMER", circular_timer)):
         f, body = gen(rd, data)
         print(f"{name}_ORIGINAL = \"{f.original.hex()}\"")
         print(f"{name}_PATCHED = \"{body.hex()}\"")
