@@ -343,16 +343,33 @@ def search_box(rd, data):
 
 
 def header_nav(rd, data):
-    """HeaderNav (Menu / Wishlist / Wallet under the store search): starts at the left edge like a tab row
-    and uses 14sp text on phones too. Room: the responsive font size lookup."""
+    """HeaderNav (Menu / Wishlist / Wallet under the store search) as a Material tab row: it starts at the
+    left edge with 14sp text, and Menu, which opens the store sections, is the selected tab with the accent
+    colour and an indicator line ('#1A9FFF' becomes the palette's primary).
+    Room: the responsive font size lookup and reloads of jsx (r2), jsxs (r6) and Box (r5)."""
     f = Fn(rd.r, fid_by_name(rd, "HeaderNav", 827), data)
     o = f.original
     assert o[0x20] == 46 and o[0x24] == 55 and o[0x2A] == 118 and o[0x2C] == 2 and o[0x3A] == 83 and o[0x3B] == 21
     assert o[0xE5] == 1 and o[0xE6] == 4 and o[0xEF] == 115 and o[0xF0] == 15
-    return f, f.rewrite(delete=[(0x20, 0x2A), (0x2C, 0x3F)],
-                        insert={0x3F: ins("LoadConstUInt8", 21, 14),
-                                0xEF: ins("LoadConstString", 15, _s16(rd, "flexStart"))
-                                      + ins("PutById", 4, 15, 0, _s16(rd, "justifyContent"))})
+    jsx, jsxs, box = sid(rd, "jsx"), sid(rd, "jsxs"), sid(rd, "Box")
+    assert (o[0x9B], o[0x9C], o[0x9F]) == (54, 2, jsx) and (o[0xD7], o[0xD8], o[0xDB]) == (54, 6, jsxs)
+    assert (o[0xE0], o[0xE1], o[0xE4]) == (54, 5, box)
+    delete = [(0x20, 0x2A), (0x2C, 0x3F)]
+    insert = {0x3F: ins("LoadConstUInt8", 21, 14),
+              0xEF: ins("LoadConstString", 15, _s16(rd, "flexStart")) + ins("PutById", 4, 15, 0, _s16(rd, "justifyContent"))}
+    for at, name, src in ((0x102, jsxs, 6), (0x10B, box, 5), (0x13E, jsx, 2), (0x195, jsx, 2), (0x1D2, jsx, 2),
+                          (0x1DB, box, 5), (0x1F4, jsx, 2)):
+        assert o[at] == 46 and o[at + 4] == 54 and o[at + 8] == name and o[at + 6] == o[at + 1], hex(at)
+        delete.append((at, at + 9)); insert[at + 9] = ins("Mov", o[at + 5], src)
+    assert o[0x127] == 64 and o[0x12C] == 64 and o[0x169] == 59 and o[0x16F] == 46 and o[0x1A8] == 2 and o[0x1B6] == 84
+    insert[0x12C] = (ins("NewObject", 18) + ins("LoadConstUInt8", 19, 2) + ins("PutNewOwnById", 18, 19, _s16(rd, "borderBottomWidth"))
+                     + ins("LoadConstString", 19, _s16(rd, "#1A9FFF")) + ins("PutNewOwnById", 18, 19, _s16(rd, "borderBottomColor"))
+                     + ins("LoadConstUInt8", 19, 6) + ins("PutNewOwnById", 18, 19, _s16(rd, "paddingBottom"))
+                     + ins("PutNewOwnByIdShort", 7, 18, sid(rd, "style")))
+    tone = lambda obj, tmp: ins("LoadConstString", tmp, _s16(rd, "info")) + ins("PutNewOwnById", obj, tmp, _s16(rd, "tone"))
+    insert[0x16F] = tone(10, 18)
+    insert[0x1B6] = tone(15, 19)
+    return f, f.rewrite(delete=delete, insert=insert)
 
 
 def three_column_header(rd, data):
