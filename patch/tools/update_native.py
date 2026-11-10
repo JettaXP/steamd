@@ -12,7 +12,8 @@ KT = os.path.join(ROOT, "android", "patcher", "src", "main", "kotlin", "com", "j
 NAMES = [("tab item code", "TAB_BODY"), ("tab item header", "TAB_HEADER"), ("tab item closure", "TAB_CLOSURE"),
          ("menu sections", "LINK_SECTION"), ("menu rows", "HEADER_LINK"), ("menu dividers", "MAIN_MENU"),
          ("profile rows", "LIST_ITEM"), ("profile menu", "PERSONA_MENU"),
-         ("guard ring", "GUARD_RING"), ("guard track", "GUARD_TIMER")]
+         ("guard ring", "GUARD_RING"), ("guard track", "GUARD_TIMER"),
+         ("search pill", "SEARCH_BOX"), ("store nav", "HEADER_NAV"), ("header title", "HEADER_TITLE")]
 
 nat = dict(re.findall(r'(\w+) = "([0-9a-f]+)"', open(sys.argv[1]).read()))
 chunks = lambda h: [h[i:i + 100] for i in range(0, len(h), 100)]

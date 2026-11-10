@@ -313,6 +313,67 @@ def circular_timer(rd, data):
     return f, bytes(body)
 
 
+def _s16(rd, x):
+    """String id as a 16-bit operand; fails when the string needs a long index."""
+    i = sid(rd, x)
+    assert i <= 0xFFFF, x
+    return u16(i)
+
+
+def search_box(rd, data):
+    """SearchBox (store header): a full-radius pill with a little horizontal padding.
+    Room: three reloads of jsx, which is still in r20."""
+    f = Fn(rd.r, fid_by_name(rd, "SearchBox", 790), data)
+    o = f.original
+    jsx = sid(rd, "jsx")
+    lit = next(a for a, b, n, _ in f.ins if n == "NewObjectWithBufferLong" and o[a + 1] == 0 and o[a + 2:a + 6] == bytes.fromhex("06000500"))
+    after = next(b for a, b, n, _ in f.ins if a == lit)
+    assert o[after] == 3 and o[after + 1] == 20                      # NewObject r20 follows the Box literal
+    first = next(a for a, b, n, _ in f.ins if n == "GetByIdShort" and o[a + 1] == 20 and o[a + 4] == jsx)
+    delete, insert = [], {}
+    for k, (a, b, n, _) in enumerate(f.ins):
+        if n == "GetByIdShort" and o[a + 4] == jsx and a > first and o[a + 1] in (7, 12) and len(delete) < 3:
+            pa = f.ins[k - 1]
+            assert pa[2] == "LoadFromEnvironment" and o[pa[0] + 1] == o[a + 2]
+            delete.append((pa[0], b)); insert[b] = ins("Mov", o[a + 1], 20)
+    assert len(delete) == 3
+    insert[after] = (ins("LoadConstString", 21, _s16(rd, "full")) + ins("PutNewOwnById", 0, 21, _s16(rd, "borderRadius"))
+                     + ins("LoadConstString", 21, _s16(rd, "xsmall")) + ins("PutNewOwnById", 0, 21, _s16(rd, "paddingX")))
+    return f, f.rewrite(delete=delete, insert=insert)
+
+
+def header_nav(rd, data):
+    """HeaderNav (Menu / Wishlist / Wallet under the store search): starts at the left edge like a tab row
+    and uses 14sp text on phones too. Room: the responsive font size lookup."""
+    f = Fn(rd.r, fid_by_name(rd, "HeaderNav", 827), data)
+    o = f.original
+    assert o[0x20] == 46 and o[0x24] == 55 and o[0x2A] == 118 and o[0x2C] == 2 and o[0x3A] == 83 and o[0x3B] == 21
+    assert o[0xE5] == 1 and o[0xE6] == 4 and o[0xEF] == 115 and o[0xF0] == 15
+    return f, f.rewrite(delete=[(0x20, 0x2A), (0x2C, 0x3F)],
+                        insert={0x3F: ins("LoadConstUInt8", 21, 14),
+                                0xEF: ins("LoadConstString", 15, _s16(rd, "flexStart"))
+                                      + ins("PutById", 4, 15, 0, _s16(rd, "justifyContent"))})
+
+
+def three_column_header(rd, data):
+    """ThreeColumnHeader (News, Steam Guard, Notifications, ...): Material top bar. The side boxes shrink to
+    their content and the centre (title + menu button) fills the row, so the title sits at the left and the
+    menu button next to the avatar. Room: the flexBasis styles, the side literals and the jsx / Box reloads."""
+    f = Fn(rd.r, fid_by_name(rd, "ThreeColumnHeader", 192), data)
+    o = f.original
+    assert o[0x28] == 1 and o[0x44] == 2 and o[0x8B] == 2 and o[0x75:0x79] == bytes([68, 4, 6, 1])
+    row = o[0x2A:0x32]                                                  # flexDirection row, alignItems center, spaceBetween
+    side = lambda r, first: ((ins("LoadConstString", 10, _s16(rd, "row")) if first else b"") + ins("NewObject", r)
+                             + ins("PutNewOwnByIdShort", r, 10, sid(rd, "flexDirection")))
+    wrap = (bytes([1, 11]) + row + ins("LoadConstUInt8", 7, 1)
+            + ins("PutNewOwnById", 11, 7, _s16(rd, "flexGrow")) + ins("PutNewOwnById", 11, 7, _s16(rd, "flexShrink"))
+            + ins("PutNewOwnByIdShort", 11, 6, sid(rd, "children")) + ins("Call3", 6, 9, 0, 2, 11))
+    assert sid(rd, "flexDirection") < 256 and sid(rd, "children") < 256
+    return f, f.rewrite(delete=[(0x44, 0x61), (0x79, 0xA6)],
+                        insert={0x61: side(4, True), 0x75: wrap,
+                                0xA6: ins("Mov", 7, 9) + ins("Mov", 6, 2) + side(5, False)})
+
+
 def literal(rd, data, fn, counts, values):
     """Operands (after the register) of an existing NewObjectWithBufferLong literal in function fn."""
     f = Fn(rd.r, fid_by_name(rd, fn), data)
@@ -330,7 +391,8 @@ if __name__ == "__main__":
         print(f"{name}_ORIGINAL = \"{old.hex()}\"")
         print(f"{name}_PATCHED = \"{new.hex()}\"")
     for name, gen in (("TAB_ITEM", tab_bar_item), ("LINK_SECTION", link_section), ("HEADER_LINK", header_link), ("MAIN_MENU", main_menu), ("LIST_ITEM", list_item), ("PERSONA_MENU", persona_menu),
-                      ("GUARD_RING", circular_progress), ("GUARD_TIMER", circular_timer)):
+                      ("GUARD_RING", circular_progress), ("GUARD_TIMER", circular_timer),
+                      ("SEARCH_BOX", search_box), ("HEADER_NAV", header_nav), ("HEADER_TITLE", three_column_header)):
         f, body = gen(rd, data)
         print(f"{name}_ORIGINAL = \"{f.original.hex()}\"")
         print(f"{name}_PATCHED = \"{body.hex()}\"")
