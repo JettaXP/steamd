@@ -663,7 +663,7 @@
 :root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .FfLcl-LcD3M- {
   display: inline-flex; align-items: center;
   height: 32px; padding: 0 16px !important; margin: 0 !important; box-sizing: border-box;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
   background: var(--sd-sec-c) !important; color: var(--sd-on-sec-c) !important;
   font-size: 14px !important; font-weight: 500 !important;
   border: 0 !important; box-shadow: none !important;
@@ -671,6 +671,7 @@
 :root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .FfLcl-LcD3M-::after { display: none !important; }
 :root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .FfLcl-LcD3M-.OH3M5fhybLw- {
   background: var(--sd-p) !important; color: var(--sd-on-p) !important;
+  border-radius: 999px !important;
 }
 :root:is(.rn_mobile_app, .steamd-preview) body.events_hub:not(#sd) .AWm6RNWZdM4- > span {
   font-size: 14px !important; font-weight: 500 !important; color: var(--sd-on) !important; letter-spacing: .1px;
