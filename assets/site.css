@@ -280,3 +280,13 @@ pre {
   .phone { width: 100%; max-width: 280px; }
   .hero h1 { font-size: 36px; line-height: 44px; }
 }
+
+.apk-meta { opacity: .8; font-variant-numeric: tabular-nums; }
+.apk-meta:empty { display: none; }
+.apk-card { display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 20px 24px; margin: 16px 0 28px; flex-wrap: wrap; }
+.apk-icon { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); flex: none; }
+.apk-icon md-icon { font-size: 30px; --md-icon-size: 30px; }
+.apk-text { flex: 1 1 260px; min-width: 0; }
+.apk-text h3 { margin: 0 0 4px; }
+.apk-text p { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+.manual-title { margin: 8px 0 4px; }

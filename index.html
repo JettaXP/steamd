@@ -8,6 +8,11 @@
   <meta name="theme-color" content="#111318" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f9f9ff" media="(prefers-color-scheme: light)">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://steamd.jettax.xyz/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="keywords" content="steamd, Steam, Android, Material 3, Material You, тема, патч, Steam Guard, APK">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"steamd","applicationCategory":"UtilitiesApplication","operatingSystem":"Android 8.0+","description":"Неофициальный патч темы Material 3 для Android-приложения Steam: палитра Material You, шрифты и тема магазина.","url":"https://steamd.jettax.xyz/","downloadUrl":"https://github.com/JettaXP/steamd/releases/latest/download/steamd.apk","image":"https://steamd.jettax.xyz/assets/og.png","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"sameAs":["https://github.com/JettaXP/steamd"]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"steamd","url":"https://steamd.jettax.xyz/"}</script>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="steamd">
   <meta property="og:url" content="https://steamd.jettax.xyz/">
@@ -88,9 +93,12 @@
           steamd — патч, который перекрашивает официальное приложение Steam в спокойную палитру Material 3, меняет шрифт и подключает свою тему для магазина и новостей.
         </p>
         <div class="actions">
-          <md-filled-button href="#install">
-            <md-icon slot="icon">download</md-icon><span data-i18n="hero.install">Как установить</span>
+          <md-filled-button data-apk href="https://github.com/JettaXP/steamd/releases/latest/download/steamd.apk">
+            <md-icon slot="icon">android</md-icon><span data-i18n="hero.apk">Скачать APK</span> <span class="apk-meta"></span>
           </md-filled-button>
+          <md-outlined-button href="#install">
+            <md-icon slot="icon">help</md-icon><span data-i18n="hero.install">Как установить</span>
+          </md-outlined-button>
           <md-outlined-button href="https://github.com/JettaXP/steamd" target="_blank">
             <md-icon slot="icon">code</md-icon><span data-i18n="hero.source">Исходный код</span>
           </md-outlined-button>
@@ -179,6 +187,17 @@
 
     <section id="install" class="section">
       <h2 class="md-typescale-headline-medium" data-i18n="install.title">Установка</h2>
+      <md-outlined-card class="apk-card">
+        <div class="apk-icon"><md-icon>android</md-icon></div>
+        <div class="apk-text">
+          <h3 class="md-typescale-title-large" data-i18n="apk.title">Приложение steamd</h3>
+          <p class="md-typescale-body-medium" data-i18n="apk.text">Патчит Steam прямо на телефоне: копирует APK, применяет тему, подписывает и устанавливает. Компьютер не нужен. Android 8.0 и новее.</p>
+        </div>
+        <md-filled-button data-apk href="https://github.com/JettaXP/steamd/releases/latest/download/steamd.apk">
+          <md-icon slot="icon">download</md-icon><span data-i18n="apk.download">Скачать APK</span> <span class="apk-meta"></span>
+        </md-filled-button>
+      </md-outlined-card>
+      <h3 class="md-typescale-title-medium manual-title" data-i18n="install.manual">Вручную, через компьютер</h3>
       <p class="md-typescale-body-medium muted">
         <span data-i18n="install.req">Понадобятся:</span>
         Python 3.10+, Java 11+, adb, <a href="https://github.com/patrickfav/uber-apk-signer/releases" target="_blank">uber-apk-signer</a>

@@ -74,8 +74,33 @@ jobs:
             exit 0
           fi
           cp "$APK" "out/steamd-$TAG.apk"
+          cp "$APK" "out/steamd.apk"
           git log -1 --pretty=%B | grep -v -E '^(Co-Authored-By|Claude-Session):' > "$RUNNER_TEMP/notes.md"
-          gh release create "$TAG" "out/steamd-$TAG.apk" --title "steamd $TAG" --notes-file "$RUNNER_TEMP/notes.md" --target "$GITHUB_SHA" --latest
+          gh release create "$TAG" "out/steamd-$TAG.apk" "out/steamd.apk" --title "steamd $TAG" --notes-file "$RUNNER_TEMP/notes.md" --target "$GITHUB_SHA" --latest
+      - name: Site download link
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ github.run_number }}
+        run: |
+          gh release view "$TAG" > /dev/null 2>&1 || exit 0
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
+            --jq '{tag: .tag_name, date: .published_at} + (.assets | map(select(.name | test("^steamd-v[0-9]+\\.apk$"))) | .[0] | {url: .browser_download_url, size: .size})' \
+            > "$RUNNER_TEMP/latest.json"
+          git fetch -q origin main
+          git checkout -q -B site origin/main
+          cp "$RUNNER_TEMP/latest.json" latest.json
+          sed -i "s|<lastmod>[^<]*</lastmod>|<lastmod>$(date -u +%F)</lastmod>|" sitemap.xml
+          git diff --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -qam "Site: download link for $TAG"
+          for attempt in 1 2 3 4 5; do
+            git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0
+            sleep $((attempt * 10))
+          done
+          exit 1
       - name: Telegram
         if: ${{ github.event_name != 'pull_request' }}
         continue-on-error: true

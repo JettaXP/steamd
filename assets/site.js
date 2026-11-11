@@ -8,7 +8,9 @@ const EN = {
   'chip.unofficial': 'Unofficial project',
   'hero.title': 'Material 3 for Steam on Android',
   'hero.lead': 'steamd is a patch that recolours the official Steam app with a calm Material 3 palette, swaps the font and adds a custom theme for the store and news.',
-  'hero.install': 'How to install', 'hero.source': 'Source code',
+  'hero.install': 'How to install', 'hero.source': 'Source code', 'hero.apk': 'Download APK',
+  'apk.title': 'steamd app', 'apk.text': 'Patches Steam right on the phone: copies the APKs, applies the theme, signs and installs them. No computer needed. Android 8.0 and newer.',
+  'apk.download': 'Download APK', 'install.manual': 'Manually, with a computer',
   'art.account': 'This account', 'art.copy': 'Tap to copy code', 'art.scan': 'Scan QR code',
   'art.news': 'News', 'art.shop': 'Shop',
   'features.title': 'What the patch changes',
@@ -170,3 +172,17 @@ let savedSeed = '';
 try { savedSeed = localStorage.getItem('steamd-seed') || ''; } catch (e) {}
 applySeed(/^#[0-9A-F]{6}$/i.test(savedSeed) ? savedSeed.toUpperCase() : '');
 setLang(document.documentElement.lang === 'en' ? 'en' : 'ru');
+
+(async () => {
+  try {
+    const r = await fetch('latest.json', { cache: 'no-cache' });
+    if (!r.ok) return;
+    const d = await r.json();
+    if (!d || !d.url) return;
+    document.querySelectorAll('[data-apk]').forEach((el) => {
+      el.href = d.url;
+      const meta = el.querySelector('.apk-meta');
+      if (meta) meta.textContent = [d.tag, d.size ? `${(d.size / 1048576).toFixed(1)} MB` : ''].filter(Boolean).join(' · ');
+    });
+  } catch (e) {}
+})();
